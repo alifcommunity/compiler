@@ -45,7 +45,7 @@ $ alif foo.alif bar.app log.txt
 
 Linux
 ```
-g++ -m64 -std=c++11 -Wl,--as-needed -finput-charset=utf-8 -Wall -fexceptions -O2 -Os -s -DLINUX -Wl,--gc-sections -Wl,--hash-style=both -Wl,-Bstatic -static -static-libgcc -static-libstdc++ -Wunused-but-set-variable -I"/usr/local/include/aliflibwx" -I"Src" "Src/alif.cpp" -o "alif"
+g++ -m64 -std=c++11 -Wl,--as-needed -finput-charset=utf-8 -Wall -fexceptions -O2 -Os -s -DLINUX -Wl,--gc-sections -Wl,--hash-style=both -Wl,-Bstatic -static -static-libgcc -static-libstdc++ -Wunused-but-set-variable -I"/usr/local/include/aliflibwx" -I"./" "alif.cpp" -o "alif"
 ```
 
 Windows
@@ -55,6 +55,11 @@ g++ -Wl,-subsystem,console -mconsole -Wno-unused -m32 -std=c++11 -finput-charset
 g++ -Wl,-subsystem,console -mconsole -m32 -std=c++11 -finput-charset=utf-8 -Wall -static-libgcc -static-libstdc++ -fexceptions -s -I "c:\Alif\include" -o "alif.exe" "alif.o"
 ```
 
-(جاري كتابة سكيبت ترجمة وبناء cmake، قريبا إن شاء الله)
-
+CMake أو بأستخدام
+```
+$ mkdir build 
+$ cd build 
+$ cmake .. .
+$ make
+```
 بالتوفيق،
