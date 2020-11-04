@@ -10,6 +10,11 @@
 
 #pragma once
 
+#include "../lib/utf8/core.h"
+#include "../lib/utf8.h"
+#include "../general/log.cpp"
+#include "../general/headers.hpp"
+
 int Generated_ID = 10000;
 int ID_GENERATOR()
 {
