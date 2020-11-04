@@ -8,6 +8,7 @@
 // Alif Programming Language
 // ==================================
 
+#pragma once
 // #include "NewVar.cpp" // New Var
 #include "alif_parser_window.cpp"
 #include "alif_parser_control.cpp"
