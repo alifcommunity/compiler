@@ -8,6 +8,8 @@
 // Alif Programming Language
 // ==================================
 
+#pragma once
+
 void ALIF_ERROR(string ERROR_DESCRIPTION) 
 {
 	cout << endl << ERROR_DESCRIPTION << endl << endl;
