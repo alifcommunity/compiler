@@ -12,6 +12,8 @@ using namespace std;
 #include <sstream> // system, stringstream
 // ----------------------------------
 
+#include "../general/global.cpp"
+
 void CLEAN()
 {
     if(DEBUG)
