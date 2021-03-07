@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_IfOr(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// إذا - أو
 
 	if (!o_tokens->TOKENS_PREDEFINED)
@@ -36,7 +36,7 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 	if (Token[1] == "أو" && Token[2] != "إذا")
 		ErrorCode("شرط غير صحيح، هل تقصد ' أو إذا " + Token[2] + " ... ' ؟", o_tokens);
 
-	string PART[1024];
+	std::string PART[1024];
 	int PART_TOTAL;
 	
 	PART[0] = "=";
@@ -54,7 +54,7 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 		if (ALIF_IF_STATUS < 1)
 			ErrorCode("لايمكن إستعمال ' أو ' من دون فتح شرط، ربمى تقصد ' إذا ' ", o_tokens);
 
-		if(DEBUG)DEBUG_MESSAGE("	[ELSE IF " + IntToString(ALIF_IF_STATUS) + "] ( ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[ELSE IF " + IntToString(ALIF_IF_STATUS) + "] ( ", o_tokens); // DEBUG
 		
 		if (IsInsideClass)
 		{
@@ -81,7 +81,7 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 
 		ALIF_IF_STATUS++;
 
-		if(DEBUG)DEBUG_MESSAGE("	[IF " + IntToString(ALIF_IF_STATUS) + "] ( ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[IF " + IntToString(ALIF_IF_STATUS) + "] ( ", o_tokens); // DEBUG
 
 		if (IsInsideClass)
 		{
@@ -103,7 +103,7 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 		// *** *** *** *** *** ***
 	}
 
-	string OBJECTIF_TYPE = "عادم";
+	std::string OBJECTIF_TYPE = "عادم";
 
 	// warning: suggest parentheses around comparison in operand of '&' [-Wparentheses]
     // if (A != B && C != D && X != Z && G != P)
@@ -114,10 +114,10 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 	PART_A = false;
 	PART_B = false;
 
-	string PART_A_OBJECTIF_TYPE;
+	std::string PART_A_OBJECTIF_TYPE;
 	PART_A_OBJECTIF_TYPE = "";
 
-	string IF_SYNTAX_BUFFER;
+	std::string IF_SYNTAX_BUFFER;
 	IF_SYNTAX_BUFFER = "";
 
 	for (int p = Start; p <= o_tokens->TOTAL[o_tokens->Line]; p++) // Line loop after إذا /أوإذا
@@ -139,7 +139,7 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 					ErrorCode("شرط غير كامل : ' " + GET_REAL_LINE_MID(0, p, o_tokens) + " ' <-- ", o_tokens);
 				}
 
-				string CLASS_OR_WIN;
+				std::string CLASS_OR_WIN;
 				if (IsInsideClass)
 					CLASS_OR_WIN = TheClass;
 				else
@@ -148,15 +148,15 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 				// Check this condition-part for syntaxt
 				IS_IF_SYNTAX = true;
 				IF_SYNTAX_BUFFER.append(CheckForSyntax(OBJECTIF_TYPE,			// OBJECTIF_TYPE
-													true,					// Accept Using Reference to Window:Controls
-													true,					// Accept Using Reference to Window:Function
+													true,					// Accept Using Reference to Namespace:Controls
+													true,					// Accept Using Reference to Namespace:Function
 													true,					// Accept Using Reference to Global Functions
 													true,					// Accept Using Reference to Local Functions
 													true,					// Accept Using Reference to Global VAR
 													true,					// Accept Using Reference to Local VAR
 													false,					// Accept Convertion from String To Int
 													false,					// Accept Convertion from Int To String
-													PART, 					// SYNTAX[] string
+													PART, 					// SYNTAX[] std::string
 													(PART_TOTAL),			// SYNTAX_LONG int
 													CLASS_OR_WIN,			// TMP_WINDOW_NAME
 													TheFunction,			// TMP_FUNCTION_NAME
@@ -384,7 +384,7 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 		ErrorCode("أحد أطراف الشرط غير موجود : " + GET_REAL_LINE_MID(0, 0, o_tokens) + " <-- ", o_tokens);
 	}
 
-	string CLASS_OR_WIN;
+	std::string CLASS_OR_WIN;
 	if (IsInsideClass)
 		CLASS_OR_WIN = TheClass;
 	else
@@ -393,15 +393,15 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 	// Check this condition-part for syntaxt
 	IS_IF_SYNTAX = true;
 	IF_SYNTAX_BUFFER.append(CheckForSyntax(OBJECTIF_TYPE,			// OBJECTIF_TYPE
-									 	true,					// Accept Using Reference to Window:Controls
-									  	true,					// Accept Using Reference to Window:Function
+									 	true,					// Accept Using Reference to Namespace:Controls
+									  	true,					// Accept Using Reference to Namespace:Function
 									  	true,					// Accept Using Reference to Global Functions
 									  	true,					// Accept Using Reference to Local Functions
 									  	true,					// Accept Using Reference to Global VAR
 									  	true,					// Accept Using Reference to Local VAR
 									  	false,					// Accept Convertion from String To Int
 									  	false,					// Accept Convertion from Int To String
-									  	PART, 					// SYNTAX[] string
+									  	PART, 					// SYNTAX[] std::string
 									  	(PART_TOTAL),			// SYNTAX_LONG int
 									  	CLASS_OR_WIN,			// TMP_WINDOW_NAME
 									  	TheFunction,			// TMP_FUNCTION_NAME
@@ -432,7 +432,7 @@ void parser_IfOr(string Token[2048], CLASS_TOKEN *o_tokens){
 	}
 	// *** *** *** *** *** ***
 
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 	return; // continue;
 }
 

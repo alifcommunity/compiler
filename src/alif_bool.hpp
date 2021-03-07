@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	//منطق
 
     // bool A = true
@@ -69,7 +69,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 					return; // continue;
 				}
 
-				if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-GLOBAL-BOOL] [" + Token[BOOL_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-GLOBAL-BOOL] [" + Token[BOOL_POS + 1] + "] ", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Class : New Private Bool
@@ -78,7 +78,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 				{
 					CPP_CLASS.append(" = false; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -91,7 +91,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 					return; // continue;
 				}
 
-				if(DEBUG)DEBUG_MESSAGE("	[CLASS-GLOBAL-BOOL] [" + Token[BOOL_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[CLASS-GLOBAL-BOOL] [" + Token[BOOL_POS + 1] + "] ", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Class : New Public Bool
@@ -100,7 +100,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 				{
 					CPP_CLASS.append(" = false; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -122,7 +122,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 					//return; // continue;
 				//}
 
-				if(DEBUG)DEBUG_MESSAGE("		[CLASS-BOOL] [" + Token[BOOL_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[CLASS-BOOL] [" + Token[BOOL_POS + 1] + "] ", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Class : New Local Class Bool
@@ -131,7 +131,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 				{
 					CPP_CLASS.append(" = false; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -162,7 +162,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 		{
 			CPP_GLOBAL.append(" = false; \n");
 
-			if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 			return; // continue;
 		}
 		// *** *** *** *** *** ***
@@ -173,7 +173,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 
 		SetNewVar(false, TheNamespace, TheFunction, Token[BOOL_POS + 1], "منطق", false,false, o_tokens->Line, o_tokens);
 		
-		if(DEBUG)DEBUG_MESSAGE("		[LOCAL-BOOL ] [" + Token[BOOL_POS + 1] + "] ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[LOCAL-BOOL ] [" + Token[BOOL_POS + 1] + "] ", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		// Local Area
@@ -186,7 +186,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 			{
 				CPP_GLOBAL_FUN.append(" = false; \n");
 
-				if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 				return; // continue;
 			}
 		}
@@ -198,7 +198,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 			{
 				cpp_AddScript(TheFunction, " = false; \n");
 
-				if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 				return; // continue;
 			}
 		}
@@ -275,7 +275,7 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 			}
 		}
 		
-		string WIN_OR_CLASS;
+		std::string WIN_OR_CLASS;
 		if (IsInsideClass)
 			WIN_OR_CLASS = TheClass;
 		else
@@ -283,21 +283,21 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		// Bool Syntax
 		ScriptSyntaxBuffer = CheckForSyntax("منطق",	// OBJECTIF_TYPE
-											true,	// Accept Using Reference to Window:Controls
-											true,	// Accept Using Reference to Window:Function
+											true,	// Accept Using Reference to Namespace:Controls
+											true,	// Accept Using Reference to Namespace:Function
 											true,	// Accept Using Reference to Global Functions
 											true,	// Accept Using Reference to Local Functions
 											true,	// Accept Using Reference to Global VAR
 											true,	// Accept Using Reference to Local VAR
 											false,	// Accept Convertion from String To Bool
 											true,	// Accept Convertion from Bool To String
-											TempToken,				// SYNTAX[] string
+											TempToken,				// SYNTAX[] std::string
 											(TempTokenCount - 1),	// SYNTAX_LONG
 											WIN_OR_CLASS,			// TMP_WINDOW_NAME
 											TheFunction,			// TMP_FUNCTION_NAME
 											o_tokens);
 		
-		if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 
 		if (IsInsideClass)
 		{
@@ -325,11 +325,11 @@ void parser_bool(string Token[2048], CLASS_TOKEN *o_tokens){
 		}
 		// *** *** *** *** *** ***
 
-		if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 		return; // continue;
 	}
 	else if (Token[BOOL_POS + 2] != "")
 		ErrorCode("أمر غير معروف '" + Token[BOOL_POS + 2] + "', ربما تقصد '=' ", o_tokens);
 	
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 }

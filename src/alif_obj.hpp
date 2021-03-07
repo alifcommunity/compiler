@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// كائن
 
 	if (!o_tokens->TOKENS_PREDEFINED)
@@ -45,9 +45,9 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 		ErrorCode("يجب وضع اسم المنتمي بعد ' " + Token[1] + ":' ", o_tokens);
 	
 	// C++, allow create Obj on global, global-class, local, but using it only on func.
-	string OBJ_ID;
+	std::string OBJ_ID;
 	bool IS_GLOBAL_OBJ = false;
-	string WIN_OR_CLASS; // Needed by CheckForSyntax()
+	std::string WIN_OR_CLASS; // Needed by CheckForSyntax()
 
 	if (IsInsideClass)
 	{
@@ -82,7 +82,7 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 	{
 		if (OBJ_IS_SET[std::make_pair(TheNamespace + TheFunction, Token[1])])
 		{
-			// Window -> Function.
+			// Namespace -> Function.
 			// Local Obj.
 
 			OBJ_ID = TheNamespace + TheFunction;
@@ -124,7 +124,7 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 	/*
 	if (OBJ_IS_SET[std::make_pair(TheNamespace + TheFunction, Token[1])])
 	{
-		// Window -> Function.
+		// Namespace -> Function.
 		// Local Obj.
 		OBJ_ID = TheNamespace + TheFunction;
 		WIN_OR_CLASS = TheNamespace;
@@ -156,13 +156,13 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 	}
 	*/
 	
-	string TK_CLASS = OBJ_CLASS[std::make_pair(OBJ_ID, Token[1])];
+	std::string TK_CLASS = OBJ_CLASS[std::make_pair(OBJ_ID, Token[1])];
 	
 	if (!CLASS_G_VAR_IS_SET[std::make_pair(TK_CLASS, Token[3])] &&
 		!CLASS_FUN_IS_SET[std::make_pair(TK_CLASS, Token[3])])
 		ErrorCode("الصنف ' " + TK_CLASS + " ' ليس فيه أي منتمي معرف باسم ' " + Token[3] + " ' ", o_tokens);
 	
-	string MEMBER_TYPE;
+	std::string MEMBER_TYPE;
 	
 	if (CLASS_G_VAR_IS_SET[std::make_pair(TK_CLASS, Token[3])])
 	{
@@ -194,7 +194,7 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 
 		if (IS_GLOBAL_OBJ)
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[GLOBAL-OBJ ' " + Token[1] + " ' : ' " + Token[3] + " '] = ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[GLOBAL-OBJ ' " + Token[1] + " ' : ' " + Token[3] + " '] = ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Obj:Mem = ...
@@ -216,7 +216,7 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 		}
 		else
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[LOCAL-OBJ ' " + Token[1] + " ' : ' " + Token[3] + " '] = ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[LOCAL-OBJ1 ' " + Token[1] + " ' : ' " + Token[3] + " '] = ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Obj:Mem = ...
@@ -239,21 +239,21 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 		}
 
 		ScriptSyntaxBuffer = CheckForSyntax(MEMBER_TYPE, // OBJECTIF_TYPE
-											true, // Accept Using Reference to Window:Controls
-											true, // Accept Using Reference to Window:Function
+											true, // Accept Using Reference to Namespace:Controls
+											true, // Accept Using Reference to Namespace:Function
 											true, // Accept Using Reference to Global Functions
 											true, // Accept Using Reference to Local Functions
 											true, // Accept Using Reference to Global VAR
 											true, // Accept Using Reference to Local VAR
 											false, // Accept Convertion from String To Int
 											true, // Accept Convertion from Int To String
-											TempToken, 				// SYNTAX[] string
+											TempToken, 				// SYNTAX[] std::string
 											(TempTokenCount - 1), 	// SYNTAX_LONG int
 											WIN_OR_CLASS, 			// TMP_WINDOW_NAME or CLASS_NAME
 											TheFunction, 			// TMP_FUNCTION_NAME
 											o_tokens);
 	
-		if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		// Obj:Mem = ... ;
@@ -308,7 +308,7 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 
 		if (IS_GLOBAL_OBJ)
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[GLOBAL-OBJ ' " + Token[1] + " ':'" + Token[3] + " '(Func)( ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[GLOBAL-OBJ ' " + Token[1] + " ':'" + Token[3] + " '(Func)( ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Obj:MemFunc ( ...
@@ -330,7 +330,7 @@ void parser_Obj(string Token[2048], CLASS_TOKEN *o_tokens){
 		}
 		else
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[LOCAL-OBJ ' " + Token[1] + " ':'" + Token[3] + " '(Func)( ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[LOCAL-OBJ2 ' " + Token[1] + " ':'" + Token[3] + " '(Func)( ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Obj:MemFunc ( ...

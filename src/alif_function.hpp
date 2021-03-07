@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	
 	//دالة
 
@@ -66,87 +66,20 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 
 			return; // continue;
 		}
-
+	
 		IsInsideFunction = true;
 		TheFunction = "رئيسية";
 		TheFunction_TYPE = "عادم";
 		RETURN_FUN[std::make_pair(TheNamespace, "رئيسية")] = "OK";
 
-		Win_FunctionNames[std::make_pair(TheNamespace, Win_CurrentTotalFucntion)] = TheFunction;
-		Win_CurrentTotalFucntion++;
-		Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
-		
-		if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [MAIN] \n\n", o_tokens); // DEBUG
-		
-		return; // continue;
-	}
-	else if (Token[FUN_POS + 1] == "نقر") // || Token[FUN_POS + 1] == "فارة_نقر") // دالة Mouse_Click MyFunctionName ()
-	{
-		// --------------------------
-		// Control Function
-		// --------------------------
-
-		if (!IsInsideNamespace)
-			ErrorCode("يجب استعمال هذه الخاصيه داخل النافذه ' " + Token[FUN_POS + 1] + " ' ", o_tokens);
-
-		if (Token[FUN_POS + 2] == "")
-			ErrorCode("يجب تحديد اسم الاداة", o_tokens);
-
-		// if (!CONTROL_IS_SET[std::make_pair(TheNamespace, Token[FUN_POS + 2])])
-		// 	ErrorCode("المجال ' " + TheNamespace + " ' لا تحتوي على أداة باسم ' " +  Token[FUN_POS + 2] + " ' ", o_tokens);
-
-		if (Token[FUN_POS + 3] != "" && Token[FUN_POS + 3] != "(")
-			ErrorCode("أمر غير معروف : ' " + Token[FUN_POS + 3] + " ' ", o_tokens);
-
-		if (Token[FUN_POS + 3] == "(")
-		{
-			if (Token[FUN_POS + 4] != ")")
-				ErrorCode("أمر غير معروف : ' " + Token[FUN_POS + 4] + " ', However Control Function didnt need args! ", o_tokens);
-			
-			if (Token[FUN_POS + 5] != "")
-				ErrorCode("أمر غير معروف : ' " + Token[FUN_POS + 5] + " ' ", o_tokens);
-		}
-
-		if (!o_tokens->TOKENS_PREDEFINED)
-		{
-			// Control function
-			IS_CONTROL_FUNCTION_NAME = true;
-			ADD_FUN(false, TheNamespace, (Token[FUN_POS + 1] + " " + Token[FUN_POS + 2]), "عادم", o_tokens->Line, o_tokens);
-
-			IsInsideFunction = true; // Need by Tokens Predefined
-			TheFunction = (Token[FUN_POS + 1] + " " + Token[FUN_POS + 2]); // Need by Tokens Predefined
-
-			return; // continue;
-		}
-
-		if (Token[FUN_POS + 1] == "نقر") // || Token[FUN_POS + 1] == "فارة_نقر")
-		{
-			if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [Mouse_Click] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
-
-			// *** Generate Code ***
-			// Control Function ()
-			CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
-			CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " void FUNCTION_MouseClick_" + Control_ID[Token[FUN_POS + 2]] + "(wxCommandEvent &event); \n";
-			
-			CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "EVENT")];
-			CPP_WINDOW[std::make_pair(TheNamespace, "EVENT")] = CBUFER + " EVT_BUTTON(ID_CTR_" + ID[TheNamespace] + "_" + Control_ID[Token[FUN_POS + 2]] + ", CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_MouseClick_" + Control_ID[Token[FUN_POS + 2]] + ") \n";
-			
-			CPP_FUN.append(" void CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_MouseClick_" + Control_ID[Token[FUN_POS + 2]] + "(wxCommandEvent &event){event.Skip(); \n");
-			// *** *** *** *** *** ***
-		}
-		else
-		{
-			ErrorCode("علة: نوع الحدث غير معروف ' " + Token[FUN_POS + 1] + " ' ", o_tokens);
-		}
-
-		IsInsideFunction = true;
-		TheFunction = (Token[FUN_POS + 1] + " " + Token[FUN_POS + 2]);
-		TheFunction_TYPE = "عادم";
+		IsInsideNamespace = true; // Alif 3
 
 		Win_FunctionNames[std::make_pair(TheNamespace, Win_CurrentTotalFucntion)] = TheFunction;
 		Win_CurrentTotalFucntion++;
 		Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
-
+		
+		if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [MAIN] \n\n", o_tokens); // DEBUG
+		
 		return; // continue;
 	}
 	else if (Token[FUN_POS + 1] == "عدد" || Token[FUN_POS + 1] == "نص" || Token[FUN_POS + 1] == "منطق") // دالة TYPE MyFunctionName (...)
@@ -199,13 +132,13 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						return; // continue;
 					}
 
-					if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					// Local INT Func(void)
 					CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 					CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " double FUNCTION_" + ID[Token[FUN_POS + 2]] + "(); \n";
-					CPP_FUN.append(" double CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
+					CPP_GLOBAL_FUN.append(" double FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
 					// *** *** *** *** *** ***
 				}
 
@@ -238,8 +171,8 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 
 					// *** Generate Code ***
 					// Global String Func(void)
-					CPP_GLOBAL.append(" wxString FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "(); \n");
-					CPP_GLOBAL_FUN.append(" wxString FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "(){ \n");
+					CPP_GLOBAL.append(" std::string FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "(); \n");
+					CPP_GLOBAL_FUN.append(" std::string FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "(){ \n");
 					// *** *** *** *** *** ***
 				}
 				else
@@ -255,13 +188,13 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						return; // continue;
 					}
 
-					if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					// Local String Func(void)
 					CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
-					CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " wxString FUNCTION_" + ID[Token[FUN_POS + 2]] + "(); \n";
-					CPP_FUN.append(" wxString CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
+					CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " std::string FUNCTION_" + ID[Token[FUN_POS + 2]] + "(); \n";
+					CPP_GLOBAL_FUN.append(" std::string FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
 					// *** *** *** *** *** ***
 				}
 
@@ -311,13 +244,13 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						return; // continue;
 					}
 
-					if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					// Local BOOL Func(void)
 					CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 					CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " bool FUNCTION_" + ID[Token[FUN_POS + 2]] + "(); \n";
-					CPP_FUN.append(" bool CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
+					CPP_GLOBAL_FUN.append(" bool FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
 					// *** *** *** *** *** ***
 				}
 
@@ -378,13 +311,13 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Local INT Func(void)
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " double FUNCTION_" + ID[Token[FUN_POS + 2]] + "(); \n";
-						CPP_FUN.append(" double CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
+						CPP_GLOBAL_FUN.append(" double FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
 						// *** *** *** *** *** ***
 					}
 
@@ -417,8 +350,8 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 
 						// *** Generate Code ***
 						// Global String Func(void)
-						CPP_GLOBAL.append(" wxString FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "(); \n");
-						CPP_GLOBAL_FUN.append(" wxString FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "(){ \n");
+						CPP_GLOBAL.append(" std::string FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "(); \n");
+						CPP_GLOBAL_FUN.append(" std::string FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "(){ \n");
 						// *** *** *** *** *** ***
 					}
 					else
@@ -434,13 +367,13 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Local String Func(void)
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
-						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " wxString FUNCTION_" + ID[Token[FUN_POS + 2]] + "(); \n";
-						CPP_FUN.append(" wxString CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
+						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " std::string FUNCTION_" + ID[Token[FUN_POS + 2]] + "(); \n";
+						CPP_GLOBAL_FUN.append(" std::string FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
 						// *** *** *** *** *** ***
 					}
 
@@ -490,13 +423,13 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Local INT Func(void)
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " bool FUNCTION_" + ID[Token[FUN_POS + 2]] + "(); \n";
-						CPP_FUN.append(" bool CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
+						CPP_GLOBAL_FUN.append(" bool FUNCTION_" + ID[Token[FUN_POS + 2]] + "(){ \n");
 						// *** *** *** *** *** ***
 					}
 
@@ -574,13 +507,13 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] ( ", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] ( ", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Local INT Func(...)
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " double FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ";
-						CPP_FUN.append(" double CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ");
+						CPP_GLOBAL_FUN.append(" double FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ");
 						// *** *** *** *** *** ***
 
 						// Function int Syntax (..., ...)
@@ -593,7 +526,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 															o_tokens);
 					}
 					
-					if(DEBUG)DEBUG_MESSAGE(" ) \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE(") \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					if (!IsInsideNamespace)
@@ -607,7 +540,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						// Local INT Func(...)
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + ScriptSyntaxBuffer + " ); \n";
-						CPP_FUN.append(ScriptSyntaxBuffer + " ){ \n");
+						CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ){ \n");
 					}
 					// *** *** *** *** *** ***
 
@@ -633,7 +566,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 							IsInsideFunction = true; // Need by Tokens Predefined
 							TheFunction = Token[FUN_POS + 2]; // Need by Tokens Predefined
 
-							// Function string Syntax (..., ...)
+							// Function std::string Syntax (..., ...)
 							// To Set ARG counter, and ARG as Local Var
 							ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(true, TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 2], o_tokens);
 
@@ -646,11 +579,11 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						// *** Generate Code ***
 						// Global String Func(...)
 						////SET_C_NAME(Token[FUN_POS + 2]);
-						CPP_GLOBAL.append(" wxString FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "( ");
-						CPP_GLOBAL_FUN.append(" wxString FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "( ");
+						CPP_GLOBAL.append(" std::string FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "( ");
+						CPP_GLOBAL_FUN.append(" std::string FUNCTION_" + Global_ID[Token[FUN_POS + 2]] + "( ");
 						// *** *** *** *** *** ***
 
-						// Function string Syntax (..., ...)
+						// Function std::string Syntax (..., ...)
 						// To Get Log, and C++ Code
 						ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(true, TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 2], o_tokens);
 					}
@@ -664,7 +597,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 							IsInsideFunction = true; // Need by Tokens Predefined
 							TheFunction = Token[FUN_POS + 2]; // Need by Tokens Predefined
 
-							// Function string Syntax (..., ...)
+							// Function std::string Syntax (..., ...)
 							// To Set ARG counter, and ARG as Local Var
 							ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(false, TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 2], o_tokens);
 
@@ -672,22 +605,22 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Local String Func(...)
 						////SET_C_NAME(Token[FUN_POS + 2]);
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
-						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " wxString FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ";
-						CPP_FUN.append(" wxString CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ");
+						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " std::string FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ";
+						CPP_GLOBAL_FUN.append(" std::string FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ");
 						// *** *** *** *** *** ***
 
-						// Function string Syntax (..., ...)
+						// Function std::string Syntax (..., ...)
 						// To Get Log, and C++ Code
 						ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(false, TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 2], o_tokens);
 					}
 
-					if(DEBUG)DEBUG_MESSAGE(" ) \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE(") \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					if (!IsInsideNamespace)
@@ -701,7 +634,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						// Local String Func(...)
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + ScriptSyntaxBuffer + " ); \n";
-						CPP_FUN.append(ScriptSyntaxBuffer + " ){ \n");
+						CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ){ \n");
 						// *** *** *** *** *** ***
 					}
 
@@ -763,13 +696,13 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] ( ", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] ( ", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Local BOOL Func(...)
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " bool FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ";
-						CPP_FUN.append(" bool CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ");
+						CPP_GLOBAL_FUN.append(" bool FUNCTION_" + ID[Token[FUN_POS + 2]] + "( ");
 						// *** *** *** *** *** ***
 
 						// Function int Syntax (..., ...)
@@ -777,7 +710,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(false,TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 2], o_tokens);
 					}
 					
-					if(DEBUG)DEBUG_MESSAGE(" ) \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE(") \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					if (!IsInsideNamespace)
@@ -791,7 +724,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						// Local INT Func(...)
 						CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 						CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + ScriptSyntaxBuffer + " ); \n";
-						CPP_FUN.append(ScriptSyntaxBuffer + " ){ \n");
+						CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ){ \n");
 					}
 					// *** *** *** *** *** ***
 
@@ -855,14 +788,14 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 					return; // continue;
 				}
 
-				if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [" + Token[FUN_POS + 1] + "] \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [" + Token[FUN_POS + 1] + "] \n\n", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Local VOID Func(void)
 				////SET_C_NAME(Token[FUN_POS + 2]);
 				CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 				CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " void FUNCTION_" + ID[Token[FUN_POS + 1]] + "(); \n";
-				CPP_FUN.append(" void CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 1]] + "(){ \n");
+				CPP_GLOBAL_FUN.append(" void FUNCTION_" + ID[Token[FUN_POS + 1]] + "(){ \n");
 				// *** *** *** *** *** ***
 			}
 
@@ -921,14 +854,14 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						return; // continue;
 					}
 
-					if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [" + Token[FUN_POS + 1] + "] () \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [" + Token[FUN_POS + 1] + "] () \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					// Local VOID Func(void)
 					////SET_C_NAME(Token[FUN_POS + 2]);
 					CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 					CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " void FUNCTION_" + ID[Token[FUN_POS + 1]] + "(); \n";
-					CPP_FUN.append(" void CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 1]] + "(){ \n");
+					CPP_GLOBAL_FUN.append(" void FUNCTION_" + ID[Token[FUN_POS + 1]] + "(){ \n");
 					// *** *** *** *** *** ***
 				}
 
@@ -968,7 +901,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						IsInsideFunction = true; // Need by Tokens Predefined
 						TheFunction = Token[FUN_POS + 1]; // Need by Tokens Predefined
 
-						// Function string Syntax (..., ...)
+						// Function std::string Syntax (..., ...)
 						// To Set ARG counter, and ARG as Local Var
 						ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(true, TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 1], o_tokens);
 
@@ -985,7 +918,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 					CPP_GLOBAL_FUN.append(" void FUNCTION_" + Global_ID[Token[FUN_POS + 1]] + "( ");
 					// *** *** *** *** *** ***
 
-					// Function string Syntax (..., ...)
+					// Function std::string Syntax (..., ...)
 					// To Get Log, and C++ Code
 					ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(true, TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 1], o_tokens);
 				}
@@ -999,7 +932,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						IsInsideFunction = true; // Need by Tokens Predefined
 						TheFunction = Token[FUN_POS + 1]; // Need by Tokens Predefined
 
-						// Function string Syntax (..., ...)
+						// Function std::string Syntax (..., ...)
 						// To Set ARG counter, and ARG as Local Var
 						ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(false, TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 1], o_tokens);
 
@@ -1007,22 +940,22 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 						return; // continue;
 					}
 
-					if(DEBUG)DEBUG_MESSAGE("	[FUNCTION] [" + Token[FUN_POS + 1] + "] ( ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[FUNCTION] [" + Token[FUN_POS + 1] + "] ( ", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					// Local VOID Func(...)
 					////SET_C_NAME(Token[FUN_POS + 2]);
 					CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 					CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " void FUNCTION_" + ID[Token[FUN_POS + 1]] + "( ";
-					CPP_FUN.append(" void CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[FUN_POS + 1]] + "( ");
+					CPP_GLOBAL_FUN.append(" void FUNCTION_" + ID[Token[FUN_POS + 1]] + "( ");
 					// *** *** *** *** *** ***
 
-					// Function string Syntax (..., ...)
+					// Function std::string Syntax (..., ...)
 					// To Get Log, and C++ Code
 					ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(false, TempToken, (TempTokenCount - 1), TheNamespace, Token[FUN_POS + 1], o_tokens);
 				}
 				
-				if(DEBUG)DEBUG_MESSAGE(" ) \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE(") \n\n", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				if (!IsInsideNamespace)
@@ -1036,7 +969,7 @@ void parser_Function(string Token[2048], CLASS_TOKEN *o_tokens){
 					// Local VOID Func(...)
 					CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
 					CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + ScriptSyntaxBuffer + " ); \n";
-					CPP_FUN.append(ScriptSyntaxBuffer + " ){ \n");
+					CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ){ \n");
 					// *** *** *** *** *** ***
 				}
 

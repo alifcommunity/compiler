@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_VarGlobal(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_VarGlobal(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
 	// Global var
 	// _g1 = 1 + 2
@@ -36,7 +36,7 @@ void parser_VarGlobal(string Token[2048], CLASS_TOKEN *o_tokens){
 	//if (IsInsideNamespace && !IsInsideFunction) // C++ cant do this !
 		//ErrorCode("Using vars must set outside window for global, or inside function for local.", o_tokens);
 	
-	string G_VAR_WITHOUT_;
+	std::string G_VAR_WITHOUT_;
 	
 	if (substr_utf8(Token[1], 0, 1) == "_")
 		G_VAR_WITHOUT_ = substr_utf8(Token[1], 1, CharCount_utf8(Token[1], o_tokens));
@@ -65,7 +65,7 @@ void parser_VarGlobal(string Token[2048], CLASS_TOKEN *o_tokens){
 			//if (G_VAR_IS_CONST[(G_VAR_WITHOUT_)] == "ثابت")
 				//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + G_VAR_WITHOUT_ + " ' لأنه من نوع ثابت ", o_tokens);
 
-			if(DEBUG)DEBUG_MESSAGE("		[GLOBAL-INT (" + G_VAR_WITHOUT_ + ")] = ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[GLOBAL-INT (" + G_VAR_WITHOUT_ + ")] = ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			if (!IsInsideNamespace)
@@ -83,16 +83,16 @@ void parser_VarGlobal(string Token[2048], CLASS_TOKEN *o_tokens){
 			//if (G_VAR_IS_CONST[(G_VAR_WITHOUT_)] == "ثابت")
 				//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + G_VAR_WITHOUT_ + " ' لأنه من نوع ثابت ", o_tokens);
 
-			if(DEBUG)DEBUG_MESSAGE("		[GLOBAL-STRING (" + G_VAR_WITHOUT_ + ")] = ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[GLOBAL-STRING (" + G_VAR_WITHOUT_ + ")] = ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			if (!IsInsideNamespace)
 				// Global Function
-				// global-string = ...
+				// global-std::string = ...
 				CPP_GLOBAL_FUN.append(Global_ID[G_VAR_WITHOUT_] + " = ");
 			else
 				// Local Function
-				// global-string = ...
+				// global-std::string = ...
 				cpp_AddScript(TheFunction, Global_ID[G_VAR_WITHOUT_] + " = ");
 			// *** *** *** *** *** ***
 		}
@@ -101,7 +101,7 @@ void parser_VarGlobal(string Token[2048], CLASS_TOKEN *o_tokens){
 			//if (G_VAR_IS_CONST[(G_VAR_WITHOUT_)] == "ثابت")
 				//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + G_VAR_WITHOUT_ + " ' لأنه من نوع ثابت ", o_tokens);
 
-			if(DEBUG)DEBUG_MESSAGE("		[GLOBAL-BOOL (" + G_VAR_WITHOUT_ + ")] = ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[GLOBAL-BOOL (" + G_VAR_WITHOUT_ + ")] = ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			if (!IsInsideNamespace)
@@ -139,7 +139,7 @@ void parser_VarGlobal(string Token[2048], CLASS_TOKEN *o_tokens){
 
 			// *** Generate Code ***
 			// Global Area
-			// global-string = ...
+			// global-std::string = ...
 			CPP_GLOBAL.append(Global_ID[G_VAR_WITHOUT_] + " = ");
 			// *** *** *** *** *** ***
 		}
@@ -172,21 +172,21 @@ void parser_VarGlobal(string Token[2048], CLASS_TOKEN *o_tokens){
 	// _a = 1 + (_a * 3) ...
 	
 	ScriptSyntaxBuffer = CheckForSyntax(G_VAR_TYPE[(G_VAR_WITHOUT_)], // OBJECTIF_TYPE
-									true, // Accept Using Reference to Window:Controls
-									true, // Accept Using Reference to Window:Function
+									true, // Accept Using Reference to Namespace:Controls
+									true, // Accept Using Reference to Namespace:Function
 									true, // Accept Using Reference to Global Functions
 									true, // Accept Using Reference to Local Functions
 									true, // Accept Using Reference to Global VAR
 									true, // Accept Using Reference to Local VAR
 									false, // Accept Convertion from String To Int
 									true, // Accept Convertion from Int To String
-									TempToken, 			// SYNTAX[] string
+									TempToken, 			// SYNTAX[] std::string
 									(TempTokenCount - 1), 	// SYNTAX_LONG int
 									TheNamespace, 			// TMP_WINDOW_NAME
 									TheFunction, 				// TMP_FUNCTION_NAME
 									o_tokens);
 	
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 
 	// *** Generate Code ***
 	if (IsInsideFunction)

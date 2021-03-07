@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_FunctionClass(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// Class -> دالة
 
 	if (IsInsideFunction)
@@ -73,7 +73,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 			TheFunction_TYPE = "عادم";
 			RETURN_FUN[std::make_pair(TheClass, "بناء")] = "OK";
 
-			if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION-CONSTRICTOR] [" + Token[FUN_POS + 1] + "] \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION-CONSTRICTOR] [" + Token[FUN_POS + 1] + "] \n\n", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Class -> CONSTRICTOR-Func.
@@ -109,7 +109,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 				TheFunction_TYPE = "عادم";
 				RETURN_FUN[std::make_pair(TheClass, "بناء")] = "OK";
 
-				if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION-CONSTRICTOR] [" + Token[FUN_POS + 1] + "] () \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION-CONSTRICTOR] [" + Token[FUN_POS + 1] + "] () \n\n", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Class -> CONSTRICTOR-Func ()
@@ -150,7 +150,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					return; // continue;
 				}
 				
-				if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION-CONSTRICTOR] [" + Token[FUN_POS + 1] + "] (", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION-CONSTRICTOR] [" + Token[FUN_POS + 1] + "] (", o_tokens); // DEBUG
 				
 				// *** Generate Code ***
 				// Class -> CONSTRICTOR-Func (...
@@ -197,7 +197,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					}
 					else
 					{
-						if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Class -> Private INT-Func
@@ -213,7 +213,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					}
 					else
 					{
-						if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 						
 						// *** Generate Code ***
 						// Class -> INT-Func
@@ -237,11 +237,11 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					}
 					else
 					{
-						if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Class -> Private STRING-Func
-						CPP_CLASS.append(" private: wxString ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + "() { \n");
+						CPP_CLASS.append(" private: std::string ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + "() { \n");
 						// *** *** *** *** *** ***
 					}
 				}
@@ -253,11 +253,11 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					}
 					else
 					{
-						if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Class -> STRING-Func
-						CPP_CLASS.append(" public: wxString ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + "() { \n");
+						CPP_CLASS.append(" public: std::string ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + "() { \n");
 						// *** *** *** *** *** ***
 					}
 				}
@@ -277,7 +277,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					}
 					else
 					{
-						if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Class -> Private BOOL-Func
@@ -293,7 +293,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					}
 					else
 					{
-						if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] \n\n", o_tokens); // DEBUG
 						
 						// *** Generate Code ***
 						// Class -> BOOL-Func
@@ -328,7 +328,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 						}
 						else
 						{
-							if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+							if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 
 							// *** Generate Code ***
 							// Class -> Private INT-Func ()
@@ -344,7 +344,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 						}
 						else
 						{
-							if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+							if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 							
 							// *** Generate Code ***
 							// Class -> INT-Func ()
@@ -368,11 +368,11 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 						}
 						else
 						{
-							if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+							if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 
 							// *** Generate Code ***
 							// Class -> Private STRING-Func ()
-							CPP_CLASS.append(" private: wxString ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + " () { \n");
+							CPP_CLASS.append(" private: std::string ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + " () { \n");
 							// *** *** *** *** *** ***
 						}
 					}
@@ -384,11 +384,11 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 						}
 						else
 						{
-							if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+							if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 
 							// *** Generate Code ***
 							// Class -> STRING-Func ()
-							CPP_CLASS.append(" public: wxString ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + " () { \n");
+							CPP_CLASS.append(" public: std::string ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + " () { \n");
 							// *** *** *** *** *** ***
 						}
 					}
@@ -408,7 +408,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 						}
 						else
 						{
-							if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+							if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 
 							// *** Generate Code ***
 							// Class -> Private BOOL-Func ()
@@ -424,7 +424,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 						}
 						else
 						{
-							if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
+							if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] () \n\n", o_tokens); // DEBUG
 							
 							// *** Generate Code ***
 							// Class -> BOOL-Func ()
@@ -471,7 +471,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
 						
 						// *** Generate Code ***
 						// Class -> Private INT-Func (...
@@ -493,7 +493,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_INT] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
 						
 						// *** Generate Code ***
 						// Class -> Public INT-Func (...
@@ -532,11 +532,11 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
 						
 						// *** Generate Code ***
 						// Class -> Private STRING-Func (...
-						CPP_CLASS.append(" private: wxString ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + " ( ");
+						CPP_CLASS.append(" private: std::string ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + " ( ");
 						// *** *** *** *** *** ***
 					}
 					else
@@ -554,11 +554,11 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_STRING] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
 						
 						// *** Generate Code ***
 						// Class -> Public STRING-Func (...
-						CPP_CLASS.append(" public: wxString ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + " ( ");
+						CPP_CLASS.append(" public: std::string ClassFUNCTION_" + ID[Token[FUN_POS + 2]] + " ( ");
 						// *** *** *** *** *** ***
 					}
 
@@ -593,7 +593,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
 						
 						// *** Generate Code ***
 						// Class -> Private BOOL-Func (...
@@ -615,7 +615,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 							return; // continue;
 						}
 
-						if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [FUN_TYPE_BOOL] [" + Token[FUN_POS + 2] + "] (", o_tokens); // DEBUG
 						
 						// *** Generate Code ***
 						// Class -> Public BOOL-Func (...
@@ -655,7 +655,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 				}
 				else
 				{
-					if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					// Class -> Private Func
@@ -671,7 +671,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 				}
 				else
 				{
-					if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					// Class -> Func
@@ -700,7 +700,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					}
 					else
 					{
-						if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] () \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] () \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Class -> Private Func ()
@@ -716,7 +716,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 					}
 					else
 					{
-						if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] () \n\n", o_tokens); // DEBUG
+						if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] () \n\n", o_tokens); // DEBUG
 
 						// *** Generate Code ***
 						// Class -> Func ()
@@ -760,7 +760,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 						return; // continue;
 					}
 					
-					if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] ( ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] ( ", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					// Class -> Private Func (...
@@ -783,7 +783,7 @@ void parser_FunctionClass(string Token[2048], CLASS_TOKEN *o_tokens){
 						return; // continue;
 					}
 
-					if(DEBUG)DEBUG_MESSAGE("	[CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] ( ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("[CLASS-FUNCTION] [" + Token[FUN_POS + 1] + "] ( ", o_tokens); // DEBUG
 				
 					// *** Generate Code ***
 					// Class -> Public Func (...

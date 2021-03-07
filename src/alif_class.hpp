@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_Class(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_Class(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	//صنف
 
 	if (IsInsideClass)

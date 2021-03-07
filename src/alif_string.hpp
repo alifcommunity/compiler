@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// نص
 
 	if (!o_tokens->TOKENS_PREDEFINED && IsInsideFunction)
@@ -67,16 +67,16 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 					return; // continue;
 				}
 
-				if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-GLOBAL-STRING] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-GLOBAL-STRING] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Class : New Private STRING
-				CPP_CLASS.append(" private: wxString " + Global_ID[Token[INT_POS + 1]] + " ");
+				CPP_CLASS.append(" private: std::string " + Global_ID[Token[INT_POS + 1]] + " ");
 				if (Token[INT_POS + 2] == "")
 				{
 					CPP_CLASS.append(" = \"\"; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -89,16 +89,16 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 					return; // continue;
 				}
 
-				if(DEBUG)DEBUG_MESSAGE("	[CLASS-GLOBAL-STRING] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[CLASS-GLOBAL-STRING] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
 				
 				// *** Generate Code ***
 				// Class : New Public STRING
-				CPP_CLASS.append(" public: wxString " + Global_ID[Token[INT_POS + 1]] + " ");
+				CPP_CLASS.append(" public: std::string " + Global_ID[Token[INT_POS + 1]] + " ");
 				if (Token[INT_POS + 2] == "")
 				{
 					CPP_CLASS.append(" = \"\"; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -120,16 +120,16 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 					//return; // continue;
 				//}
 
-				if(DEBUG)DEBUG_MESSAGE("		[CLASS-STRING] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[CLASS-STRING] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Class : New Local Class STRING
-				CPP_CLASS.append(" wxString " + ID[Token[INT_POS + 1]] + " ");
+				CPP_CLASS.append(" std::string " + ID[Token[INT_POS + 1]] + " ");
 				if (Token[INT_POS + 2] == "")
 				{
 					CPP_CLASS.append(" = \"\"; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -154,12 +154,12 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 		// *** Generate Code ***
 		// Global Area
 		// String a
-		CPP_GLOBAL.append(" wxString " + Global_ID[Token[INT_POS + 1]] + " ");
+		CPP_GLOBAL.append(" std::string " + Global_ID[Token[INT_POS + 1]] + " ");
 		if (Token[INT_POS + 2] == "")
 		{
 			CPP_GLOBAL.append(" ; \n");
 
-			if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 			return; // continue;
 		}
 		// *** *** *** *** *** ***
@@ -173,7 +173,7 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 
 		SetNewVar(false, TheNamespace, TheFunction, Token[INT_POS + 1], "نص", false, false, o_tokens->Line, o_tokens);
 		
-		if(DEBUG)DEBUG_MESSAGE("		[LOCAL-STRING] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[LOCAL-STRING] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
 		
 		// *** Generate Code ***
 		// Local Area
@@ -181,24 +181,24 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 		if (!IsInsideNamespace)
 		{
 			// Global Function
-			CPP_GLOBAL_FUN.append(" wxString " + ID[Token[INT_POS + 1]] + " ");
+			CPP_GLOBAL_FUN.append(" std::string " + ID[Token[INT_POS + 1]] + " ");
 			if (Token[INT_POS + 2] == "")
 			{
 				CPP_GLOBAL_FUN.append(" ; \n");
 
-				if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 				return; // continue;
 			}
 		}
 		else
 		{
 			// Local Function
-			cpp_AddScript(TheFunction, " wxString " + ID[Token[INT_POS + 1]] + " ");
+			cpp_AddScript(TheFunction, " std::string " + ID[Token[INT_POS + 1]] + " ");
 			if (Token[INT_POS + 2] == "")
 			{
 				cpp_AddScript(TheFunction, " = \"\"; \n");
 
-				if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 				return; // continue;
 			}
 		}
@@ -275,7 +275,7 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 			}
 		}
 		
-		string WIN_OR_CLASS;
+		std::string WIN_OR_CLASS;
 		if (IsInsideClass)
 			WIN_OR_CLASS = TheClass;
 		else
@@ -283,15 +283,15 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		// STRING Syntax
 		ScriptSyntaxBuffer = CheckForSyntax("نص", // OBJECTIF_TYPE
-								true, // Accept Using Reference to Window:Controls
-								true, // Accept Using Reference to Window:Function
+								true, // Accept Using Reference to Namespace:Controls
+								true, // Accept Using Reference to Namespace:Function
 								true, // Accept Using Reference to Global Functions
 								true, // Accept Using Reference to Local Functions
 								true, // Accept Using Reference to Global VAR
 								true, // Accept Using Reference to Local VAR
 								false, // Accept Convertion from String To Int
 								true, // Accept Convertion from Int To String
-								TempToken, 						// SYNTAX[] string
+								TempToken, 						// SYNTAX[] std::string
 								(TempTokenCount - 1), 	// SYNTAX_LONG int
 								WIN_OR_CLASS, 			// TMP_WINDOW_NAME
 								TheFunction, 				// TMP_FUNCTION_NAME
@@ -326,11 +326,11 @@ void parser_String(string Token[2048], CLASS_TOKEN *o_tokens){
 			// *** *** *** *** *** ***
 		}
 
-		if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 		return; // continue;
 	}
 	else if (Token[INT_POS + 2] != "")
 		ErrorCode("أمر غير معروف '" + Token[INT_POS + 2] + "', ربما تقصد '=' ", o_tokens);
 
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 }

@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_ObjNew(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// كائن
 
 	if (!o_tokens->TOKENS_PREDEFINED && IsInsideFunction)
@@ -81,12 +81,12 @@ void parser_ObjNew(string Token[2048], CLASS_TOKEN *o_tokens){
 	// TODO: Is C++ Allow create Obj inside the same class ? class X { X o; }
 
 	// C++, allow create Obj on global, global-class, local, but using it only on func.
-	string OBJ_ID;
+	std::string OBJ_ID;
 	if (IsInsideNamespace)
 	{
 		if (IsInsideFunction)
 		{
-			// Window -> Function.
+			// Namespace -> Function.
 			// Local Obj.
 
 			OBJ_ID = TheNamespace + TheFunction;
@@ -99,7 +99,7 @@ void parser_ObjNew(string Token[2048], CLASS_TOKEN *o_tokens){
 		}
 		else
 		{
-			// Window.
+			// Namespace.
 			// Error Obj.
 			ErrorCode("يجب إنشاء الكائن الجديد داخل دالة ", o_tokens);
 		}
@@ -160,8 +160,8 @@ void parser_ObjNew(string Token[2048], CLASS_TOKEN *o_tokens){
 	//OBJ_AT_LINE[std::make_pair(TheNamespace + TheFunction, Token[3])] = IntToString(o_tokens->Line);
 	//OBJ_CLASS[std::make_pair(TheNamespace + TheFunction, Token[3])] = Token[2];
 	
-	//if(DEBUG)DEBUG_MESSAGE("		[NEW-OBJ] [CLASS ' " + Token[2] + " '] [Generated_ID ' " + Token[3] + " '] (", o_tokens); // DEBUG
-	//if(DEBUG)DEBUG_MESSAGE("		[NEW-OBJ] [Generated_ID ' " + Token[2] + " '] = [CLASS ' " + Token[4] + " '] (", o_tokens); // DEBUG
+	//if(DEBUG)DEBUG_MESSAGE("[NEW-OBJ] [CLASS ' " + Token[2] + " '] [Generated_ID ' " + Token[3] + " '] (", o_tokens); // DEBUG
+	//if(DEBUG)DEBUG_MESSAGE("[NEW-OBJ] [Generated_ID ' " + Token[2] + " '] = [CLASS ' " + Token[4] + " '] (", o_tokens); // DEBUG
 
 	// NOTE: Dont add '(' now, 
 	// bcs if no Arg then error: 
@@ -169,9 +169,9 @@ void parser_ObjNew(string Token[2048], CLASS_TOKEN *o_tokens){
 
 	if (IsInsideNamespace)
 	{
-		// Window -> Function.
+		// Namespace -> Function.
 
-		if(DEBUG)DEBUG_MESSAGE("		[NEW-LOCAL-OBJ] [Generated_ID ' " + Token[2] + " '] = [CLASS ' " + Token[4] + " '] (", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[NEW-LOCAL-OBJ] [Generated_ID ' " + Token[2] + " '] = [CLASS ' " + Token[4] + " '] (", o_tokens); // DEBUG
 
 		SET_OBJ_C_NAME(Token[2]);
 		OBJ_IS_SET[std::make_pair(OBJ_ID, Token[2])] = true;
@@ -188,7 +188,7 @@ void parser_ObjNew(string Token[2048], CLASS_TOKEN *o_tokens){
 		{
 			// Class -> Function.
 
-			if(DEBUG)DEBUG_MESSAGE("		[NEW-LOCAL-CLASS-OBJ] [Generated_ID ' " + Token[2] + " '] = [CLASS ' " + Token[4] + " '] (", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[NEW-LOCAL-CLASS-OBJ] [Generated_ID ' " + Token[2] + " '] = [CLASS ' " + Token[4] + " '] (", o_tokens); // DEBUG
 
 			SET_OBJ_C_NAME(Token[2]);
 			OBJ_IS_SET[std::make_pair(OBJ_ID, Token[2])] = true;
@@ -213,7 +213,7 @@ void parser_ObjNew(string Token[2048], CLASS_TOKEN *o_tokens){
 				return; // continue;
 			}
 
-			if(DEBUG)DEBUG_MESSAGE("	[NEW-GLOBAL-CLASS-OBJ] [Generated_ID ' " + Token[2] + " '] = [CLASS ' " + Token[4] + " '] (", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[NEW-GLOBAL-CLASS-OBJ] [Generated_ID ' " + Token[2] + " '] = [CLASS ' " + Token[4] + " '] (", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			CPP_CLASS.append("public: CLASS_" + Global_ID[Token[4]] + " " + GlobalObj_ID[Token[2]] + " ");
@@ -326,7 +326,7 @@ void parser_ObjNew(string Token[2048], CLASS_TOKEN *o_tokens){
 	}
 	else if (IsInsideNamespace)
 	{
-		// Window -> Function.
+		// Namespace -> Function.
 		if (IS_EMPTY_ARG)
 		{
 			cpp_AddScript(TheFunction, " ; \n");

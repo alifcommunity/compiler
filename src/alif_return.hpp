@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// إرجاع
 	// func int ()
 	// return 1 + 2
@@ -45,7 +45,7 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 		{
 			// void return in class func
 
-			if(DEBUG)DEBUG_MESSAGE("		[VOID-RETURN-CLASS-FUN] \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[VOID-RETURN-CLASS-FUN] \n\n", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			CPP_CLASS.append("\n return; \n");
@@ -57,7 +57,7 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 		{
 			// void return in global func
 
-			if(DEBUG)DEBUG_MESSAGE("	[VOID-RETURN-GLOBAL-FUN] \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[VOID-RETURN-GLOBAL-FUN] \n\n", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			CPP_GLOBAL_FUN.append("\n  return; \n");
@@ -69,7 +69,7 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 		{
 			// void return in local func
 
-			if(DEBUG)DEBUG_MESSAGE("		[VOID-RETURN-LOCAL-FUN] \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[VOID-RETURN-LOCAL-FUN] \n\n", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			cpp_AddScript(TheFunction, "\n  return; \n");
@@ -81,14 +81,14 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 	else
 	{
 		// return int
-		// return string
+		// return std::string
 		// return bool
 
 		if (Token[2] == "")
 			ErrorCode("يجب اضافه قيمة بعد ' إرجاع ' لأن الدالة ' " + TheFunction + " ' من نوع " + TheFunction_TYPE, o_tokens);
 	}
 	
-	//string FUN_TYPE;
+	//std::string FUN_TYPE;
 	
 	if (IsInsideClass)
 	{
@@ -96,15 +96,15 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		if (TheFunction_TYPE == "عدد")
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[RETURN-CLASS-INT] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-CLASS-INT] ", o_tokens); // DEBUG
 		}
 		else if (TheFunction_TYPE == "نص")
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[RETURN-CLASS-STRING] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-CLASS-STRING] ", o_tokens); // DEBUG
 		}
 		else if (TheFunction_TYPE == "منطق")
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[RETURN-CLASS-BOOL] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-CLASS-BOOL] ", o_tokens); // DEBUG
 		}
 
 		// *** Generate Code ***
@@ -122,15 +122,15 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		if (TheFunction_TYPE == "عدد")
 		{
-			if(DEBUG)DEBUG_MESSAGE("	[RETURN-GLOBAL-INT] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-GLOBAL-INT] ", o_tokens); // DEBUG
 		}
 		else if (TheFunction_TYPE == "نص")
 		{
-			if(DEBUG)DEBUG_MESSAGE("	[RETURN-GLOBAL-STRING] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-GLOBAL-STRING] ", o_tokens); // DEBUG
 		}
 		else if (TheFunction_TYPE == "منطق")
 		{
-			if(DEBUG)DEBUG_MESSAGE("	[RETURN-GLOABL-BOOL] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-GLOABL-BOOL] ", o_tokens); // DEBUG
 		}
 
 		// *** Generate Code ***
@@ -149,15 +149,15 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		if (TheFunction_TYPE == "عدد")
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[RETURN-INT] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-INT] ", o_tokens); // DEBUG
 		}
 		else if (TheFunction_TYPE == "نص")
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[RETURN-STRING] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-STRING] ", o_tokens); // DEBUG
 		}
 		else if (TheFunction_TYPE == "منطق")
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[RETURN-BOOL] ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[RETURN-BOOL] ", o_tokens); // DEBUG
 		}
 
 		// *** Generate Code ***
@@ -176,14 +176,14 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 		// return true.
 
 		ScriptSyntaxBuffer = " true ";
-		if(DEBUG)DEBUG_MESSAGE(" [true] ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[true] ", o_tokens); // DEBUG
 
 	} else if(Token[2] == "خطأ"){
 		// Return Syntax
 		// return false.
 
 		ScriptSyntaxBuffer = " false ";
-		if(DEBUG)DEBUG_MESSAGE(" [false] ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[false] ", o_tokens); // DEBUG
 	} else {
 
 		// Return Syntax
@@ -201,22 +201,22 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 			}
 		}
 		
-		string WIN_OR_CLASS;
+		std::string WIN_OR_CLASS;
 		if (IsInsideClass)
 			WIN_OR_CLASS = TheClass;
 		else
 			WIN_OR_CLASS = TheNamespace;
 		
 		ScriptSyntaxBuffer = CheckForSyntax(TheFunction_TYPE,		// OBJECTIF_TYPE
-											true,					// Accept Using Reference to Window:Controls
-											true,					// Accept Using Reference to Window:Function
+											true,					// Accept Using Reference to Namespace:Controls
+											true,					// Accept Using Reference to Namespace:Function
 											true,					// Accept Using Reference to Global Functions
 											true,					// Accept Using Reference to Local Functions
 											true,					// Accept Using Reference to Global VAR
 											true,					// Accept Using Reference to Local VAR
 											false,					// Accept Convertion from String To Int
 											true,					// Accept Convertion from Int To String
-											TempToken,				// SYNTAX[] string
+											TempToken,				// SYNTAX[] std::string
 											(TempTokenCount - 1),	// SYNTAX_LONG int
 											WIN_OR_CLASS,			// TMP_WINDOW_NAME
 											TheFunction,			// TMP_FUNCTION_NAME
@@ -249,7 +249,7 @@ void parser_Return(string Token[2048], CLASS_TOKEN *o_tokens){
 	}
 	// *** *** *** *** *** ***
 
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 
 	return; // continue;
 }

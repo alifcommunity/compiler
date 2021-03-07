@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_IfElse(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_IfElse(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// وإلا
 
 	if (!o_tokens->TOKENS_PREDEFINED)
@@ -39,7 +39,7 @@ void parser_IfElse(string Token[2048], CLASS_TOKEN *o_tokens){
 	if (Token[2] != "")
 		ErrorCode("أمر غير معروف : ' " + Token[2] + " '، على العموم إذا كنت تقصد شرط جديد المرجو إستعمال ' إذا ' ", o_tokens);
 
-	if(DEBUG)DEBUG_MESSAGE("	[ELSE " + IntToString(ALIF_IF_STATUS) + "] \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("[ELSE " + IntToString(ALIF_IF_STATUS) + "] \n\n", o_tokens); // DEBUG
 
 	// TODO: show error when double Else
 	// if ...

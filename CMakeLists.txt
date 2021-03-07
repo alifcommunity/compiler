@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15.0)
 
 # --[ Alif version ] --------------------------------------------------------------
 
-project(AlifProject VERSION 3.0.2 DESCRIPTION "Alif language compiler.")
+project(AlifProject VERSION 3.0.15 DESCRIPTION "Alif language compiler.")
 message("-- [ Alif version ${CMAKE_PROJECT_VERSION} ]")
 
 # --[ Settings ] -------------------------------------------------------------------
@@ -13,22 +13,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # Default build
-set(default_build_type "Release")
+set(default_build_type "Debug")
 if(CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-    message("[!] Build type changed to ${CMAKE_BUILD_TYPE}.")
-    if(NOT CMAKE_CONFIGURATION_TYPES)
-        set(CMAKE_CONFIGURATION_TYPES Release)
-        message("[!] Configuration type changed to ${CMAKE_CONFIGURATION_TYPES}.")
-    endif()
-endif()
+# if(NOT CMAKE_BUILD_TYPE)
+#     set(CMAKE_BUILD_TYPE Release)
+#     message("[!] Build type changed to ${CMAKE_BUILD_TYPE}.")
+#     if(NOT CMAKE_CONFIGURATION_TYPES)
+#         set(CMAKE_CONFIGURATION_TYPES Release)
+#         message("[!] Configuration type changed to ${CMAKE_CONFIGURATION_TYPES}.")
+#     endif()
+# endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)  
     message("[!] Warning: Build type set to Debug. Make sure you have Debug version of Boost libs.")

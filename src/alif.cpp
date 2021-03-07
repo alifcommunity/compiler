@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.11 (Beta)"
+#define ALIF_VERSION "3.0.15 (Beta)"
 
 // Stack ********************************************************
 
@@ -63,25 +63,23 @@
 
 	// Boost
 	#include <boost/algorithm/string/replace.hpp>
-	#include <boost/lexical_cast.hpp>
 	#include <boost/algorithm/string.hpp>
-	#include <boost/locale.hpp>
+	#include <boost/algorithm/string/replace.hpp>
 	#include <boost/filesystem/path.hpp>
 	#include <boost/filesystem/fstream.hpp>
-	#include <boost/filesystem/operations.hpp >
+	#include <boost/filesystem/operations.hpp>
 	#include <boost/program_options.hpp>
-	#include <boost/algorithm/string/replace.hpp>
+	#include <boost/locale.hpp>
 	#include <boost/lexical_cast.hpp>
-	#include <boost/algorithm/string.hpp>
 
 	// UTF-8
 	#include "utf8.h"
 
-// Alif includes ************************************************
+// Alif v2 ************************************************
 
 	using namespace std;
 	bool DEBUG = true;
-	static const string VERSION = "3.0.2 (Beta)";
+	static const std::string VERSION = ALIF_VERSION;
 
 // Global *******************************************************
 
@@ -123,6 +121,14 @@
 			std::string fullpath = "";
 		} output;
 
+		struct _log {
+
+			std::string path = "";
+			std::string filename = "";
+			std::string extension = "";
+			std::string fullpath = "";
+		} log;
+
 	} argument;
 
 	struct _script {
@@ -145,7 +151,7 @@
 	// نهاية كلما مجال دالة عدد نص كائن إذا و أو سطر إرجاع صنف أداة نقر زر نص
 	// ملصق إظهار إخفاء تدمير عنوان نص تجميد عرض محتوى ارتفاع أفصول أرتوب 
 
-	static const string ALIF_RESERVED[] = {	"ألف", "أضف", "مكتبة", "واجهة", "_س_", "مجال", "إرجاع", "نهاية", 
+	static const std::string ALIF_RESERVED[] = {	"ألف", "أضف", "مكتبة", "واجهة", "_س_", "مجال", "إرجاع", "نهاية", 
 											"صنف", "خاص", "عدد", "نص", "كائن", "دالة", "هدم", "بناء",
 											"كلما", "إذا", "أو", "و", "وإلا", "سطر", "أداة", "نقر", "زر", "ملصق", 
 											"صحيح", "خطأ", "كسر", "متغير", "ثابت", "منطق", "طرفية", "رئيسية"
@@ -160,7 +166,7 @@
 	// Create Obj for every Alif Source files
 	// -----------------------------------------------------------
 
-	string TempToken [1024];
+	std::string TempToken [1024];
 	int TempTokenCount = 1;
 
 	class CLASS_TOKEN
@@ -171,8 +177,8 @@
 			// Script Type
 			// ----------------------------------
 			
-			// to block setting Alif-Window inside librarys
-			string 	ALIF_SCRIPT_TYPE;
+			// to block setting Alif-Namespace inside library's
+			std::string 	ALIF_SCRIPT_TYPE;
 			
 			// ----------------------------------
 			// File Path
@@ -180,19 +186,19 @@
 			
 			// usr/username/Desktop/myproject/src/mysource.alif
 			// Used only by Lexer()
-			string PATH_FULL_SOURCE;
+			std::string PATH_FULL_SOURCE;
 			
 			// ----------------------------------
 			// Tokens
 			// ----------------------------------
 
-			string REAL_LINE[2048];										// The real Alif script line, without toknonisation !
+			std::string REAL_LINE[2048];										// The real Alif script line, without toknonisation !
 			std::map<std::pair<int, int>, int> REAL_TOKEN_POSITION;		// The real Alif script token position in real line !
 																		// [Line Number, Token Number] = "real char number"
 			
 			bool TOKENS_PREDEFINED = false;
 
-			std::map<std::pair<int, int>, string> TOKEN; // TOKEN [Line Number, Token Number] = "token"
+			std::map<std::pair<int, int>, std::string> TOKEN; // TOKEN [Line Number, Token Number] = "token"
 			
 			int TOTAL [2048];
 			int TOTAL_LINES;
@@ -217,115 +223,115 @@
 	// Alif Global Language Variables
 	// ----------------------------------
 
-	static string APP_TYPE = "PC_CONSOLE";
+	//static std::string APP_TYPE = "PC_CONSOLE";
 
 	// ----------------------------------
 	// Flag
 	// ----------------------------------
 
-	static std::map<string, bool>	ALIF_FLAG_FILE;			// alif_flag[full_file_path] = true or false
-	static std::map<string, string>	ALIF_FLAG_AT_LINE_FILE;	// alif_flag[full_file_path] = at_line
+	static std::map<std::string, bool>	ALIF_FLAG_FILE;			// alif_flag[full_file_path] = true or false
+	static std::map<std::string, std::string>	ALIF_FLAG_AT_LINE_FILE;	// alif_flag[full_file_path] = at_line
 
 	// ----------------------------------
 	// صنف
 	// ----------------------------------
 
-	static std::map<string, bool>							CLASS_CONSTRICTOR_FUN_IS_SET;		// abc[class] = main_func true or false
-	static std::map<string, string>							CLASS_CONSTRICTOR_FUN_AT_LINE;		// abc[class] = main_func_at_line
-	static std::map<string, string>							CLASS_CONSTRICTOR_FUN_ARG_TOTAL;	// abc[class] = total args
-	static std::map<std::pair<string, int>, string>			CLASS_CONSTRICTOR_FUN_ARG_TYPE;		// abc[class][arg number] = arg type
+	static std::map<std::string, bool>							CLASS_CONSTRICTOR_FUN_IS_SET;		// abc[class] = main_func true or false
+	static std::map<std::string, std::string>							CLASS_CONSTRICTOR_FUN_AT_LINE;		// abc[class] = main_func_at_line
+	static std::map<std::string, std::string>							CLASS_CONSTRICTOR_FUN_ARG_TOTAL;	// abc[class] = total args
+	static std::map<std::pair<std::string, int>, std::string>			CLASS_CONSTRICTOR_FUN_ARG_TYPE;		// abc[class][arg number] = arg type
 
 	static bool												IsInsideClass = false;
-	static string											TheClass;
-	static std::map<string, bool>							CLASS_IS_SET;				// abc['class name'] = already set ?
-	static std::map<string, string>							CLASS_AT_LINE;				// abc['class name'] = class at line
+	static std::string											TheClass;
+	static std::map<std::string, bool>							CLASS_IS_SET;				// abc['class name'] = already set ?
+	static std::map<std::string, std::string>							CLASS_AT_LINE;				// abc['class name'] = class at line
 
-	static std::map<std::pair<string, string>, bool>		CLASS_FUN_IS_SET; 			// abc[class][fun] = class fun already set ?
-	static std::map<std::pair<string, string>, string>		CLASS_FUN_AT_LINE; 			// abc[class][fun] = class fun line number
-	static std::map<std::pair<string, string>, string>		CLASS_FUN_TYPE;				// abc[class][fun] = class fun type
-	static std::map<std::pair<string, string>, bool>		CLASS_FUN_PRIVATE; 			// abc[class][fun] = class fun private ?
-	static std::map<std::pair<string, string>, int>			CLASS_FUN_ARG_TOTAL;		// abc[class][fun] = global total args
-	static std::map<std::pair<string, int>, string>			CLASS_FUN_ARG_TYPE;			// abc[class + fun][arg number] = arg type
+	static std::map<std::pair<std::string, std::string>, bool>		CLASS_FUN_IS_SET; 			// abc[class][fun] = class fun already set ?
+	static std::map<std::pair<std::string, std::string>, std::string>		CLASS_FUN_AT_LINE; 			// abc[class][fun] = class fun line number
+	static std::map<std::pair<std::string, std::string>, std::string>		CLASS_FUN_TYPE;				// abc[class][fun] = class fun type
+	static std::map<std::pair<std::string, std::string>, bool>		CLASS_FUN_PRIVATE; 			// abc[class][fun] = class fun private ?
+	static std::map<std::pair<std::string, std::string>, int>			CLASS_FUN_ARG_TOTAL;		// abc[class][fun] = global total args
+	static std::map<std::pair<std::string, int>, std::string>			CLASS_FUN_ARG_TYPE;			// abc[class + fun][arg number] = arg type
 
-	static std::map<std::pair<string, string>, bool>		CLASS_G_VAR_IS_SET; 	    // abc[class][var] = global var already set ?
-	static std::map<std::pair<string, string>, string>		CLASS_G_VAR_AT_LINE; 	    // abc[class][var] = global var line number
-	static std::map<std::pair<string, string>, string>		CLASS_G_VAR_TYPE; 		    // abc[class][var] = global var type
-	static std::map<std::pair<string, string>, bool>		CLASS_G_VAR_PRIVATE; 	    // abc[class][var] = global private ?
-	static std::map<std::pair<string, string>, bool>		CLASS_G_VAR_IS_CONST;		// abc[class][var] = global var Constant
-	static std::map<std::pair<string, string>, bool>		CLASS_G_VAR_IS_ARRAY;
+	static std::map<std::pair<std::string, std::string>, bool>		CLASS_G_VAR_IS_SET; 	    // abc[class][var] = global var already set ?
+	static std::map<std::pair<std::string, std::string>, std::string>		CLASS_G_VAR_AT_LINE; 	    // abc[class][var] = global var line number
+	static std::map<std::pair<std::string, std::string>, std::string>		CLASS_G_VAR_TYPE; 		    // abc[class][var] = global var type
+	static std::map<std::pair<std::string, std::string>, bool>		CLASS_G_VAR_PRIVATE; 	    // abc[class][var] = global private ?
+	static std::map<std::pair<std::string, std::string>, bool>		CLASS_G_VAR_IS_CONST;		// abc[class][var] = global var Constant
+	static std::map<std::pair<std::string, std::string>, bool>		CLASS_G_VAR_IS_ARRAY;
 
 	// ----------------------------------
 	// كائن
 	// ----------------------------------
 
-	static std::map<std::pair<string, string>, bool>	OBJ_IS_SET;			        // abc[win + fun][obj] = already set ?
-	static std::map<std::pair<string, string>, string>	OBJ_AT_LINE;		        // abc[win + fun][obj] = line number
-	static std::map<std::pair<string, string>, string>	OBJ_CLASS;			        // abc[win + fun][obj] = base class
-	static std::map<string, string>						OBJ_GLOBAL_DECLARATION;     // abc[class] = Obj1; Obj2;...
+	static std::map<std::pair<std::string, std::string>, bool>	OBJ_IS_SET;						// abc[namespace + fun][obj] = already set ?
+	static std::map<std::pair<std::string, std::string>, std::string>	OBJ_AT_LINE;			// abc[namespace + fun][obj] = line number
+	static std::map<std::pair<std::string, std::string>, std::string>	OBJ_CLASS;				// abc[namespace + fun][obj] = base class
+	static std::map<std::string, std::string>						OBJ_GLOBAL_DECLARATION;		// abc[class] = Obj1; Obj2;...
 
 	// ----------------------------------
 	// مجال
 	// ----------------------------------
 
 	static bool 	IsInsideNamespace = false;
-	static string 	TheNamespace;
+	static std::string 	TheNamespace;
 
 	int Namespace_Total = 0;
-	string Namespace_Total_Names[64];
+	std::string Namespace_Total_Names[64];
 
 	// ----------------------------------
 	// مجال رئيسية
 	// ----------------------------------
 
 	// static bool 	MAIN_WIN_IS_SET = false;
-	// static string 	MAIN_WIN_AT_LINE;
+	// static std::string 	MAIN_WIN_AT_LINE;
 
 	// ----------------------------------
 	// مجال
 	// ----------------------------------
 
-	static std::map<string, bool>		namespace_is_set;		// abc['window_name'] = already set ?
-	static std::map<string, string> 	namespace_at_line;	// abc['window_name'] = func_at_line
-	//static std::map<string, bool>		WIN_IS_WEB; 	// abc['window_name'] = Web UI ?
+	static std::map<std::string, bool>		namespace_is_set;		// abc['namespace_name'] = already set ?
+	static std::map<std::string, std::string> 	namespace_at_line;	// abc['namespace_name'] = func_at_line
+	//static std::map<std::string, bool>		WIN_IS_WEB; 	// abc['namespace_name'] = Web UI ?
 
 	// ----------------------------------
 	// دالة 
 	// ----------------------------------
 
 	static bool											IsInsideFunction = false;
-	static string										TheFunction;
-	static string 										TheFunction_TYPE;
-	static std::map<std::pair<string, string>, string>	RETURN_FUN;	// abc[win][fun] = return is ok ? "OK", "IF"
+	static std::string										TheFunction;
+	static std::string 										TheFunction_TYPE;
+	static std::map<std::pair<std::string, std::string>, std::string>	RETURN_FUN;	// abc[win][fun] = return is ok ? "OK", "IF"
 	static bool 										IS_CONTROL_FUNCTION_NAME = false;
 
 	// ----------------------------------
 	// دالة رئيسية
 	// ----------------------------------
 
-	static std::map<string, bool> 	MAIN_FUN_IS_SET;	// abc['window_name'] = main_func true or false
-	static std::map<string, string> MAIN_FUN_AT_LINE; 	// abc['window_name'] = main_func_at_line
+	static std::map<std::string, bool> 	MAIN_FUN_IS_SET;	// abc['namespace_name'] = main_func true or false
+	static std::map<std::string, std::string> MAIN_FUN_AT_LINE; 	// abc['namespace_name'] = main_func_at_line
 
 	// ----------------------------------
 	// دالة
 	// ----------------------------------
 
-	static std::map<string, bool>							G_FUN_IS_SET; 			// abc[gfun] = global fun already set ?
-	static std::map<string, string>							G_FUN_AT_LINE; 			// abc[gfun] = global fun line number
-	static std::map<string, string>							G_FUN_TYPE; 			// abc[gfun] = global fun type
-	static std::map<string, int>							G_FUN_ARG_TOTAL;		// abc[gfun] = global total args
-	static std::map<std::pair<string, int>, string>			G_FUN_ARG_TYPE;			// abc[gfun][arg number] = arg type
+	static std::map<std::string, bool>							G_FUN_IS_SET; 			// abc[gfun] = global fun already set ?
+	static std::map<std::string, std::string>							G_FUN_AT_LINE; 			// abc[gfun] = global fun line number
+	static std::map<std::string, std::string>							G_FUN_TYPE; 			// abc[gfun] = global fun type
+	static std::map<std::string, int>							G_FUN_ARG_TOTAL;		// abc[gfun] = global total args
+	static std::map<std::pair<std::string, int>, std::string>			G_FUN_ARG_TYPE;			// abc[gfun][arg number] = arg type
 	int														Global_TotalFucntion = 0;
-	static std::map<int, string>							Global_FunctionNames;	// abc[global fun number] = func name
+	static std::map<int, std::string>							Global_FunctionNames;	// abc[global fun number] = func name
 
-	static std::map<std::pair<string, string>, bool>		L_FUN_IS_SET; 	    // abc[window][fun] = local fun already set ?
-	static std::map<std::pair<string, string>, string>		L_FUN_AT_LINE; 		// abc[window][fun] = local fun line number
-	static std::map<std::pair<string, string>, string>		L_FUN_TYPE; 		// abc[window][fun] = local fun type
-	static std::map<std::pair<string, string>, int>			L_FUN_ARG_TOTAL;	// abc[window][fun] = global total args
-	static std::map<std::pair<string, int>, string>			L_FUN_ARG_TYPE;		// abc[window + fun][arg number] = arg type
+	static std::map<std::pair<std::string, std::string>, bool>		L_FUN_IS_SET; 	    // abc[window][fun] = local fun already set ?
+	static std::map<std::pair<std::string, std::string>, std::string>		L_FUN_AT_LINE; 		// abc[window][fun] = local fun line number
+	static std::map<std::pair<std::string, std::string>, std::string>		L_FUN_TYPE; 		// abc[window][fun] = local fun type
+	static std::map<std::pair<std::string, std::string>, int>			L_FUN_ARG_TOTAL;	// abc[window][fun] = global total args
+	static std::map<std::pair<std::string, int>, std::string>			L_FUN_ARG_TYPE;		// abc[window + fun][arg number] = arg type
 
 	int														Win_CurrentTotalFucntion = 0;
-	static std::map<string, int>							Win_TotalFucntion;	// abc[window] = total functions
-	static std::map<std::pair<string, int>, string>			Win_FunctionNames;	// abc[window][fun number] = func name
+	static std::map<std::string, int>							Win_TotalFucntion;	// abc[window] = total functions
+	static std::map<std::pair<std::string, int>, std::string>			Win_FunctionNames;	// abc[window][fun number] = func name
 
 	static std::string										NEW_FUNCTION_ARG = "";
 
@@ -335,31 +341,31 @@
 
 	// Local var
 
-	static std::map<std::pair<string, string>, bool>	L_VAR_IS_SET; 		// abc[window + func][var] = local var already set ?
-	static std::map<std::pair<string, string>, string>	L_VAR_AT_LINE; 		// abc[window + func][var] = local var line number
-	static std::map<std::pair<string, string>, string>	L_VAR_TYPE; 		// abc[window + func][var] = local var type
-	static std::map<std::pair<string, string>, bool>	L_VAR_IS_CONST; 	// abc[window + func][var] = local var Constant
-	static std::map<std::pair<string, string>, bool>	L_VAR_IS_ARRAY;
+	static std::map<std::pair<std::string, std::string>, bool>	L_VAR_IS_SET; 		// abc[window + func][var] = local var already set ?
+	static std::map<std::pair<std::string, std::string>, std::string>	L_VAR_AT_LINE; 		// abc[window + func][var] = local var line number
+	static std::map<std::pair<std::string, std::string>, std::string>	L_VAR_TYPE; 		// abc[window + func][var] = local var type
+	static std::map<std::pair<std::string, std::string>, bool>	L_VAR_IS_CONST; 	// abc[window + func][var] = local var Constant
+	static std::map<std::pair<std::string, std::string>, bool>	L_VAR_IS_ARRAY;
 
 	// Global var
 
-	static std::map<string, bool>	G_VAR_IS_SET; 		// abc[var] = global var already set ?
-	static std::map<string, string>	G_VAR_AT_LINE; 		// abc[var] = global var line number
-	static std::map<string, string>	G_VAR_TYPE; 		// abc[var] = global var type
-	static std::map<string, bool>	G_VAR_IS_CONST; 	// abc[var] = global var Constant
-	static std::map<string, bool>	G_VAR_IS_ARRAY;
+	static std::map<std::string, bool>	G_VAR_IS_SET; 		// abc[var] = global var already set ?
+	static std::map<std::string, std::string>	G_VAR_AT_LINE; 		// abc[var] = global var line number
+	static std::map<std::string, std::string>	G_VAR_TYPE; 		// abc[var] = global var type
+	static std::map<std::string, bool>	G_VAR_IS_CONST; 	// abc[var] = global var Constant
+	static std::map<std::string, bool>	G_VAR_IS_ARRAY;
 	static int						G_VAR_TOTAL = 0;	// Total of global vars
-	static std::map<int, string>	G_VAR_NAMES; 		// abc[var] = var_name
+	static std::map<int, std::string>	G_VAR_NAMES; 		// abc[var] = var_name
 
 	// -----------------------------------------------------------
 	// CONTROLS TABLE
 	// -----------------------------------------------------------
 
-	// static std::map<string, bool>						CONTROL_WIN_IS_SET; 	// abc[win-control] = already set ?
-	// static std::map<string, string>						CONTROL_WIN_AT_LINE;	// abc[win-control] = line number
-	// static std::map<std::pair<string, string>, bool>	CONTROL_IS_SET;			// abc[window][control] = already set ?
-	// static std::map<std::pair<string, string>, string>	CONTROL_AT_LINE;		// abc[window][control] = line number
-	// static std::map<std::pair<string, string>, string>	CONTROL_TYPE;			// abc[window][control] = type
+	// static std::map<std::string, bool>						CONTROL_WIN_IS_SET; 	// abc[win-control] = already set ?
+	// static std::map<std::string, std::string>						CONTROL_WIN_AT_LINE;	// abc[win-control] = line number
+	// static std::map<std::pair<std::string, std::string>, bool>	CONTROL_IS_SET;			// abc[window][control] = already set ?
+	// static std::map<std::pair<std::string, std::string>, std::string>	CONTROL_AT_LINE;		// abc[window][control] = line number
+	// static std::map<std::pair<std::string, std::string>, std::string>	CONTROL_TYPE;			// abc[window][control] = type
 
 	// ----------------------------------
 	// PARENTHESIS
@@ -395,79 +401,79 @@
 	bool ERROR_PRINT_ON_SCREEN = false;
 
 	// Log
-	string LOG_MESSAGE_FULL = "";
+	std::string LOG_MESSAGE_FULL = "";
 
 	// -----------------------------------------------------------
 	// CPP BUFERs
 	// -----------------------------------------------------------
 
-	string CBUFER;
-	string CBUFER_ID;
-	string CBUFER_OBJ;
-	string ScriptSyntaxBuffer;
-	string ScriptBuffer;
+	std::string CBUFER;
+	std::string CBUFER_ID;
+	std::string CBUFER_OBJ;
+	std::string ScriptSyntaxBuffer;
+	std::string ScriptBuffer;
 
 	// -----------------------------------------------------------
 	// C++ Code Inside Alif Code
 	// -----------------------------------------------------------
 
 	static bool LIB_INSIDE_CPP_CODE = false;
-	string LIB_LEXER_CG_BUFER;
-	string LIB_PARSER_CG_BUFER;
+	std::string LIB_LEXER_CG_BUFER;
+	std::string LIB_PARSER_CG_BUFER;
 
 	// -----------------------------------------------------------
 	// ALIF COMPILER VARs
 	// -----------------------------------------------------------
 
-	static std::map<string, bool> ALREADY_PARSED_FILE_TOKENS_NOT_PREDEFINED;
-	static std::map<string, bool> ALREADY_PARSED_FILE_TOKENS_PREDEFINED;
+	static std::map<std::string, bool> ALREADY_PARSED_FILE_TOKENS_NOT_PREDEFINED;
+	static std::map<std::string, bool> ALREADY_PARSED_FILE_TOKENS_PREDEFINED;
 
-	string PATH_FULL_ALIF;				// Desktop/myapp.alif
-	string PATH_FULL_BIN;				// Desktop/mybin.bin
-	string PATH_FULL_LOG;				// Desktop/myapp.log
+	std::string PATH_FULL_ALIF;				// Desktop/myapp.alif
+	std::string PATH_FULL_BIN;				// Desktop/mybin.bin
+	std::string PATH_FULL_LOG;				// Desktop/myapp.log
 
-	string cc_path_full;				// Linux : 'gcc' | Win : c:\Alif\bin\gcc.exe
-	string PATH_FULL_CPP;				// tmp/123456789.cpp
-	string PATH_FULL_OBJ;				// tmp/123456789.o
-	string PATH_FULL_RC;				// tmp/123456789.rc
-	string PATH_FULL_ICO;				// Mac: /usr/share/aliflang/alif.ics | Win: c:\Alif\alif.ico
+	std::string cc_path_full;				// Linux : 'gcc' | Win : c:\Alif\bin\gcc.exe
+	std::string PATH_FULL_CPP;				// tmp/123456789.cpp
+	std::string PATH_FULL_OBJ;				// tmp/123456789.o
+	std::string PATH_FULL_RC;				// tmp/123456789.rc
+	std::string PATH_FULL_ICO;				// Mac: /usr/share/aliflang/alif.ics | Win: c:\Alif\alif.ico
 	#if  __APPLE__
-		string PATH_FULL_PLIST;				// Mac only
-		string PATH_FULL_BIN_TMP;			// Tmp/mybin.bin
+		std::string PATH_FULL_PLIST;				// Mac only
+		std::string PATH_FULL_BIN_TMP;			// Tmp/mybin.bin
 	#endif
 
-	string PATH_ABSOLUTE;
-	string PATH_WORKING;
+	std::string PATH_ABSOLUTE;
+	std::string PATH_WORKING;
 
-	string PATH_TEMP;					// /usr/tmp
-	string RANDOM;						// 1234
+	std::string PATH_TEMP;					// /usr/tmp
+	std::string RANDOM;						// 1234
 
-	//string PATH_FULL_LIB_SETTING;		// 'gcc' | c:\Alif\aliflib\aliflib.inf
-	//std::map<string, string> LIB_FILE_NAME;
+	//std::string PATH_FULL_LIB_SETTING;		// 'gcc' | c:\Alif\aliflib\aliflib.inf
+	//std::map<std::string, std::string> LIB_FILE_NAME;
 
 	// Complet path of Web UI window (HTML5) file
 	// Used by parser #window_web
-	string PATH_FULL_WINDOW_WEB;
+	std::string PATH_FULL_WINDOW_WEB;
 
 	#ifdef _WIN32
-		string SEPARATION = "\\";
+		std::string SEPARATION = "\\";
 	#else
-		string SEPARATION = "/";
+		std::string SEPARATION = "/";
 	#endif
 
 	// -----------------------------------------------------------
 	// Compile Extra commands
 	// -----------------------------------------------------------
 
-	string Compile_ExtraCompile = " ";	// -I/...
-	string Compile_ExtraLink = " ";		// -L\"/...\" -lmylib...
+	std::string Compile_ExtraCompile = " ";	// -I/...
+	std::string Compile_ExtraLink = " ";		// -L\"/...\" -lmylib...
 
-	void CompileAddExtra_Compile (string cmd){
+	void add_extra_arg_to_compiler (std::string cmd){
 
 		Compile_ExtraCompile.append(cmd);
 	}
 
-	void CompileAddExtra_Link (string cmd){
+	void add_extra_arg_to_linker (std::string cmd){
 
 		Compile_ExtraLink.append(cmd);
 	}
@@ -479,9 +485,9 @@
 	// -I/usr/include/python3.5
 	// -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu\" -lpython3.5
 
-	string PythonInclude_path = "";
-	string PythonLib_path = "";
-	string PythonLibName = "";
+	std::string PythonInclude_path = "";
+	std::string PythonLib_path = "";
+	std::string PythonLibName = "";
 
 	void PythonSetEnvirenment(){
 
@@ -494,47 +500,47 @@
 
 		// TODO: if thos var are empty, then get python paths by cmd.
 
-		string buffer = " -I\"" + PythonInclude_path + "\" ";
+		std::string buffer = " -I\"" + PythonInclude_path + "\" ";
 
-		CompileAddExtra_Compile(buffer);
+		add_extra_arg_to_compiler(buffer);
 
 		buffer = " -L\"" + PythonLib_path + "\" -l" + PythonLibName + " ";
 
-		CompileAddExtra_Link(buffer);
+		add_extra_arg_to_linker(buffer);
 	}
 
 // Headers ******************************************************
 
 	// Core
-	string CHECK_CALL_FUN_ARG(bool CALL_FUN_GLOBAL,
-							string CALL_WIN_OR_CLASS, // win1/class1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> win1
-							string CALL_FUN,			// win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> fun1
+	std::string CHECK_CALL_FUN_ARG(bool CALL_FUN_GLOBAL,
+							std::string CALL_WIN_OR_CLASS, // win1/class1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> win1
+							std::string CALL_FUN,			// win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> fun1
 							int CALL_IS_CLASS,		// 0 = non class, 1 constructor, 2 = الدالة member, ل Message when new obj
-							string FROM_WIN_OR_CLASS, // win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> win2
-							string FROM_FUN,			// win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> fun2
-							string SYNTAX[2048],
+							std::string FROM_WIN_OR_CLASS, // win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> win2
+							std::string FROM_FUN,			// win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> fun2
+							std::string SYNTAX[2048],
 							int SYNTAX_LONG,
 							CLASS_TOKEN *o_tokens);
 
 	// Parser
 	void SetNewVar(	bool IsGlobal, 
-					string TmpWindow, 
-					string TmpFunction, 
-					string VarName, 
-					string VarDataType, 
+					std::string TempNS, 
+					std::string TmpFunction, 
+					std::string VarName, 
+					std::string VarDataType, 
 					bool IsConstant, 
 					bool IsArray,
 					int Line, 
 					CLASS_TOKEN *o_tokens);
 
-	//void parser_NewWindowWeb(string Token[2048], CLASS_TOKEN *o_tokens);
+	//void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens);
 
 	// Lexer
-	void AlifLexerParser(string FILE_NAME, string FILE_TYPE, bool FIRST_FILE, bool TOKENS_ARE_PREDININED);
+	void AlifLexerParser(std::string FILE_NAME, std::string FILE_TYPE, bool FIRST_FILE, bool TOKENS_ARE_PREDININED);
 
 // Log **********************************************************
 
-	void ALIF_ERROR(string ERROR_DESCRIPTION) 
+	void ALIF_ERROR(std::string ERROR_DESCRIPTION) 
 	{
 		cout << endl << ERROR_DESCRIPTION << endl << endl;
 		
@@ -549,7 +555,7 @@
 		exit(EXIT_FAILURE);
 	}
 
-	void DEBUG_MESSAGE(string MESSAGE, CLASS_TOKEN *o_tokens)
+	void DEBUG_MESSAGE(std::string MESSAGE, CLASS_TOKEN *o_tokens)
 	{
 		LOG_MESSAGE_FULL.append(MESSAGE);
 		
@@ -559,7 +565,7 @@
 		}
 	}
 
-	void LogMessage(string MESSAGE)
+	void LogMessage(std::string MESSAGE)
 	{
 		LOG_MESSAGE_FULL.append(MESSAGE);
 		
@@ -578,16 +584,16 @@
 		file.close();
 	}
 
-	void ErrorCode(string ERROR_DESCRIPTION, CLASS_TOKEN *o_tokens) 
+	void ErrorCode(std::string ERROR_DESCRIPTION, CLASS_TOKEN *o_tokens) 
 	{
 
 		if(DEBUG)DEBUG_MESSAGE("\n ----------- DEBUGING ERROR ------------- \n", o_tokens);
 		
+		if(DEBUG)DEBUG_MESSAGE("Namespace : " + TheNamespace + " \n", o_tokens);
 		if(DEBUG)DEBUG_MESSAGE("Class : " + TheClass + " \n", o_tokens);
-		if(DEBUG)DEBUG_MESSAGE("Win : " + TheNamespace + " \n", o_tokens);
 		if(DEBUG)DEBUG_MESSAGE("Fun : " + TheFunction + " \n\n", o_tokens);
 		
-		string ERR_MSG;
+		std::string ERR_MSG;
 		
 		if (SHOW_FILE_AND_LINE)
 		{
@@ -615,7 +621,7 @@
 
 	// New
 
-	void err(string des) {
+	void err(std::string des) {
 
 		std::cout << "[!] Error" << std::endl << 
 		des << std::endl;
@@ -664,9 +670,9 @@
 		return true;
 	}
 
-	string substr_utf8(string originalString, int Position, int MaxLen){
+	std::string substr_utf8(std::string originalString, int Position, int MaxLen){
 
-		string resultString_start = originalString;
+		std::string resultString_start = originalString;
 		const char* aStr_start = originalString.c_str();
 		
 		int len = 0;
@@ -704,7 +710,7 @@
 			len = 0;
 			byteCount = 0;
 		
-			string resultString = resultString_start;
+			std::string resultString = resultString_start;
 
 			const char* aStr = resultString_start.c_str();
 
@@ -729,19 +735,19 @@
 		}
 	}
 
-	string IntToString(int INT_VAL){
+	std::string IntToString(int INT_VAL){
 
 		// Int --> String
 
 		stringstream STRING_STREAM_BUFFER;
 		STRING_STREAM_BUFFER << INT_VAL;
-		string STRING_BUFFER = STRING_STREAM_BUFFER.str();
+		std::string STRING_BUFFER = STRING_STREAM_BUFFER.str();
 		return STRING_BUFFER;
 	}
 
-	string CONVERT_STRING_ARRAY_TO_STRING(string STRING_ARRAY_VAL[1024], int LONG)
+	std::string CONVERT_STRING_ARRAY_TO_STRING(std::string STRING_ARRAY_VAL[1024], int LONG)
 	{
-		// string[123] --> String
+		// std::string[123] --> String
 		stringstream STRING_STREAM_BUFFER;
 		
 		if (LONG < 1)
@@ -752,16 +758,16 @@
 			STRING_STREAM_BUFFER << STRING_ARRAY_VAL[p];
 		}
 		
-		string STRING_BUFFER = STRING_STREAM_BUFFER.str();
+		std::string STRING_BUFFER = STRING_STREAM_BUFFER.str();
 		return STRING_BUFFER;
 	}
 
-	string CONVERT_WCHAT_T_TO_STRING(wchar_t* WCHART_T_VAL)
+	std::string CONVERT_WCHAT_T_TO_STRING(wchar_t* WCHART_T_VAL)
 	{
 		// wchar_t --> String
 
 		// const wstring W_STRING_BUFFER (WCHART_T_VAL);
-		// const string STRING_BUFFER (W_STRING_BUFFER.begin(), W_STRING_BUFFER.end());
+		// const std::string STRING_BUFFER (W_STRING_BUFFER.begin(), W_STRING_BUFFER.end());
 		// return STRING_BUFFER;
 
 		using convert_typeX = std::codecvt_utf8<wchar_t>;
@@ -769,10 +775,10 @@
 		return converterX.to_bytes(WCHART_T_VAL);
 	}
 
-	string CONVERT_CHAR_TO_STRING(char* CHART_VAL)
+	std::string CONVERT_CHAR_TO_STRING(char* CHART_VAL)
 	{
 		// Char --> String
-		string STRING_BUFFER(CHART_VAL);
+		std::string STRING_BUFFER(CHART_VAL);
 		return STRING_BUFFER;
 	}
 
@@ -831,14 +837,14 @@
 		if (ifile == NULL) {
 			//fprintf(stderr, "cannot open %s for reading\n", ifname);
 			//exit(1);
-			ALIF_ERROR("ERROR : cannot open file for reading -> " + string(ifname));
+			ALIF_ERROR("ERROR : cannot open file for reading -> " + std::string(ifname));
 		}
 
 		ofile = fopen(ofname, "wb");
 		if (ofile == NULL) {
 			//fprintf(stderr, "cannot open %s for writing\n", ofname);
 			//exit(1);
-			ALIF_ERROR("ERROR : cannot open file for reading -> " + string(ofname));
+			ALIF_ERROR("ERROR : cannot open file for reading -> " + std::string(ofname));
 		}
 
 		char buf[PATH_MAX], *p;
@@ -884,9 +890,9 @@
 		fclose(ofile);
 	}
 
-	void BinaryToC(string FileIn, string FileOut){
+	void BinaryToC(std::string FileIn, std::string FileOut){
 
-		string FileType = FileIn.substr(FileIn.find_last_of(".") + 1);
+		std::string FileType = FileIn.substr(FileIn.find_last_of(".") + 1);
 
 		if (FileType == "CSS" || FileType == "css" ||
 			FileType == "JS" || FileType == "js" ||
@@ -1005,7 +1011,7 @@
 	}
 	*/
 
-	string BinaryToBase64(string FileIn){
+	std::string BinaryToBase64(std::string FileIn){
 
 		return "";
 	}
@@ -1014,43 +1020,43 @@
 	// CPP Set Variables Name
 	// -----------------------------------------------------------
 
-	static std::map<string, string> ID;  // abc[var] = V1000
-	static std::map<string, string> Global_ID; // abc[var] = G_V1000
-	static std::map<string, string> Control_ID; // abc[var] = C_V1000
-	static std::map<string, string> Obj_ID; // abc[var] = OBJ_V1000
-	static std::map<string, string> GlobalObj_ID; // abc[var] = G_OBJ_V1000
+	static std::map<std::string, std::string> ID;  // abc[var] = V1000
+	static std::map<std::string, std::string> Global_ID; // abc[var] = G_V1000
+	static std::map<std::string, std::string> Control_ID; // abc[var] = C_V1000
+	static std::map<std::string, std::string> Obj_ID; // abc[var] = OBJ_V1000
+	static std::map<std::string, std::string> GlobalObj_ID; // abc[var] = G_OBJ_V1000
 
-	void SET_OBJ_C_NAME(string VAR)
+	void SET_OBJ_C_NAME(std::string VAR)
 	{
 		if (Obj_ID[VAR] == "")
 			Obj_ID[VAR] = "OBJ_" + IntToString(ID_GENERATOR());
 	}
 
-	void SET_GLOBAL_OBJ_C_NAME(string VAR)
+	void SET_GLOBAL_OBJ_C_NAME(std::string VAR)
 	{
 		if (GlobalObj_ID[VAR] == "")
 			GlobalObj_ID[VAR] = "G_OBJ_" + IntToString(ID_GENERATOR());
 	}
 
-	void SET_C_NAME(string VAR)
+	void SET_C_NAME(std::string VAR)
 	{
 		if (ID[VAR] == "")
 			ID[VAR] = "V_" + IntToString(ID_GENERATOR());
 	}
 
-	void SET_GLOBAL_C_NAME(string VAR)
+	void SET_GLOBAL_C_NAME(std::string VAR)
 	{
 		if (Global_ID[VAR] == "")
 			Global_ID[VAR] = "G_V_" + IntToString(ID_GENERATOR());
 	}
 
-	void SET_CONTROL_C_NAME(string VAR)
+	void SET_CONTROL_C_NAME(std::string VAR)
 	{
 		if (Control_ID[VAR] == "")
 			Control_ID[VAR] = "C_V_" + IntToString(ID_GENERATOR());
 	}
 
-	bool IsInArray_v(const std::string &value, const std::vector<string> &array){
+	bool IsInArray_v(const std::string &value, const std::vector<std::string> &array){
 		
 		return std::find(array.begin(), array.end(), value) != array.end();
 	}
@@ -1064,7 +1070,7 @@
 	// Get UTF8 Total Leng
 	// -----------------------------------------------------------
 
-	int CharCount_utf8(string LINE8, CLASS_TOKEN *o_tokens){
+	int CharCount_utf8(std::string LINE8, CLASS_TOKEN *o_tokens){
 
 		// ------------------------------------------------------
 		// check ل invalid utf-8
@@ -1072,7 +1078,7 @@
 		// there is also utf8::is_valid function
 		// ------------------------------------------------------
 
-		string::iterator LINE_END_IT = utf8::find_invalid(LINE8.begin(), LINE8.end());
+		std::string::iterator LINE_END_IT = utf8::find_invalid(LINE8.begin(), LINE8.end());
 
 		if (LINE_END_IT != LINE8.end())
 		{
@@ -1085,7 +1091,7 @@
 		// ------------------------------------------------------
 
 		//vector<int short> LINE32;
-		string LINE32;
+		std::string LINE32;
 		utf8::utf8to32(LINE8.begin(), LINE_END_IT, back_inserter(LINE32));
 
 		// ------------------------------------------------------
@@ -1108,7 +1114,7 @@
 
 	// ====================================================
 
-	string GET_REAL_LINE_MID (int START, int TOKEN_POSITION, CLASS_TOKEN *o_tokens)
+	std::string GET_REAL_LINE_MID (int START, int TOKEN_POSITION, CLASS_TOKEN *o_tokens)
 	{
 		if(DEBUG)DEBUG_MESSAGE("REAL_LINE : |" + o_tokens->REAL_LINE[o_tokens->Line] + "| \n", o_tokens);
 		if(DEBUG)DEBUG_MESSAGE("START : " + IntToString(START) + " \n", o_tokens);
@@ -1118,7 +1124,7 @@
 		if (START < 0 || TOKEN_POSITION < 1) // Exception !
 			return o_tokens->REAL_LINE[o_tokens->Line];
 		
-		string BUFFER;
+		std::string BUFFER;
 
 		BUFFER = substr_utf8(o_tokens->REAL_LINE[o_tokens->Line], 
 							START, 
@@ -1132,7 +1138,7 @@
 
 	// ====================================================
 
-	bool IsValidStringFormat(string STRING, CLASS_TOKEN *o_tokens)
+	bool IsValidStringFormat(std::string STRING, CLASS_TOKEN *o_tokens)
 	{
 		if (substr_utf8(STRING, 0, 1) != "\"")
 			return false;
@@ -1144,14 +1150,14 @@
 	}
 
 	/*
-	bool IsValidStringFormatOrStringVar(string STRING, CLASS_TOKEN *o_tokens){
+	bool IsValidStringFormatOrStringVar(std::string STRING, CLASS_TOKEN *o_tokens){
 
 		// TODO : We need add support for global class var, global var.
 
 		if (L_VAR_IS_SET[std::make_pair(TheNamespace + TheFunction, STRING)] || 
 			L_VAR_IS_SET[std::make_pair(TheClass + TheFunction, STRING)]){
 
-			string CLASS_OR_WIN;
+			std::string CLASS_OR_WIN;
 			if (IsInsideClass)
 				CLASS_OR_WIN = TheClass;
 			else
@@ -1175,10 +1181,10 @@
 
 	// ====================================================
 
-	string REMOVE_DOUBLE_SPACE(string LINE_BUFFER, CLASS_TOKEN *o_tokens)
+	std::string REMOVE_DOUBLE_SPACE(std::string LINE_BUFFER, CLASS_TOKEN *o_tokens)
 	{
-		string Char;
-		string BUFFER;
+		std::string Char;
+		std::string BUFFER;
 
 		bool INSIDE = false;
 		bool VALID_CHAR = false;
@@ -1248,11 +1254,11 @@
 
 	// ====================================================
 
-	bool IsValidDigit(string DIGIT, bool FLOAT, CLASS_TOKEN *o_tokens)
+	bool IsValidDigit(std::string DIGIT, bool FLOAT, CLASS_TOKEN *o_tokens)
 	{
 		int I = 0;
 		int TOTAL_CHAR = CharCount_utf8(DIGIT, o_tokens);
-		string Char;
+		std::string Char;
 		bool First = true;
 		bool DECIMAL = false;
 
@@ -1318,7 +1324,7 @@
 
 	// ====================================================
 
-	bool CAN_ADD_OPERATION_HERE(string TOKEN_LAST)
+	bool CAN_ADD_OPERATION_HERE(std::string TOKEN_LAST)
 	{
 		// = 1 + 2 * (3 / 4 - 5) + 6
 		// IF 
@@ -1356,7 +1362,7 @@
 		return true;
 	}
 
-	bool CAN_ADD_VAR_HERE(string TOKEN_LAST)
+	bool CAN_ADD_VAR_HERE(std::string TOKEN_LAST)
 	{
 		// str / عدد = متغير + متغير * (var / متغير - var)
 
@@ -1395,7 +1401,7 @@
 
 	// ====================================================
 
-	bool CAN_ADD_FUN_HERE(string TOKEN_LAST)
+	bool CAN_ADD_FUN_HERE(std::string TOKEN_LAST)
 	{
 		// str / عدد = متغير + fun(var) * (fun(var) / fun(var, fun(var), var) - var)
 
@@ -1435,7 +1441,7 @@
 
 	// ====================================================
 
-	bool CAN_ADD_PARENTHESIS_OPEN_HERE(string TOKEN_LAST)
+	bool CAN_ADD_PARENTHESIS_OPEN_HERE(std::string TOKEN_LAST)
 	{
 		// = ((1)) + (2 * (3 / (4) - 5) +( 6))
 		// IF = (a + s < b * h) او (z + 2) != (x - 7) و (z = x)
@@ -1474,9 +1480,9 @@
 
 	// ====================================================
 
-	string IsValidVar_Type = "عادم";
+	std::string IsValidVar_Type = "عادم";
 
-	bool IsValidVar(string Var, CLASS_TOKEN *o_tokens)
+	bool IsValidVar(std::string Var, CLASS_TOKEN *o_tokens)
 	{
 		IsValidVar_Type = "عادم";
 
@@ -1573,7 +1579,7 @@
 
 		// else if (CONTROL_WIN_IS_SET[Var]){
 			
-		// 	// Window: (By UI)
+		// 	// namespace: (By UI)
 
 		// 	IsValidVar_Type = "عادم";
 
@@ -1582,7 +1588,7 @@
 
 		else if (namespace_is_set[Var]){
 			
-			// Window: (By Code)
+			// namespace: (By Code)
 
 			IsValidVar_Type = "عادم";
 
@@ -1604,7 +1610,7 @@
 
 	// ====================================================
 
-	bool CAN_ADD_PARENTHESIS_CLOSE_HERE(string TOKEN_LAST)
+	bool CAN_ADD_PARENTHESIS_CLOSE_HERE(std::string TOKEN_LAST)
 	{
 		// = ((1)) + (2 * (3 / (4) - 5) + ( 6)) + ()
 
@@ -1623,7 +1629,7 @@
 
 	// ====================================================
 
-	bool CAN_ADD_DIGIT_HERE(string TOKEN_LAST)
+	bool CAN_ADD_DIGIT_HERE(std::string TOKEN_LAST)
 	{
 		// = 1 + 2 * (3 / 4 - 5) + 6
 
@@ -1661,11 +1667,11 @@
 
 	// ====================================================
 
-	string GET_TXT_FROM_STRING(string STRING, CLASS_TOKEN *o_tokens)
+	std::string GET_TXT_FROM_STRING(std::string STRING, CLASS_TOKEN *o_tokens)
 	{
-		string MESSAGE_BUFFER;
+		std::string MESSAGE_BUFFER;
 
-		if (CharCount_utf8(STRING, o_tokens) < 3)	// "" Emty string
+		if (CharCount_utf8(STRING, o_tokens) < 3)	// "" Emty std::string
 			return "";									// 3 is the minimum msg, "a"
 
 		MESSAGE_BUFFER = substr_utf8(STRING, 1, CharCount_utf8(STRING, o_tokens));
@@ -1676,7 +1682,7 @@
 
 	// ====================================================
 
-	void CheckForSameGlobalID(string Name, CLASS_TOKEN *o_tokens)
+	void CheckForSameGlobalID(std::string Name, CLASS_TOKEN *o_tokens)
 	{
 		// check if same name with any already global declaration
 
@@ -1713,15 +1719,15 @@
 
 		else if (namespace_is_set[Name]) // || CONTROL_WIN_IS_SET[Name]
 		{
-			// same name with Window
+			// same name with Namespace
 			ErrorCode("تشابه في الاسم مع مجال ثم إنشائها مسبقا، المرجو تغيير الاسم : ' " + Name + " ' ", o_tokens);
 		}
 
 	}
 
-	bool IsValidName(string Name, CLASS_TOKEN *o_tokens){
+	bool IsValidName(std::string Name, CLASS_TOKEN *o_tokens){
 
-		string Char;
+		std::string Char;
 		bool First = true;
 
 		for (int I = 0; I <= CharCount_utf8(Name, o_tokens); I++){
@@ -1829,13 +1835,13 @@
 
 	// ====================================================
 
-	void ADD_FUN(bool GLOBAL, string WIN_NAME, string FUN_NAME, string TYPE, int Line, CLASS_TOKEN *o_tokens)
+	void ADD_FUN(bool GLOBAL, std::string NS_Name, std::string FUN_NAME, std::string TYPE, int Line, CLASS_TOKEN *o_tokens)
 	{
 		if (!IsValidName(FUN_NAME, o_tokens))
 			ErrorCode("اسم غير مقبول : ' " + FUN_NAME + " ' ", o_tokens);
 
-		// if same name as Window !
-		if (WIN_NAME == FUN_NAME)
+		// if same name as Namespace !
+		if (NS_Name == FUN_NAME)
 			ErrorCode("تشابه في الاسم بين الدالة و المجال ' " + FUN_NAME + " ' ", o_tokens);
 
 		if (GLOBAL)
@@ -1866,19 +1872,19 @@
 		else
 		{
 			// if already exist local fun
-			if (L_FUN_IS_SET[std::make_pair(WIN_NAME, FUN_NAME)])
+			if (L_FUN_IS_SET[std::make_pair(NS_Name, FUN_NAME)])
 			{
 				ErrorCode("الدالة ' " + FUN_NAME + " ' تم انشاؤها مسبقا في السطر : " +
-								L_FUN_AT_LINE[std::make_pair(WIN_NAME, FUN_NAME)],
+								L_FUN_AT_LINE[std::make_pair(NS_Name, FUN_NAME)],
 							o_tokens);
 			}
 
-			L_FUN_TYPE[std::make_pair(WIN_NAME, FUN_NAME)] = TYPE;
-			L_FUN_IS_SET[std::make_pair(WIN_NAME, FUN_NAME)] = true;
-			L_FUN_AT_LINE[std::make_pair(WIN_NAME, FUN_NAME)] = IntToString(Line);
+			L_FUN_TYPE[std::make_pair(NS_Name, FUN_NAME)] = TYPE;
+			L_FUN_IS_SET[std::make_pair(NS_Name, FUN_NAME)] = true;
+			L_FUN_AT_LINE[std::make_pair(NS_Name, FUN_NAME)] = IntToString(Line);
 
 			if (TYPE == "عادم")
-				RETURN_FUN[std::make_pair(WIN_NAME, FUN_NAME)] = "OK";
+				RETURN_FUN[std::make_pair(NS_Name, FUN_NAME)] = "OK";
 
 			// *** Generate Code ***
 			SET_C_NAME(FUN_NAME);
@@ -1887,10 +1893,10 @@
 	}
 
 	void SetNewVar(	bool IsGlobal, 
-					string TmpWindow, 
-					string TmpFunction, 
-					string VarName, 
-					string VarDataType, 
+					std::string TempNS, 
+					std::string TmpFunction, 
+					std::string VarName, 
+					std::string VarDataType, 
 					bool IsConstant, 
 					bool IsArray,
 					int Line, 
@@ -1923,17 +1929,17 @@
 		}
 		else
 		{
-			if (L_VAR_IS_SET[std::make_pair(TmpWindow + TmpFunction, VarName)])
+			if (L_VAR_IS_SET[std::make_pair(TempNS + TmpFunction, VarName)])
 			{
 				ErrorCode(	"المتغير ' " + VarName + " ' تم انشاؤه مسبقا في السطر : " + 
-							L_VAR_AT_LINE[std::make_pair(TmpWindow + TmpFunction, VarName)], o_tokens);
+							L_VAR_AT_LINE[std::make_pair(TempNS + TmpFunction, VarName)], o_tokens);
 			}
 
-			L_VAR_TYPE[std::make_pair(TmpWindow + TmpFunction, VarName)] = VarDataType;
-			L_VAR_IS_SET[std::make_pair(TmpWindow + TmpFunction, VarName)] = true;
-			L_VAR_AT_LINE[std::make_pair(TmpWindow + TmpFunction, VarName)] = IntToString(Line);
-			L_VAR_IS_CONST[std::make_pair(TmpWindow + TmpFunction, VarName)] = IsConstant;
-			L_VAR_IS_ARRAY[std::make_pair(TmpWindow + TmpFunction, VarName)] = IsArray;
+			L_VAR_TYPE[std::make_pair(TempNS + TmpFunction, VarName)] = VarDataType;
+			L_VAR_IS_SET[std::make_pair(TempNS + TmpFunction, VarName)] = true;
+			L_VAR_AT_LINE[std::make_pair(TempNS + TmpFunction, VarName)] = IntToString(Line);
+			L_VAR_IS_CONST[std::make_pair(TempNS + TmpFunction, VarName)] = IsConstant;
+			L_VAR_IS_ARRAY[std::make_pair(TempNS + TmpFunction, VarName)] = IsArray;
 
 			// *** Generate Code ***
 			SET_C_NAME(VarName);
@@ -1943,10 +1949,10 @@
 
 	void SetNewVarClass( bool IsGlobal, 
 						bool IsPrivate, 
-						string ClassName, 
-						string FunctionName, 
-						string VarName, 
-						string VarDataType, 
+						std::string ClassName, 
+						std::string FunctionName, 
+						std::string VarName, 
+						std::string VarDataType, 
 						bool IsConstant, 
 						bool IsArray,
 						int Line,
@@ -2008,7 +2014,7 @@
 		}
 	}
 
-	string GetSyntaxDataType(string Token[1024], int Position, CLASS_TOKEN *o_tokens){
+	std::string GetSyntaxDataType(std::string Token[1024], int Position, CLASS_TOKEN *o_tokens){
 
 		// Token[Position] -> '='
 
@@ -2018,7 +2024,7 @@
 		return {};
 	}
 
-	void ADD_FUN_CLASS(bool PRIVATE, string CLASS_NAME, string FUN_NAME, string TYPE, int Line, CLASS_TOKEN *o_tokens)
+	void ADD_FUN_CLASS(bool PRIVATE, std::string CLASS_NAME, std::string FUN_NAME, std::string TYPE, int Line, CLASS_TOKEN *o_tokens)
 	{
 		if (!IsValidName(FUN_NAME, o_tokens))
 			ErrorCode("اسم غير مقبول : ' " + FUN_NAME + " ' ", o_tokens);
@@ -2064,24 +2070,24 @@
 
 	// ====================================================
 
-	string C_LAST_ARG;
+	std::string C_LAST_ARG;
 
-	string CHECK_NEW_FUN_SYNTAX(bool GLOBAL,
-								string SYNTAX[1024],
+	std::string CHECK_NEW_FUN_SYNTAX(bool GLOBAL,
+								std::string SYNTAX[1024],
 								int SYNTAX_LONG,
-								string TmpWindow, // fun1 { a = b + win:fun2(x) + z }
-								string TmpFunction, // fun1 { a = b + win:fun2(x) + z }
+								std::string TempNS, // fun1 { a = b + namespace:fun2(x) + z }
+								std::string TmpFunction, // fun1 { a = b + namespace:fun2(x) + z }
 								CLASS_TOKEN *o_tokens)
 	{
 		// function (int a, نص b)
 
-		// SYNTAX : عدد 	| SYNTAX[3] : string
+		// SYNTAX : عدد 	| SYNTAX[3] : std::string
 		// SYNTAX[1] : a	| SYNTAX[4] : b
 		// SYNTAX[2] : ,	| SYNTAX[5] : )
 
 		int TYPE = 0, VAR = 1, COMMA = 2;
 
-		string CPP_CODE;
+		std::string CPP_CODE;
 		NEW_FUNCTION_ARG = "";
 
 		for (int p = 0; p <= SYNTAX_LONG; p += 3)
@@ -2098,7 +2104,7 @@
 				if (!IsValidName(SYNTAX[VAR], o_tokens))
 					ErrorCode("اسم غير مقبول ' " + SYNTAX[VAR] + " ' ", o_tokens);
 
-				if (L_VAR_IS_SET[std::make_pair(TmpWindow + TmpFunction, SYNTAX[VAR])]) // الدالة (int a, نص a)
+				if (L_VAR_IS_SET[std::make_pair(TempNS + TmpFunction, SYNTAX[VAR])]) // الدالة (int a, نص a)
 					ErrorCode("متغير محلي موجود مسبقا ' " + SYNTAX[VAR] + " ' ", o_tokens);
 
 				if (SYNTAX[COMMA] != "،" && SYNTAX[COMMA] != "," && SYNTAX[COMMA] != ")")
@@ -2110,7 +2116,7 @@
 				//if(DEBUG)DEBUG_MESSAGE("[" + SYNTAX[TYPE] + "|" + SYNTAX[VAR] + "]", o_tokens); // DEBUG
 
 				// add always-local (bcs this var is in arg..) VAR to fun
-				SetNewVar(false, TmpWindow, TmpFunction, SYNTAX[VAR], SYNTAX[TYPE], false, false, o_tokens->Line, o_tokens);
+				SetNewVar(false, TempNS, TmpFunction, SYNTAX[VAR], SYNTAX[TYPE], false, false, o_tokens->Line, o_tokens);
 
 				// add local ARG-VAR as ARGUMENT to fun
 				if (GLOBAL)
@@ -2120,8 +2126,8 @@
 				}
 				else
 				{
-					L_FUN_ARG_TYPE[std::make_pair(TmpWindow + TmpFunction, L_FUN_ARG_TOTAL[std::make_pair(TmpWindow, TmpFunction)])] = SYNTAX[TYPE];
-					L_FUN_ARG_TOTAL[std::make_pair(TmpWindow, TmpFunction)]++;
+					L_FUN_ARG_TYPE[std::make_pair(TempNS + TmpFunction, L_FUN_ARG_TOTAL[std::make_pair(TempNS, TmpFunction)])] = SYNTAX[TYPE];
+					L_FUN_ARG_TOTAL[std::make_pair(TempNS, TmpFunction)]++;
 				}
 
 				TYPE += 3, VAR += 3, COMMA += 3; // For ARG non-predifined loop
@@ -2147,8 +2153,8 @@
 						DEBUG_MESSAGE("[STRING " + SYNTAX[VAR] + "]", o_tokens); // DEBUG
 
 					// *** Generate Code ***
-					CPP_CODE.append(" wxString " + ID[SYNTAX[VAR]] + " ");
-					NEW_FUNCTION_ARG.append(" wxString " + ID[SYNTAX[VAR]] + " ");
+					CPP_CODE.append(" std::string " + ID[SYNTAX[VAR]] + " ");
+					NEW_FUNCTION_ARG.append(" std::string " + ID[SYNTAX[VAR]] + " ");
 					// *** *** *** *** *** ***
 
 				}
@@ -2180,6 +2186,8 @@
 			}
 		}
 
+		//if(DEBUG)DEBUG_MESSAGE("[NS: "+ TempNS +"|Fun: " + TmpFunction + "|Looocal: " + IntToString(L_FUN_ARG_TOTAL[std::make_pair(TempNS, TmpFunction)]) + "|Glooobal: " + IntToString(G_FUN_ARG_TOTAL[TmpFunction]) + "]", o_tokens); // DEBUG
+
 		if (o_tokens->TOKENS_PREDEFINED)
 			return CPP_CODE;
 		else
@@ -2188,19 +2196,19 @@
 
 	// ====================================================
 
-	string CheckForSyntax(string OBJECTIF_TYPE,		// OBJECTIF_TYPE
-						bool ACCEPT_REF_WIN_WIDGET, // Accept Using Reference إلى Window:Controls
-						bool ACCEPT_REF_WIN_FUN,	// Accept Using Reference إلى Window:Function
+	std::string CheckForSyntax(std::string OBJECTIF_TYPE,		// OBJECTIF_TYPE
+						bool ACCEPT_REF_WIN_WIDGET, // Accept Using Reference إلى namespace:Controls
+						bool ACCEPT_REF_WIN_FUN,	// Accept Using Reference إلى namespace:Function
 						bool ACCEPT_REF_GLOBAL_FUN, // Accept Using Reference إلى Global Functions
 						bool ACCEPT_REF_LOCAL_FUN,  // Accept Using Reference إلى Local Functions
 						bool ACCEPT_REF_GLOBAL_VAR, // Accept Using Reference إلى Global VAR
 						bool ACCEPT_REF_LOCAL_VAR,  // Accept Using Reference إلى Local VAR
 						bool ACCEPT_STR_TO_INT,		// Accept Convertion من نص إلى Int
 						bool ACCEPT_INT_TO_STRING,  // Accept Convertion من عدد إلى String
-						string SYNTAX[1024],		// SYNTAX[] string
+						std::string SYNTAX[1024],		// SYNTAX[] std::string
 						int SYNTAX_LONG,			// SYNTAX_LONG int
-						string TMP_WIN_OR_CLASS,	// a = b + win:fun(2+2) + class:fun(x)
-						string TmpFunction,				// a = b + win/class:fun(2+2)
+						std::string TMP_NAMESPACE_OR_CLASS,	// a = b + namespace:fun(2+2) + class:fun(x)
+						std::string TmpFunction,				// a = b + win/class:fun(2+2)
 						CLASS_TOKEN *o_tokens)
 	{
 		// Note : WX Crash if On creating using reference إلى Controls, BUT OK ل Functions.
@@ -2209,10 +2217,10 @@
 		// SYNTAX[1] = ...
 
 		// TmpFunction				: = a + b + TMP_FUN_NAME(X, Y, Z) + ...
-		// TMP_WIN_OR_CLASS		: إلى get Generated_ID of tmp الدالة name
+		// TMP_NAMESPACE_OR_CLASS		: إلى get Generated_ID of tmp الدالة name
 		// OBJECTIF_TYPE		: INT.ToString or STRING.ToInt
 
-		string CPP_CODE;
+		std::string CPP_CODE;
 
 		if (SYNTAX[0] != "=")
 		{
@@ -2255,7 +2263,7 @@
 						if(DEBUG)
 							DEBUG_MESSAGE(" {Syntax@} ", o_tokens); // DEBUG
 
-						string TempToken[1024];
+						std::string TempToken[1024];
 						TempToken[0] = "=";	  // CheckForSyntax() Need this.
 						int TempTokenCount = 1; // CheckForSyntax() Need this.
 
@@ -2277,16 +2285,16 @@
 						if (!AT_FOUND)
 							ErrorCode("نهايه شفرة غير موجود داخل البناء ' @ '", o_tokens);
 
-						string SYNTAX_BUFFER = CheckForSyntax("C++",				// OBJECTIF_TYPE
-															true,				// Accept Using Reference إلى Window:Controls
-															true,				// Accept Using Reference إلى Window:Function
+						std::string SYNTAX_BUFFER = CheckForSyntax("C++",				// OBJECTIF_TYPE
+															true,				// Accept Using Reference إلى namespace:Controls
+															true,				// Accept Using Reference إلى namespace:Function
 															true,				// Accept Using Reference إلى Global Functions
 															true,				// Accept Using Reference إلى Local Functions
 															true,				// Accept Using Reference إلى Global VAR
 															true,				// Accept Using Reference إلى Local VAR
 															true,				// Accept Convertion من نص إلى Int
 															true,				// Accept Convertion من عدد إلى String
-															TempToken,				// SYNTAX[] string
+															TempToken,				// SYNTAX[] std::string
 															(TempTokenCount - 1), // SYNTAX_LONG int
 															TheNamespace,		// TMP_WINDOW_NAME
 															TheFunction,		// TMP_FUNCTION_NAME
@@ -2410,7 +2418,7 @@
 					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
 						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
 
-				string G_VAR_WITHOUT_ ;
+				std::string G_VAR_WITHOUT_ ;
 
 				if (G_VAR_IS_SET[(SYNTAX[p])])
 					G_VAR_WITHOUT_ = SYNTAX[p];
@@ -2521,7 +2529,7 @@
 			// Local VARIABLE INT
 			// ----------------------
 
-			else if (L_VAR_TYPE[std::make_pair(TMP_WIN_OR_CLASS + TmpFunction, SYNTAX[p])] == "عدد")
+			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "عدد")
 			{
 				if (p > 0)
 					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
@@ -2571,7 +2579,7 @@
 			// Local VARIABLE STRING
 			// -----------------------------------
 
-			else if (L_VAR_TYPE[std::make_pair(TMP_WIN_OR_CLASS + TmpFunction, SYNTAX[p])] == "نص")
+			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "نص")
 			{
 				if (p > 0)
 					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
@@ -2610,7 +2618,7 @@
 			// Local VARIABLE Bool
 			// -----------------------------------
 
-			else if (L_VAR_TYPE[std::make_pair(TMP_WIN_OR_CLASS + TmpFunction, SYNTAX[p])] == "منطق")
+			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "منطق")
 			{
 				//if (p != 1)
 				//{
@@ -2735,7 +2743,7 @@
 						DEBUG_MESSAGE("[C++_NewLine] ", o_tokens); // DEBUG
 
 					// *** Generate Code ***
-					CPP_CODE.append(" wxT(\"\n\") ");
+					CPP_CODE.append(" (\"\n\") ");
 					// *** *** *** *** *** ***
 				}
 				else
@@ -2748,8 +2756,8 @@
 			// Class Global/Local Obj
 			// ----------------------
 
-			else if (OBJ_IS_SET[std::make_pair(TMP_WIN_OR_CLASS + TmpFunction, SYNTAX[p])] ||
-					OBJ_IS_SET[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])] ||
+			else if (OBJ_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] ||
+					OBJ_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])] ||
 					OBJ_IS_SET[std::make_pair("", SYNTAX[p])])
 			{
 				// a = obj:mem + c
@@ -2774,20 +2782,20 @@
 					ErrorCode("يجب وضع اسم المنتمي بعد ' " + SYNTAX[p] + ":' ", o_tokens);
 
 				// C++, allow create Obj on global, global-class, local, but using it only on func.
-				string OBJ_ID;
+				std::string OBJ_ID;
 				bool IS_GLOBAL_OBJ = false;
-				if (OBJ_IS_SET[std::make_pair(TMP_WIN_OR_CLASS + TmpFunction, SYNTAX[p])])
+				if (OBJ_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])])
 				{
 					// Local Obj.
-					// Window -> Func -> Obj. Or
+					// Namespace -> Func -> Obj. Or
 					// Class  -> Func -> Obj.
-					OBJ_ID = TMP_WIN_OR_CLASS + TmpFunction;
+					OBJ_ID = TMP_NAMESPACE_OR_CLASS + TmpFunction;
 				}
-				else if (OBJ_IS_SET[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])])
+				else if (OBJ_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])] && TMP_NAMESPACE_OR_CLASS != "")
 				{
 					// Global Class Obj.
 					// Class -> Obj.
-					OBJ_ID = TMP_WIN_OR_CLASS;
+					OBJ_ID = TMP_NAMESPACE_OR_CLASS;
 				}
 				else
 				{
@@ -2797,13 +2805,13 @@
 					IS_GLOBAL_OBJ = true;
 				}
 
-				string TK_CLASS = OBJ_CLASS[std::make_pair(OBJ_ID, SYNTAX[p])];
+				std::string TK_CLASS = OBJ_CLASS[std::make_pair(OBJ_ID, SYNTAX[p])];
 
 				if (!CLASS_G_VAR_IS_SET[std::make_pair(TK_CLASS, SYNTAX[p + 2])] &&
 					!CLASS_FUN_IS_SET[std::make_pair(TK_CLASS, SYNTAX[p + 2])])
 					ErrorCode("الصنف ' " + TK_CLASS + " ' ليس فيه أي منتمي معرف باسم ' " + SYNTAX[p + 2] + " ' ", o_tokens);
 
-				string MEMBER_TYPE;
+				std::string MEMBER_TYPE;
 
 				if (CLASS_G_VAR_IS_SET[std::make_pair(TK_CLASS, SYNTAX[p + 2])])
 				{
@@ -2999,7 +3007,7 @@
 					if (SYNTAX[TMP_FUN_LONG] != ")") // Double check!
 						ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p] + " : " + SYNTAX[p + 2] + "()' بالإشارة ')' ", o_tokens);
 
-					string TempToken[1024];
+					std::string TempToken[1024];
 					int TempTokenCount = 0;
 					for (int i = p + 4; i <= TMP_FUN_LONG; i++)
 					{
@@ -3197,7 +3205,7 @@
 			//   g1 = 123
 			//   g2 = g1<--
 
-			else if (CLASS_G_VAR_IS_SET[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])] && IsInsideClass)
+			else if (CLASS_G_VAR_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])] && IsInsideClass)
 			{
 				// Class Global area
 
@@ -3205,7 +3213,7 @@
 					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
 						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
 
-				if (CLASS_G_VAR_TYPE[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])] == "عدد")
+				if (CLASS_G_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])] == "عدد")
 				{
 					if (OBJECTIF_TYPE == "عدد")
 					{
@@ -3248,7 +3256,7 @@
 						ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
 					}
 				}
-				else if (CLASS_G_VAR_TYPE[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])] == "نص")
+				else if (CLASS_G_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])] == "نص")
 				{
 					if (OBJECTIF_TYPE == "عدد")
 					{
@@ -3281,7 +3289,7 @@
 						ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
 					}
 				}
-				else if (CLASS_G_VAR_TYPE[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])] == "منطق")
+				else if (CLASS_G_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])] == "منطق")
 				{
 					if (OBJECTIF_TYPE == "C++")
 					{
@@ -3353,7 +3361,7 @@
 						DEBUG_MESSAGE("[STRING_MSG (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
 
 					// *** Generate Code ***
-					CPP_CODE.append(" wxT(" + SYNTAX[p] + ") ");
+					CPP_CODE.append(" (" + SYNTAX[p] + ") ");
 					// *** *** *** *** *** ***
 				}
 				else if (OBJECTIF_TYPE == "منطق")
@@ -3366,7 +3374,7 @@
 						DEBUG_MESSAGE("[C++ نص (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
 
 					// *** Generate Code ***
-					CPP_CODE.append(" wxT(" + SYNTAX[p] + ") ");
+					CPP_CODE.append(" (" + SYNTAX[p] + ") ");
 					// *** *** *** *** *** ***
 				}
 				else
@@ -3433,9 +3441,9 @@
 			// Function / Class-Function
 			// -----------------------------------
 
-			else if (	CLASS_FUN_IS_SET[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])] || 
+			else if (	CLASS_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])] || 
 						G_FUN_IS_SET[(SYNTAX[p])] || 
-						L_FUN_IS_SET[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])]) // call الدالة (a, b)
+						L_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])]) // call الدالة (a, b)
 			{
 				if (p > 0)
 					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
@@ -3451,7 +3459,7 @@
 					ErrorCode("أمر غير معروف ' " + SYNTAX[p + 1] + " ' ", o_tokens);
 
 				bool ThisIsClassFunction = false;
-				if(CLASS_FUN_IS_SET[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])])
+				if(CLASS_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])])
 					ThisIsClassFunction = true;
 				
 				if(ThisIsClassFunction)
@@ -3503,7 +3511,7 @@
 					ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p] + "()' بالإشارة ')' ", o_tokens);
 					//ErrorCode("===== |" + SYNTAX[TMP_FUN_LONG - 1] + "| =====", o_tokens);
 
-				string TempToken[1024];
+				std::string TempToken[1024];
 				int TempTokenCount = 0;
 				for (int i = p + 2; i <= TMP_FUN_LONG; i++)
 				{
@@ -3515,13 +3523,13 @@
 				}
 
 				bool IS_LOCAL_FUN = false;
-				IS_LOCAL_FUN = L_FUN_IS_SET[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])];
+				IS_LOCAL_FUN = L_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
 
-				string FUN_TYPE;
+				std::string FUN_TYPE;
 
 				if (IS_LOCAL_FUN)
 				{
-					FUN_TYPE = L_FUN_TYPE[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])];
+					FUN_TYPE = L_FUN_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
 
 					if (FUN_TYPE == "عادم")
 						ErrorCode("الدالة المحلية ' " + SYNTAX[p] + "()' من نوع عادم, لدى لا يمكن تحويلها إلى " + OBJECTIF_TYPE, o_tokens);
@@ -3534,7 +3542,7 @@
 						ErrorCode("الدالة العامة ' " + SYNTAX[p] + "()' من نوع عادم, لدى لا يمكن تحويل إلى " + OBJECTIF_TYPE, o_tokens);
 				}
 
-				string CG_BUFFER;
+				std::string CG_BUFFER;
 				
 				if (OBJECTIF_TYPE == "عدد")
 				{
@@ -3548,14 +3556,14 @@
 
 							// *** Generate Code ***
 							// Buffer
-							CG_BUFFER.append(" OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "->FUNCTION_" + ID[SYNTAX[p]] + "( ");
+							CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
 							// *** *** *** *** *** ***
 
 							CG_BUFFER.append( CHECK_CALL_FUN_ARG( 	false, 
-																	TMP_WIN_OR_CLASS, 
+																	TMP_NAMESPACE_OR_CLASS, 
 																	SYNTAX[p], 
 																	0, 
-																	TMP_WIN_OR_CLASS, 
+																	TMP_NAMESPACE_OR_CLASS, 
 																	TheFunction, 
 																	TempToken, 
 																	(TempTokenCount - 1), 
@@ -3581,7 +3589,7 @@
 																		"", 
 																		SYNTAX[p], 
 																		0, 
-																		TMP_WIN_OR_CLASS, 
+																		TMP_NAMESPACE_OR_CLASS, 
 																		TheFunction, 
 																		TempToken, 
 																		(TempTokenCount - 1), 
@@ -3624,14 +3632,14 @@
 
 							// *** Generate Code ***
 							// Buffer
-							CG_BUFFER.append(" alifcore_IntToString( OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "->FUNCTION_" + ID[SYNTAX[p]] + "( ");
+							CG_BUFFER.append(" alifcore_IntToString( OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
 							// *** *** *** *** *** ***
 
 							CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
-																		TMP_WIN_OR_CLASS, 
+																		TMP_NAMESPACE_OR_CLASS, 
 																		SYNTAX[p], 
 																		0, 
-																		TMP_WIN_OR_CLASS, 
+																		TMP_NAMESPACE_OR_CLASS, 
 																		TheFunction, 
 																		TempToken, 
 																		(TempTokenCount - 1), 
@@ -3657,7 +3665,7 @@
 																		"", 
 																		SYNTAX[p], 
 																		0, 
-																		TMP_WIN_OR_CLASS, 
+																		TMP_NAMESPACE_OR_CLASS, 
 																		TheFunction, 
 																		TempToken, 
 																		(TempTokenCount - 1), 
@@ -3673,20 +3681,20 @@
 					{
 						if (IS_LOCAL_FUN)
 						{
-							// Call a local fun string
+							// Call a local fun std::string
 
 							if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-STRING ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
 
 							// *** Generate Code ***
 							// Buffer
-							CG_BUFFER.append(" OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "->FUNCTION_" + ID[SYNTAX[p]] + "( ");
+							CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
 							// *** *** *** *** *** ***
 
 							CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
-																	TMP_WIN_OR_CLASS, 
+																	TMP_NAMESPACE_OR_CLASS, 
 																	SYNTAX[p], 
 																	0, 
-																	TMP_WIN_OR_CLASS, 
+																	TMP_NAMESPACE_OR_CLASS, 
 																	TheFunction, 
 																	TempToken, 
 																	(TempTokenCount - 1), 
@@ -3697,7 +3705,7 @@
 							CG_BUFFER.append(" ) ");
 							// *** *** *** *** *** ***
 
-							if(DEBUG)DEBUG_MESSAGE(" ) ", o_tokens); // DEBUG
+							if(DEBUG)DEBUG_MESSAGE(") ", o_tokens); // DEBUG
 						}
 						else
 						{
@@ -3714,7 +3722,7 @@
 																		"", 
 																		SYNTAX[p], 
 																		0, 
-																		TMP_WIN_OR_CLASS, 
+																		TMP_NAMESPACE_OR_CLASS, 
 																		TheFunction, 
 																		TempToken, 
 																		(TempTokenCount - 1), 
@@ -3764,14 +3772,14 @@
 
 							// *** Generate Code ***
 							// Buffer
-							CG_BUFFER.append(" OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "->FUNCTION_" + ID[SYNTAX[p]] + "( ");
+							CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
 							// *** *** *** *** *** ***
 
 							CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
-																		TMP_WIN_OR_CLASS, 
+																		TMP_NAMESPACE_OR_CLASS, 
 																		SYNTAX[p], 
 																		0, 
-																		TMP_WIN_OR_CLASS, 
+																		TMP_NAMESPACE_OR_CLASS, 
 																		TheFunction, 
 																		TempToken, 
 																		(TempTokenCount - 1), 
@@ -3797,7 +3805,7 @@
 																		"", 
 																		SYNTAX[p], 
 																		0, 
-																		TMP_WIN_OR_CLASS, 
+																		TMP_NAMESPACE_OR_CLASS, 
 																		TheFunction, 
 																		TempToken, 
 																		(TempTokenCount - 1), 
@@ -3827,14 +3835,14 @@
 
 						// *** Generate Code ***
 						// Buffer
-						CG_BUFFER.append(" OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "->FUNCTION_" + ID[SYNTAX[p]] + "( ");
+						CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
 						// *** *** *** *** *** ***
 
 						CG_BUFFER.append( CHECK_CALL_FUN_ARG(	false, 
-																TMP_WIN_OR_CLASS, 
+																TMP_NAMESPACE_OR_CLASS, 
 																SYNTAX[p], 
 																0, 
-																TMP_WIN_OR_CLASS, 
+																TMP_NAMESPACE_OR_CLASS, 
 																TheFunction, 
 																TempToken, 
 																(TempTokenCount - 1), 
@@ -3860,7 +3868,7 @@
 																	"", 
 																	SYNTAX[p], 
 																	0, 
-																	TMP_WIN_OR_CLASS, 
+																	TMP_NAMESPACE_OR_CLASS, 
 																	TheFunction, 
 																	TempToken, 
 																	(TempTokenCount - 1), 
@@ -3881,35 +3889,265 @@
 			}
 
 			// -----------------------------------
-			// : (Operator between members)
+			// : (Operator between members) v3
 			// -----------------------------------
 
-			// else if (CONTROL_WIN_IS_SET[SYNTAX[p]] || CONTROL_IS_SET[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])]) 
+			else if (namespace_is_set[SYNTAX[p]] || SYNTAX[p + 1] == ":"){
+
+				// abc = namespace:local_func(a, b)	| namespace:my_func(a, b)
+				// abc = namespace:local_var		| namespace:my_var
+
+				string CTR_WIN;
+				string CTR_CONTROL;
+				string CTR_OPTION;
+				string CTR_OPTION_TYPE;
+				string CTR_OPTION_CPP_END;
+				//int CTR_ARG;
+				int CTR_LAST_TOKEN_NUMBER = 0;
+
+				if (namespace_is_set[SYNTAX[p]]){
+
+					// abc = namespace:local_func(a, b)	| namespace:my_func(a, b)
+					// abc = namespace:local_var		| namespace:my_var
+
+					//	namespace_name	:		local_func		( ... )
+					//	p				+1		+2				+3
+					
+					if (SYNTAX[p + 1] != ":")
+						ErrorCode("يجب اضافه ' : ' بعد ' " + SYNTAX[p] + " ' ", o_tokens);
+					
+					if (SYNTAX[p + 2] == "")
+						ErrorCode("يجب اضافه عضو تابع ل ' " + SYNTAX[p] + " ' بعد ':' ", o_tokens);
+					
+					if (SYNTAX[p + 3] == "")
+						ErrorCode("يجب اضافه ':' أو '()' بعد ' " + SYNTAX[p] + " " + SYNTAX[p + 1] + " " + SYNTAX[p + 2] + " ' ", o_tokens);
+					
+					if (SYNTAX[p + 3] != "(" && SYNTAX[p + 3] != ":")
+						ErrorCode("أمر غير معروف ' " + SYNTAX[p + 3] + " ', يجب اضافه ':' أو '()' ", o_tokens);
+					
+					if (SYNTAX[p + 3] == "(") {
+
+						if (L_FUN_IS_SET[std::make_pair(SYNTAX[p], SYNTAX[p + 2])]){
+
+							// ---------------------------------------------------------------------------------
+							// namespace : member_function ()
+							// ---------------------------------------------------------------------------------
+
+							// abc = namespace:local_func(a, b) | namespace:my_func(a, b)
+
+							if (SYNTAX[p + 3] != "(")
+								ErrorCode("من اجل نداء الدالة ' " + SYNTAX[p + 2] + " ' يجب اضافه '()' بعد ' " + SYNTAX[p] + " " + 
+												SYNTAX[p + 1] + " " + SYNTAX[p + 2] + " ' ", o_tokens);
+							
+							std::string FUN_TYPE;
+							std::string CPP_END;
+
+							FUN_TYPE = L_FUN_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
+
+							if (FUN_TYPE == "عادم")
+								ErrorCode("الدالة المحلية ' " + SYNTAX[p] + "()' من نوع عادم, لدى لا يمكن تحويلها إلى " + OBJECTIF_TYPE, o_tokens);
+
+							if (OBJECTIF_TYPE == "عدد")
+							{
+								if (FUN_TYPE == "عدد")
+								{
+									if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':LOCAL_INT_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
+
+									// *** Generate Code ***
+									// Buffer
+									CPP_END = " ";
+									CPP_CODE.append(" NS_" + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
+									// *** *** *** *** *** ***
+								}
+								else
+								{
+									ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p + 2] + "()' من " + FUN_TYPE + " إلى عدد ", o_tokens);
+								}
+							}
+							else if (OBJECTIF_TYPE == "نص")
+							{
+								if (FUN_TYPE == "نص")
+								{
+									if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':LOCAL_STRING_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
+
+									// *** Generate Code ***
+									// Buffer
+									CPP_END = " ";
+									CPP_CODE.append(" NS_" + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
+									// *** *** *** *** *** ***
+								}
+								else if (FUN_TYPE == "عدد")
+								{
+									if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':LOCAL_INT_FUNC'" + SYNTAX[p + 2] + " '().ToString( ", o_tokens); // DEBUG
+
+									// *** Generate Code ***
+									// Buffer
+									CPP_END = " ) ";
+									CPP_CODE.append(" alifcore_IntToString( OBJ_CLASS_WINDOW_" + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
+									// *** *** *** *** *** ***
+								}
+								else
+								{
+									ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p + 2] + "()' من " + FUN_TYPE + " إلى نص ", o_tokens);
+								}
+							}
+							else if (OBJECTIF_TYPE == "منطق")
+							{
+								if (FUN_TYPE == "منطق")
+								{
+									if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':LOCAL_BOOL_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
+
+									// *** Generate Code ***
+									// Buffer
+									CPP_END = " ";
+									CPP_CODE.append(" NS_" + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
+									// *** *** *** *** *** ***
+								}
+								else
+								{
+									ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p + 2] + "()' من " + FUN_TYPE + " إلى منطق ", o_tokens);
+								}
+							}
+							else
+								ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p + 2] + " ' ", o_tokens);
+
+							// abc = (p)namespace:local_func(a, b) + x + y
+
+							int TMP_FUN_LONG = p + 4;
+							int OPEN_PARENTIZE = 0;
+
+							// Get Local Function Args
+							while (TMP_FUN_LONG <= SYNTAX_LONG)
+							{
+								if (SYNTAX[TMP_FUN_LONG] == "(") // مفتوح inside الدالة args : fun( a + (b))
+									OPEN_PARENTIZE++;
+								else if (SYNTAX[TMP_FUN_LONG] == ")" && OPEN_PARENTIZE > 0) // Close inside الدالة args
+									OPEN_PARENTIZE--;
+								else if (SYNTAX[TMP_FUN_LONG] == ")" && OPEN_PARENTIZE < 1) // Close final الدالة call
+								{
+									if (TMP_FUN_LONG < SYNTAX_LONG)
+									{
+										// abc = fun( a + (b)) + 123
+										// abc = x + (fun(var)) * (fun(var) / fun(var, fun(var), var) - var)
+
+										if ((SYNTAX[TMP_FUN_LONG + 1] != "+") &&
+											(SYNTAX[TMP_FUN_LONG + 1] != "-") &&
+											(SYNTAX[TMP_FUN_LONG + 1] != "*") &&
+											(SYNTAX[TMP_FUN_LONG + 1] != "/") &&
+											(SYNTAX[TMP_FUN_LONG + 1] != "،") &&
+											(SYNTAX[TMP_FUN_LONG + 1] != ",") &&
+											(SYNTAX[TMP_FUN_LONG + 1] != ")"))
+										{
+											ErrorCode("نص غير معروف بعد نداء ' " + SYNTAX[p + 2] + "()' : ' " +
+															SYNTAX[TMP_FUN_LONG + 1] + " ' ",
+															o_tokens);
+										}
+									}
+									else if (TMP_FUN_LONG == SYNTAX_LONG)
+									{
+										// a = fun( a + (b))
+										if (SYNTAX[TMP_FUN_LONG] != ")" || SYNTAX[SYNTAX_LONG] != ")") // double check!
+											ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p + 2] + "()' بالإشارة ')' ", o_tokens);
+									}
+
+									break;
+								}
+
+								TMP_FUN_LONG++;
+							}
+
+							if (SYNTAX[TMP_FUN_LONG] != ")") // Double check!
+								ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p + 2] + "()' بالإشارة ')' ", o_tokens);
+
+							std::string TempToken[1024];
+							int TempTokenCount = 0;
+							for (int i = p + 4; i <= TMP_FUN_LONG; i++)
+							{
+								if (SYNTAX[i] != "")
+								{
+									TempToken[TempTokenCount] = SYNTAX[i];
+									TempTokenCount++;
+								}
+							}
+
+							// Check local fun Args : fun (a + c, 2 * (b - 1))
+							CPP_CODE.append( CHECK_CALL_FUN_ARG( false, 
+																SYNTAX[p], 
+																SYNTAX[p + 2], 
+																0, 
+																TheNamespace, 
+																TheFunction, 
+																TempToken, 
+																(TempTokenCount - 1),  
+																o_tokens));
+
+							if(DEBUG)DEBUG_MESSAGE(")] \n\n", o_tokens); // DEBUG
+
+							// *** Generate Code ***
+							CPP_CODE.append(" ) " + CPP_END + " ");
+							// *** *** *** *** *** ***
+
+							// Point to last token of full func call
+							p = TMP_FUN_LONG;
+							
+							continue;
+						}
+						
+						// TODO: Add support for local var
+						// if (L_VAR_IS_SET[...]) <-- abc[namespace][var] = local var already set ?
+
+						else
+							ErrorCode("النافذة ' " + SYNTAX[p] + " ' لا تحتوي على دالة محليه بإسم ' " + SYNTAX[p + 2] + " ' ", o_tokens);
+						
+						// Exception!
+						continue;
+					}
+					else {
+
+						// Exception !
+						ErrorCode("يجب اضافه ':' أو '()' بعد ' " + SYNTAX[p] + " " + SYNTAX[p + 1] + " " + SYNTAX[p + 2] + " ' ", o_tokens);
+					}
+				}
+				else
+				{
+					// Exception !
+					ErrorCode("أمر غير معروف ' " + SYNTAX[p] + " ', كان من المتوقع أن يكون إسم مجال", o_tokens);
+				}
+
+				// Point to last token of full namespace:member.
+				p = CTR_LAST_TOKEN_NUMBER;				
+			}
+
+			// -----------------------------------
+			// : (Operator between members) v2
+			// -----------------------------------
+
+			// else if (CONTROL_WIN_IS_SET[SYNTAX[p]] || CONTROL_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])]) 
 			// {
-			// 	// abc = Window:option() 				| win:show()
-			// 	// abc = Window:Option					| win:with
-			// 	// abc = Window:local_func(a, b)		| win:my_func(a, b)
-			// 	// abc = Window:Control:Option()		| win:ctr:disable()
-			// 	// abc = Window:Control:Option			| win:ctr:text
+			// 	// abc = namespace:option() 				| namespace:show()
+			// 	// abc = namespace:Option					| namespace:with
+			// 	// abc = namespace:local_func(a, b)		| namespace:my_func(a, b)
+			// 	// abc = namespace:Control:Option()		| namespace:ctr:disable()
+			// 	// abc = namespace:Control:Option			| namespace:ctr:text
 
 			// 	// abc = Control:Option()				| ctr:disable()
 			// 	// abc = Control:Option					| ctr:text
 
-			// 	string CTR_WIN;
-			// 	string CTR_CONTROL;
-			// 	string CTR_OPTION;
-			// 	string CTR_OPTION_TYPE;
-			// 	string CTR_OPTION_CPP_END;
+			// 	std::string CTR_WIN;
+			// 	std::string CTR_CONTROL;
+			// 	std::string CTR_OPTION;
+			// 	std::string CTR_OPTION_TYPE;
+			// 	std::string CTR_OPTION_CPP_END;
 			// 	//int CTR_ARG;
 			// 	int CTR_LAST_TOKEN_NUMBER;
 
 			// 	if (CONTROL_WIN_IS_SET[SYNTAX[p]] || namespace_is_set [SYNTAX[p]])
 			// 	{
-			// 		// abc = Window:option() 				| win:show()
-			// 		// abc = Window:Option					| win:with
-			// 		// abc = Window:local_func(a, b)		| win:my_func(a, b)
-			// 		// abc = Window:Control:Option()		| win:ctr:disable()
-			// 		// abc = Window:Control:Option			| win:ctr:text
+			// 		// abc = namespace:option() 				| namespace:show()
+			// 		// abc = namespace:Option					| namespace:with
+			// 		// abc = namespace:local_func(a, b)		| namespace:my_func(a, b)
+			// 		// abc = namespace:Control:Option()		| namespace:ctr:disable()
+			// 		// abc = namespace:Control:Option			| namespace:ctr:text
 					
 			// 			if (SYNTAX[p + 1] != ":")
 			// 				ErrorCode("يجب اضافه ' : ' بعد ' " + SYNTAX[p] + " ' ", o_tokens);
@@ -3926,14 +4164,14 @@
 			// 			if (SYNTAX[p + 3] == "(")
 			// 			{
 			// 				// ---------------------------------------------------------------------------------
-			// 				// Window : Options ()
+			// 				// namespace : Options ()
 			// 				// ---------------------------------------------------------------------------------
 
-			// 				// abc = Window:option() 				| win:show()
-			// 				// abc = Window:local_func(a, b)		| win:my_func(a, b)
+			// 				// abc = namespace:option() 				| namespace:show()
+			// 				// abc = namespace:local_func(a, b)		| namespace:my_func(a, b)
 
 			// 				// -----------------------
-			// 				// abc = Window:win-option() 
+			// 				// abc = namespace:win-option() 
 			// 				// -----------------------
 
 			// 				if (SYNTAX[p + 2] == "إظهار" ||
@@ -3944,7 +4182,7 @@
 			// 				}
 
 			// 				// -----------------------
-			// 				// abc = Window:win-local_func() 
+			// 				// abc = namespace:win-local_func() 
 			// 				// -----------------------
 
 			// 				else if (L_FUN_IS_SET[std::make_pair(SYNTAX[p], SYNTAX[p + 2])])
@@ -3953,10 +4191,10 @@
 			// 						ErrorCode("من اجل نداء الدالة ' " + SYNTAX[p + 2] + " ' يجب اضافه '()' بعد ' " + SYNTAX[p] + " " + 
 			// 										SYNTAX[p + 1] + " " + SYNTAX[p + 2] + " ' ", o_tokens);
 								
-			// 					string FUN_TYPE;
-			// 					string CPP_END;
+			// 					std::string FUN_TYPE;
+			// 					std::string CPP_END;
 
-			// 					FUN_TYPE = L_FUN_TYPE[std::make_pair(TMP_WIN_OR_CLASS, SYNTAX[p])];
+			// 					FUN_TYPE = L_FUN_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
 
 			// 					if (FUN_TYPE == "عادم")
 			// 						ErrorCode("الدالة المحلية ' " + SYNTAX[p] + "()' من نوع عادم, لدى لا يمكن تحويلها إلى " + OBJECTIF_TYPE, o_tokens);
@@ -3965,12 +4203,12 @@
 			// 					{
 			// 						if (FUN_TYPE == "عدد")
 			// 						{
-			// 							if(DEBUG)DEBUG_MESSAGE(" [WIN'" + SYNTAX[p] + " ':LOCAL_INT_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
+			// 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':LOCAL_INT_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
 
 			// 							// *** Generate Code ***
 			// 							// Buffer
 			// 							CPP_END = " ";
-			// 							CPP_CODE.append(" OBJ_CLASS_WINDOW_" + ID[SYNTAX[p]] + "->FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
+			// 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
 			// 							// *** *** *** *** *** ***
 			// 						}
 			// 						else
@@ -3982,22 +4220,22 @@
 			// 					{
 			// 						if (FUN_TYPE == "نص")
 			// 						{
-			// 							if(DEBUG)DEBUG_MESSAGE(" [WIN'" + SYNTAX[p] + " ':LOCAL_STRING_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
+			// 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':LOCAL_STRING_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
 
 			// 							// *** Generate Code ***
 			// 							// Buffer
 			// 							CPP_END = " ";
-			// 							CPP_CODE.append(" OBJ_CLASS_WINDOW_" + ID[SYNTAX[p]] + "->FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
+			// 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
 			// 							// *** *** *** *** *** ***
 			// 						}
 			// 						else if (FUN_TYPE == "عدد")
 			// 						{
-			// 							if(DEBUG)DEBUG_MESSAGE(" [WIN'" + SYNTAX[p] + " ':LOCAL_INT_FUNC'" + SYNTAX[p + 2] + " '().ToString( ", o_tokens); // DEBUG
+			// 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':LOCAL_INT_FUNC'" + SYNTAX[p + 2] + " '().ToString( ", o_tokens); // DEBUG
 
 			// 							// *** Generate Code ***
 			// 							// Buffer
 			// 							CPP_END = " ) ";
-			// 							CPP_CODE.append(" alifcore_IntToString( OBJ_CLASS_WINDOW_" + ID[SYNTAX[p]] + "->FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
+			// 							CPP_CODE.append(" alifcore_IntToString( OBJ_CLASS_WINDOW_" + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
 			// 							// *** *** *** *** *** ***
 			// 						}
 			// 						else
@@ -4009,12 +4247,12 @@
 			// 					{
 			// 						if (FUN_TYPE == "منطق")
 			// 						{
-			// 							if(DEBUG)DEBUG_MESSAGE(" [WIN'" + SYNTAX[p] + " ':LOCAL_BOOL_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
+			// 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':LOCAL_BOOL_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
 
 			// 							// *** Generate Code ***
 			// 							// Buffer
 			// 							CPP_END = " ";
-			// 							CPP_CODE.append(" OBJ_CLASS_WINDOW_" + ID[SYNTAX[p]] + "->FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
+			// 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
 			// 							// *** *** *** *** *** ***
 			// 						}
 			// 						else
@@ -4025,7 +4263,7 @@
 			// 					else
 			// 						ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p + 2] + " ' ", o_tokens);
 
-			// 					// abc = (p)Window:local_func(a, b) + x + y
+			// 					// abc = (p)namespace:local_func(a, b) + x + y
 
 			// 					int TMP_FUN_LONG = p + 4;
 			// 					int OPEN_PARENTIZE = 0;
@@ -4073,7 +4311,7 @@
 			// 					if (SYNTAX[TMP_FUN_LONG] != ")") // Double check!
 			// 						ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p + 2] + "()' بالإشارة ')' ", o_tokens);
 
-			// 					string TempToken[1024];
+			// 					std::string TempToken[1024];
 			// 					int TempTokenCount = 0;
 			// 					for (int i = p + 4; i <= TMP_FUN_LONG; i++)
 			// 					{
@@ -4095,7 +4333,7 @@
 			// 														(TempTokenCount - 1),  
 			// 														o_tokens));
 
-			// 					if(DEBUG)DEBUG_MESSAGE(" )] \n\n", o_tokens); // DEBUG
+			// 					if(DEBUG)DEBUG_MESSAGE(")] \n\n", o_tokens); // DEBUG
 
 			// 					// *** Generate Code ***
 			// 					CPP_CODE.append(" ) " + CPP_END + " ");
@@ -4117,38 +4355,38 @@
 			// 			else if (SYNTAX[p + 3] == "=")
 			// 			{
 			// 				// ---------------------------------------------------------------------------------
-			// 				// abc = Window : Value
+			// 				// abc = namespace : Value
 			// 				// ---------------------------------------------------------------------------------
 
-			// 				// abc = Window:Title
-			// 				// abc = Window:With
-			// 				// abc = Window:Heint
-			// 				// abc = Window:X
-			// 				// abc = Window:Y
-			// 				// abc = Window:Color
-			// 				// abc = Window:Background
+			// 				// abc = namespace:Title
+			// 				// abc = namespace:With
+			// 				// abc = namespace:Heint
+			// 				// abc = namespace:X
+			// 				// abc = namespace:Y
+			// 				// abc = namespace:Color
+			// 				// abc = namespace:Background
 
-			// 				// bool A = Window:Is_Show
+			// 				// bool A = namespace:Is_Show
 
 			// 				if (SYNTAX[p + 4] == "")
 			// 						ErrorCode("يجب اضافه قيمة بعد '=' ", o_tokens);
 
-			// 				string VALUE_TYPE;
-			// 				string VALUE_CPP_END;
+			// 				std::string VALUE_TYPE;
+			// 				std::string VALUE_CPP_END;
 
 			// 				if (SYNTAX[p + 2] == "عنوان")
 			// 				{
-			// 					// Window:Title = 
+			// 					// namespace:Title = 
 
-			// 					if(DEBUG)DEBUG_MESSAGE("		[WIN'" + SYNTAX[p] + " ':VALUE'" + SYNTAX[p + 2] + "(SetWindowTitle)' = ", o_tokens); // DEBUG
+			// 					if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':VALUE'" + SYNTAX[p + 2] + "(SetWindowTitle)' = ", o_tokens); // DEBUG
 
 			// 					// *** Generate Code ***
 			// 					if (!IsInsideNamespace)
-			// 						// Window : Title =
-			// 						CPP_GLOBAL_FUN.append(CG_WIN_MEMBER(SYNTAX[p], "SetLabel (wxT( "));
+			// 						// namespace : Title =
+			// 						CPP_GLOBAL_FUN.append(CG_WIN_MEMBER(SYNTAX[p], "SetLabel (( "));
 			// 					else
-			// 						// Window : Title =
-			// 						cpp_AddScript(TheFunction, CG_WIN_MEMBER(SYNTAX[p], "SetLabel (wxT( "));
+			// 						// namespace : Title =
+			// 						cpp_AddScript(TheFunction, CG_WIN_MEMBER(SYNTAX[p], "SetLabel (( "));
 			// 					// *** *** *** *** *** ***
 			// 					VALUE_CPP_END = " )); \n } \n";
 			// 					// *** *** *** *** *** ***
@@ -4158,7 +4396,7 @@
 			// 					ErrorCode("النافذة ' " + SYNTAX[p] + " ' لا تحتوي على خاصيه باسم ' " + SYNTAX[p + 2] + " ' ", o_tokens);
 			// 				}
 
-			// 				// Window : Option = ...
+			// 				// namespace : Option = ...
 
 			// 				TempTokenCount = 0;
 			// 				for (int p = 3; p <= o_tokens->TOTAL[o_tokens->Line]; p++) // | = a * b + 2 / (c) + 1 |
@@ -4171,15 +4409,15 @@
 			// 				}
 
 			// 				CheckForSyntax(VALUE_TYPE,	// OBJECTIF_TYPE
-			// 								true, 		// Accept Using Reference to Window:Controls
-			// 								true, 		// Accept Using Reference to Window:Function
+			// 								true, 		// Accept Using Reference to namespace:Controls
+			// 								true, 		// Accept Using Reference to namespace:Function
 			// 								true, 		// Accept Using Reference to Global Functions
 			// 								true, 		// Accept Using Reference to Local Functions
 			// 								true, 		// Accept Using Reference to Global VAR
 			// 								true, 		// Accept Using Reference to Local VAR
 			// 								false, 		// Accept Convertion from String To Int
 			// 								true, 		// Accept Convertion from Int To String
-			// 								TempToken,				// SYNTAX[] string
+			// 								TempToken,				// SYNTAX[] std::string
 			// 								(TempTokenCount - 1),	// SYNTAX_LONG int
 			// 								TheNamespace,		// TMP_WINDOW_NAME
 			// 								TheFunction,		// TMP_FUNCTION_NAME
@@ -4187,10 +4425,10 @@
 
 			// 				// *** Generate Code ***
 			// 				if (!IsInsideNamespace)
-			// 					// Window : Option =
+			// 					// namespace : Option =
 			// 					CPP_GLOBAL_FUN.append(VALUE_CPP_END);
 			// 				else
-			// 					// Window : Option =
+			// 					// namespace : Option =
 			// 					cpp_AddScript(TheFunction, VALUE_CPP_END);
 			// 				// *** *** *** *** *** ***
 
@@ -4200,11 +4438,11 @@
 			// 			else if (SYNTAX[p + 3] == ":")
 			// 			{
 			// 				// ---------------------------------------------------------------------------------
-			// 				// abc = Window : Control : Options
+			// 				// abc = namespace : Control : Options
 			// 				// ---------------------------------------------------------------------------------
 
-			// 				// abc = Window:Control:Option()	| win:ctr:disable()
-			// 				// abc = Window:Control:Option		| win:ctr:text
+			// 				// abc = namespace:Control:Option()	| namespace:ctr:disable()
+			// 				// abc = namespace:Control:Option		| namespace:ctr:text
 							
 			// 				if (!CONTROL_IS_SET[std::make_pair(SYNTAX[p], SYNTAX[p + 2])])
 			// 					ErrorCode("النافذة ' " + SYNTAX[p] + " ' لا تحتوي على اداه باسم ' " + SYNTAX[p + 2] + " ' ", o_tokens);
@@ -4266,18 +4504,18 @@
 			// 	else
 			// 	{
 			// 			// Exception !
-			// 			ErrorCode("أمر غير معروف ' " + SYNTAX[p] + " ', يجب اضافة نافذه او اداة", o_tokens);
+			// 			ErrorCode("أمر غير معروف ' " + SYNTAX[p] + " ', يجب اضافة مجال", o_tokens);
 			// 	}
 				
 			// 	// ---------------------------------------------------------------------------------
 			// 	// Check Control Options if valid
-			// 	// For Control:Option AND Window:Control:Option
+			// 	// For Control:Option AND namespace:Control:Option
 			// 	// ---------------------------------------------------------------------------------
 
 			// 	if (CTR_OPTION == "نص") // abc = Control:نص
 			// 	{
 			// 		// GetValue not working Label, need 
-			// 		string GetValueFix = "GetValue";
+			// 		std::string GetValueFix = "GetValue";
 			// 		if (CONTROL_TYPE[std::make_pair(CTR_WIN, CTR_CONTROL)] == "ملصق")
 			// 			GetValueFix = "GetLabelText";
 
@@ -4285,7 +4523,7 @@
 
 			// 		if (OBJECTIF_TYPE == "عدد")
 			// 		{
-			// 			if(DEBUG)DEBUG_MESSAGE(" [WIN'" + CTR_WIN + " ':CTR'" + CTR_CONTROL + " ':OPTION'" + CTR_OPTION + "(Text).ToInt()]' ", o_tokens); // DEBUG
+			// 			if(DEBUG)DEBUG_MESSAGE("[NS'" + CTR_WIN + " ':CTR'" + CTR_CONTROL + " ':OPTION'" + CTR_OPTION + "(Text).ToInt()]' ", o_tokens); // DEBUG
 
 			// 			// *** Generate Code ***
 			// 			CPP_CODE.append(" (alifcore_StringToInt(OBJ_CTR_" + ID[CTR_WIN] + "_" + Control_ID[CTR_CONTROL] + "->" + GetValueFix + "())) ");
@@ -4293,7 +4531,7 @@
 			// 		}
 			// 		else if (OBJECTIF_TYPE == "نص")
 			// 		{
-			// 			if(DEBUG)DEBUG_MESSAGE(" [WIN'" + CTR_WIN + " ':CTR'" + CTR_CONTROL + " ':OPTION'" + CTR_OPTION + "(Text)]' ", o_tokens); // DEBUG
+			// 			if(DEBUG)DEBUG_MESSAGE("[NS'" + CTR_WIN + " ':CTR'" + CTR_CONTROL + " ':OPTION'" + CTR_OPTION + "(Text)]' ", o_tokens); // DEBUG
 
 			// 			// *** Generate Code ***
 			// 			CPP_CODE.append(" (OBJ_CTR_" + ID[CTR_WIN] + "_" + Control_ID[CTR_CONTROL] + "->" + GetValueFix + "()) ");
@@ -4313,7 +4551,7 @@
 			// 		ErrorCode("الأداة ' " + CTR_CONTROL + " ' لا تحتوي على خاصيه باسم ' " + CTR_OPTION + " ' ", o_tokens);
 			// 	}
 
-			// 	// Point to last token of full win:ctrl:option
+			// 	// Point to last token of full namespace:ctrl:option
 			// 	p = CTR_LAST_TOKEN_NUMBER;
 			// }
 
@@ -4323,7 +4561,7 @@
 
 			else
 			{
-				//if(DEBUG)DEBUG_MESSAGE(" \n \n *** \n TMP_WIN_OR_CLASS : " + TMP_WIN_OR_CLASS + " \n", o_tokens);
+				//if(DEBUG)DEBUG_MESSAGE("\n \n *** \n TMP_NAMESPACE_OR_CLASS : " + TMP_NAMESPACE_OR_CLASS + " \n", o_tokens);
 				//if(DEBUG)DEBUG_MESSAGE("TmpFunction : " + TmpFunction + " \n *** \n", o_tokens);
 
 				if (Control_ID[SYNTAX[p]] != "")
@@ -4346,8 +4584,8 @@
 				}
 				else{
 
-					//L_VAR_TYPE[std::make_pair(TMP_WIN_OR_CLASS + TmpFunction, SYNTAX[p])]
-					if(DEBUG)DEBUG_MESSAGE("TMP_WIN_OR_CLASS '" + TMP_WIN_OR_CLASS + "'\n ", o_tokens); // DEBUG
+					//L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])]
+					if(DEBUG)DEBUG_MESSAGE("TMP_NAMESPACE_OR_CLASS '" + TMP_NAMESPACE_OR_CLASS + "'\n ", o_tokens); // DEBUG
 					if(DEBUG)DEBUG_MESSAGE("TmpFunction '" + TmpFunction + "'\n ", o_tokens); // DEBUG
 					if(DEBUG)DEBUG_MESSAGE("SYNTAX[p] '" + SYNTAX[p] + "'\n ", o_tokens); // DEBUG
 					ErrorCode("بناء الجملة غير مفهوم : ' " + SYNTAX[p] + " ' ", o_tokens);
@@ -4365,31 +4603,33 @@
 
 	// ====================================================
 
-	string CHECK_CALL_FUN_ARG(bool CALL_FUN_GLOBAL,
-							string CALL_WIN_OR_CLASS, // win1/class1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> win1
-							string CALL_FUN,			// win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> fun1
+	std::string CHECK_CALL_FUN_ARG(bool CALL_FUN_GLOBAL,
+							std::string CALL_WIN_OR_CLASS, // win1/class1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> win1
+							std::string CALL_FUN,			// win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> fun1
 							int CALL_IS_CLASS,		// 0 = non class, 1 constructor, 2 = الدالة member, ل Message when new obj
-							string FROM_WIN_OR_CLASS, // win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> win2
-							string FROM_FUN,			// win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> fun2
-							string SYNTAX[1024],
+							std::string FROM_WIN_OR_CLASS, // win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> win2
+							std::string FROM_FUN,			// win1 { fun1(int a) } | win2 { fun2{ عدد b; fun1(b) } } ==> fun2
+							std::string SYNTAX[1024],
 							int SYNTAX_LONG,
 							CLASS_TOKEN *o_tokens)
 	{
-		// SYNTAX[]			: 	1+1, b*2, 	("test" + s)
+		// SYNTAX[]			: 	1+1, 	b*2, 	("test" + s) 	)
 		// G_FUN_ARG_TYPE 	: 	INT, 	INT, 	STRING
 
 		int CURRENT_ARG_NUMBER = 0;
 
 		int p = 0;
-		string ARG[1024];
+		std::string ARG[1024];
 		int ARG_LONG = 1;
 
 		ARG[0] = "=";
 
 		int CALL_ARG_TOTAL = 0;
 
-		string CPP_CODE;
+		std::string CPP_CODE;
 
+		//if(DEBUG)DEBUG_MESSAGE("-[Function to call: " + CONVERT_STRING_ARRAY_TO_STRING(SYNTAX, SYNTAX_LONG) + " ]-", o_tokens); // DEBUG
+		//ErrorCode(" Yep1! ", o_tokens);
 		//if(DEBUG)DEBUG_MESSAGE("_---_|" + IntToString(G_FUN_ARG_TOTAL[CALL_FUN]) + "\n" + IntToString(SYNTAX_LONG) + "|_---_", o_tokens); // DEBUG
 		//if(DEBUG)DEBUG_MESSAGE("=__=|" + SYNTAX + "|_---_", o_tokens); // DEBUG
 
@@ -4413,6 +4653,8 @@
 
 			CALL_ARG_TOTAL = L_FUN_ARG_TOTAL[std::make_pair(CALL_WIN_OR_CLASS, CALL_FUN)];
 
+			//if(DEBUG)DEBUG_MESSAGE("[CHEEECK -> NS: "+ CALL_WIN_OR_CLASS +"|Fun: " + CALL_FUN + "|Looocal: " + IntToString(L_FUN_ARG_TOTAL[std::make_pair(CALL_WIN_OR_CLASS, CALL_FUN)]) + "|Glooobal: " + IntToString(G_FUN_ARG_TOTAL[CALL_FUN]) + "]", o_tokens); // DEBUG
+
 			// check args
 			if (CALL_ARG_TOTAL > 0 && SYNTAX_LONG < 1)
 				ErrorCode("الدالة المحلية ' " + CALL_FUN + "()' تأخد " + IntToString(CALL_ARG_TOTAL) + " خاصية", o_tokens);
@@ -4429,6 +4671,8 @@
 
 			if (SYNTAX[p] != "," && SYNTAX[p] != "،" && p < SYNTAX_LONG)
 			{
+				if(DEBUG)DEBUG_MESSAGE("-[ New ARG: " + SYNTAX[p] + " ]-", o_tokens); // DEBUG
+
 				ARG[ARG_LONG] = SYNTAX[p];
 				ARG_LONG++;
 			}
@@ -4450,15 +4694,15 @@
 
 					// Current خاصية OBJECTIF_TYPE
 					CPP_CODE.append(CheckForSyntax(G_FUN_ARG_TYPE[std::make_pair(CALL_FUN, CURRENT_ARG_NUMBER)],
-												true,				// Accept Using Reference إلى Window:Controls
-												true,				// Accept Using Reference إلى Window:Function
+												true,				// Accept Using Reference إلى namespace:Controls
+												true,				// Accept Using Reference إلى namespace:Function
 												true,				// Accept Using Reference إلى Global Functions
 												true,				// Accept Using Reference إلى Local Functions
 												true,				// Accept Using Reference إلى Global VAR
 												true,				// Accept Using Reference إلى Local VAR
 												false,				// Accept Convertion من نص إلى Int
 												true,				// Accept Convertion من عدد إلى String
-												ARG,				// SYNTAX[] string
+												ARG,				// SYNTAX[] std::string
 												(ARG_LONG - 1),	// SYNTAX_LONG int
 												FROM_WIN_OR_CLASS, // TMP_WINDOW_NAME
 												FROM_FUN,			// TMP_FUNCTION_NAME
@@ -4479,25 +4723,25 @@
 							ErrorCode("خصائص أكثر من ألازم، الدالة ' " + CALL_FUN + " ' تأخد فقط " + IntToString(CALL_ARG_TOTAL) + " خاصية ", o_tokens);
 					}
 
+					//if(DEBUG)DEBUG_MESSAGE("-[ " + CONVERT_STRING_ARRAY_TO_STRING(ARG, ARG_LONG) + " ]-", o_tokens); // DEBUG
+					//ErrorCode(" Yep! ", o_tokens);
+
 					// Current خاصية OBJECTIF_TYPE
 					CPP_CODE.append(CheckForSyntax(L_FUN_ARG_TYPE[std::make_pair(CALL_WIN_OR_CLASS + CALL_FUN, CURRENT_ARG_NUMBER)],
-												true,				// Accept Using Reference إلى Window:Controls
-												true,				// Accept Using Reference إلى Window:Function
+												true,				// Accept Using Reference إلى namespace:Controls
+												true,				// Accept Using Reference إلى namespace:Function
 												true,				// Accept Using Reference إلى Global Functions
 												true,				// Accept Using Reference إلى Local Functions
 												true,				// Accept Using Reference إلى Global VAR
 												true,				// Accept Using Reference إلى Local VAR
 												false,				// Accept Convertion من نص إلى Int
 												true,				// Accept Convertion من عدد إلى String
-												ARG,				// SYNTAX[] string
+												ARG,				// SYNTAX[] std::string
 												(ARG_LONG - 1),	// SYNTAX_LONG int
 												FROM_WIN_OR_CLASS, // TMP_WINDOW_NAME
 												FROM_FUN,			// TMP_FUNCTION_NAME
 												o_tokens));
 				}
-
-				//ARG[] = ""; // bug!
-				//delete[] ARG; // delete is فقط used when paired with new()
 
 				ARG[0] = "=";
 				ARG_LONG = 1;		  // Point إلى next arg writed بالإشارة user
@@ -4547,8 +4791,8 @@
 		if (IsInsideFunction)
 			ErrorCode("يجب إغلاق الدالة : " + TheFunction, o_tokens);
 
-		// Window()
-		if (IsInsideNamespace)
+		// Namespace()
+		if (IsInsideNamespace && TheNamespace != "")
 			ErrorCode("يجب إغلاق النافذة : " + TheNamespace, o_tokens);
 
 		// Class()
@@ -4576,17 +4820,17 @@
 		{
 			if(DEBUG)DEBUG_MESSAGE("FINAL_APPLICATION_CODE_CHECKING()... \n", o_tokens); // DEBUG
 
-			// Main Window()
+			// Main Namespace()
 			//if (!MAIN_WIN_IS_SET && !CONTROL_WIN_IS_SET["رئيسية"])
 				//ErrorCode("النافذة الرئيسية غير موجودة", o_tokens);
 
 			// TODO: IDE dont catch the error log.
 
-			if (APP_TYPE == "PC_GUI")
-			{
-				// if (!MAIN_WIN_IS_SET)
-				// 	ErrorCode("هذا التطبيق ذي واجهة رسومية، لكن النافذة الرئيسية غير محددة، هل نسيت ' مجال رئيسية ' ؟", o_tokens);
-			}
+			// if (APP_TYPE == "PC_GUI")
+			// {
+			// 	// if (!MAIN_WIN_IS_SET)
+			// 	// 	ErrorCode("هذا التطبيق ذي واجهة رسومية، لكن النافذة الرئيسية غير محددة، هل نسيت ' مجال رئيسية ' ؟", o_tokens);
+			// }
 			
 			// #Alif
 			if (!ALIF_FLAG_FILE[o_tokens->PATH_FULL_SOURCE])
@@ -4602,7 +4846,6 @@
 		#define GetCurrentDir _getcwd
 
 		#include <windows.h> // Get Working Path by Win32 API
-		#include <string>
 
 		//#include <w32api.h>
 		//#include <Winbase.h>
@@ -4628,7 +4871,7 @@
 
 	#endif
 
-	string GET_WORKING_PATH()
+	std::string GET_WORKING_PATH()
 	{
 		//https://msdn.microsoft.com/en-us/library/sf98bd4y.aspx
 		
@@ -4647,7 +4890,7 @@
 		}
 	}
 
-	string GET_PATH_WITHOUT_FILE(string PATH)
+	std::string GET_PATH_WITHOUT_FILE(std::string PATH)
 	{
 		// In: /abc/def/test.xx
 		// Out: /abc/def/
@@ -4672,7 +4915,7 @@
 		}
 	}
 
-	bool IS_PATH(string PATH_OR_FILE)
+	bool IS_PATH(std::string PATH_OR_FILE)
 	{
 		// 'myfile.x'               --> false.
 		// '/abc/test/myfile.x'     --> true.
@@ -4689,12 +4932,12 @@
 			return true;
 	}
 
-	string GET_PATH_WITHOUT_LAST_SEPARATION (string PATH)
+	std::string GET_PATH_WITHOUT_LAST_SEPARATION (std::string PATH)
 	{
 		// In : '/abc/test/folder/'
 		// Out : '/abc/test/folder'
 
-		string Last_Char = PATH.substr(PATH.length() - 1);  // PATH.back()
+		std::string Last_Char = PATH.substr(PATH.length() - 1);  // PATH.back()
 
 		#ifdef _WIN32
 			if (Last_Char == "\\")
@@ -4716,7 +4959,7 @@
 	}
 
 	/*
-	bool CHECK_FOLDER_EXISTE(string PATH)
+	bool CHECK_FOLDER_EXISTE(std::string PATH)
 	{
 		#ifdef _WIN32
 			//
@@ -4733,10 +4976,10 @@
 	}
 	*/
 
-	bool CHECK_FILE_EXISTE(string PATH)
+	bool CHECK_FILE_EXISTE(std::string PATH)
 	{
 		/*
-		string::iterator end_it = utf8::find_invalid(PATH.begin(), PATH.end());
+		std::string::iterator end_it = utf8::find_invalid(PATH.begin(), PATH.end());
 
 		if (end_it != PATH.end()) {
 			cout << "Invalid UTF-8 encoding detected at line " << "\n";
@@ -4755,7 +4998,7 @@
 		return infile.good();
 	}
 
-	bool CHECK_SETUP() // string ARGV_0, string OUTPUT)
+	bool CHECK_SETUP() // std::string ARGV_0, std::string OUTPUT)
 	{
 		if(DEBUG)
 			RANDOM = "0000";
@@ -4779,7 +5022,7 @@
 
 			wstring WIN32_PATH_BUFFER_W(&WIN32_PATH_BUFFER[0]);
 
-			// PATH_ABSOLUTE = string(WIN32_PATH_BUFFER_W.begin(), WIN32_PATH_BUFFER_W.end());
+			// PATH_ABSOLUTE = std::string(WIN32_PATH_BUFFER_W.begin(), WIN32_PATH_BUFFER_W.end());
 			PATH_ABSOLUTE = ws_to_s(WIN32_PATH_BUFFER_W);
 
 			PATH_ABSOLUTE = PATH_ABSOLUTE.substr(0, PATH_ABSOLUTE.find_last_of("\\/"));
@@ -4962,7 +5205,7 @@
 
 		if (PATH_FULL_BIN == PATH_FULL_LOG)
 		{
-			ALIF_ERROR("ERROR: The binary file and the log, is the same.");
+			ALIF_ERROR("ERROR: The binary file and the log are the same.");
 		}
 
 		if (PATH_WORKING.empty())
@@ -5003,9 +5246,10 @@
 // Generator ****************************************************
 
     // Alif 3
-	string code_stack;
-    string code;
-    string code_entry_point;
+	std::string code_core;
+	std::string code_stack;
+    std::string code;
+    std::string code_entry_point;
 
 	enum code_t : unsigned short {
 		STACK,
@@ -5013,7 +5257,7 @@
 		ENTRY_POINT
 	};
 
-	void code_add(code_t type, string c){
+	void code_add(code_t type, std::string c){
 		
 		if(type == STACK)
 			code_stack.append(c);
@@ -5026,20 +5270,20 @@
 	// - - - - - - - - - - - - - - - - - -
 	
 	// General (Old)
-    string CPP_ID_DECLARATION;
-    string CPP_GLOBAL;
-    string CPP_OBJ_DECLARATION;
-    string CPP_FUN;
-    string CPP_GLOBAL_FUN;
-    string CPP_CLASS;
+    std::string CPP_ID_DECLARATION;
+    std::string CPP_GLOBAL;
+    std::string CPP_OBJ_DECLARATION;
+    //std::string CPP_FUN;
+    std::string CPP_GLOBAL_FUN;
+    std::string CPP_CLASS;
 
-    // Window
-    std::map<std::pair<string,string>, string>	CPP_WINDOW;	// [window][option] = value
+    // Namespace
+    std::map<std::pair<std::string,std::string>, std::string>	CPP_WINDOW;	// [window][option] = value
 
     // Platformes
 
     // PC Console
-	string CODE_GENERATOR_GET_PC_CONSOLE(){
+	std::string CODE_GENERATOR_GET_PC_CONSOLE(){
 
         return "";
     }
@@ -5051,7 +5295,7 @@
 	// ----------------------------------
 
 	/*
-	void Script(string Code){
+	void Script(std::string Code){
 
 		// CPP_ID_DECLARATION
 		// CPP_GLOBAL
@@ -5059,7 +5303,7 @@
 		// Windows const..
 		// Event..
 		// 		CPP_CLASS
-		// 		CPP_FUN
+		// 		CPP_GLOBAL_FUN
 		// CPP_GLOBAL_FUN
 
 		if (IsInsideClass){
@@ -5069,13 +5313,13 @@
 		}
 		else
 		{
-			// Local Window Function
-			// Local Window Main Function
+			// Local Namespace Function
+			// Local Namespace Main Function
 
 			if (FUN != "رئيسية")
 			{
 				// Normal Function
-				CPP_FUN.append(NEW_CODE);
+				CPP_GLOBAL_FUN.append(NEW_CODE);
 			}
 			else
 			{
@@ -5087,8 +5331,15 @@
 	}
 	*/
 
-	void cpp_AddScript(string FUN, string NEW_CODE)
-	{
+	void cpp_AddScript(std::string FUN, std::string NEW_CODE){
+
+		// code.append(NEW_CODE);
+
+		// if (IsInsideClass)
+		// 	CPP_CLASS.append(NEW_CODE);
+		// else
+		// 	CPP_GLOBAL_FUN.append(NEW_CODE);
+
 		if (IsInsideClass)
 		{
 			// Local Class Function
@@ -5096,19 +5347,21 @@
 		}
 		else
 		{
-			// Local Window Function
-			// Local Window Main Function
+			// Local Namespace Function
+			// Local Namespace Main Function
 
 			if (FUN != "رئيسية")
 			{
 				// Normal Function
-				CPP_FUN.append(NEW_CODE);
+				CPP_GLOBAL_FUN.append(NEW_CODE);
 			}
 			else
 			{
 				// Main Function
-				CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "LOAD")];
-				CPP_WINDOW[std::make_pair(TheNamespace, "LOAD")] = CBUFER + NEW_CODE;
+				// CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "LOAD")];
+				// CPP_WINDOW[std::make_pair(TheNamespace, "LOAD")] = CBUFER + NEW_CODE;
+
+				code_entry_point.append(NEW_CODE);
 			}
 		}
 	}
@@ -5117,10 +5370,10 @@
 	// WinX Load()
 	// ----------------------------------
 
-	string CG_WINX_LOAD()
+	std::string CG_WINX_LOAD()
 	{
-		string CODE;
-		string BUFFER;
+		std::string CODE;
+		std::string BUFFER;
 
 		for (int i = 1; i <= Namespace_Total; i++) 
 		{
@@ -5128,7 +5381,7 @@
 
 	// ========================================================================
 	// ------------------------------------------------
-	// Window X )" + ID[Namespace_Total_Names[i]] + R"( Load()
+	// Namespace X )" + ID[Namespace_Total_Names[i]] + R"( Load()
 	// ------------------------------------------------
 
 	void WINDOW_LOAD_)" + ID[Namespace_Total_Names[i]] + R"(()
@@ -5149,10 +5402,10 @@
 	// Application Destroy()
 	// ----------------------------------
 
-	string CG_APP_DESTROY()
+	std::string CG_APP_DESTROY()
 	{
-		string CODE;
-		string BUFFER;
+		std::string CODE;
+		std::string BUFFER;
 
 		BUFFER = R"( 
 		// ------------------------------------------------
@@ -5165,7 +5418,7 @@
 		for (int i = 1; i <= Namespace_Total; i++) 
 		{
 			BUFFER = R"( 
-			// Window X )" + ID[Namespace_Total_Names[i]] + R"( Destroy
+			// Namespace X )" + ID[Namespace_Total_Names[i]] + R"( Destroy
 			// ---------
 			//#ifdef __APPLE__
 				//if (WINDOW_IS_CONSTRUCTION_)" + ID[Namespace_Total_Names[i]] + R"() OBJ_CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(->EndModal(0);
@@ -5195,18 +5448,18 @@
 	}
 
 	// ----------------------------------
-	// Window Show ()
+	// Namespace Show ()
 	// ----------------------------------
 
-	string CG_WIN_SHOW(string WIN)
+	std::string CG_WIN_SHOW(std::string WIN)
 	{
-		string CODE = R"(
+		std::string CODE = R"(
 		// -------------------------------
 		// Win Show ()" + WIN + R"()
 		// -------------------------------
 		if (!WINDOW_IS_CONSTRUCTION_)" + ID[WIN] + R"()
 		{
-			OBJ_CLASS_WINDOW_)" + ID[WIN] + R"( = new CLASS_WINDOW_)" + ID[WIN] + R"(();
+			OBJ_CLASS_WINDOW_)" + ID[WIN] + R"( = new NS_)" + ID[WIN] + R"(();
 			OBJ_CLASS_WINDOW_)" + ID[WIN] + R"(->SetLayoutDirection(wxLayout_RightToLeft);
 			WINDOW_IS_CONSTRUCTION_)" + ID[WIN] + R"( = true;
 		}
@@ -5221,12 +5474,12 @@
 	}
 
 	// ----------------------------------
-	// Window Center ()
+	// Namespace Center ()
 	// ----------------------------------
 
-	string CG_WIN_CENTER(string WIN)
+	std::string CG_WIN_CENTER(std::string WIN)
 	{
-		string CODE = R"(
+		std::string CODE = R"(
 		// -------------------------------
 		// Win Center ()" + WIN + R"()
 		// -------------------------------
@@ -5241,12 +5494,12 @@
 	}
 
 	// ----------------------------------
-	// Window Hide ()
+	// Namespace Hide ()
 	// ----------------------------------
 
-	string CG_WIN_HIDE(string WIN)
+	std::string CG_WIN_HIDE(std::string WIN)
 	{
-		string CODE = R"(
+		std::string CODE = R"(
 		// -----------------------------------------------
 		// Win Hide
 		// -----------------------------------------------
@@ -5262,12 +5515,12 @@
 	}
 
 	// ----------------------------------
-	// Window Destroy ()
+	// Namespace Destroy ()
 	// ----------------------------------
 
-	string CG_WIN_DESTROY(string WIN)
+	std::string CG_WIN_DESTROY(std::string WIN)
 	{
-		string CODE = R"(
+		std::string CODE = R"(
 		// -----------------------------------------------
 		// Win Destroy
 		// -----------------------------------------------
@@ -5287,34 +5540,32 @@
 	}
 
 	// ----------------------------------
-	// Window : members
+	// namespace : members
 	// ----------------------------------
 
-	string CG_WIN_MEMBER(string WIN, string MEMBER_CODE)
-	{
-		// Used by Operator:xx:yy
-
-		string CODE = R"(
-		// -----------------------------------------------
-		// Win Members
-		// -----------------------------------------------
-		if (WINDOW_IS_CONSTRUCTION_)" + ID[WIN] + R"()
-		{
-			OBJ_CLASS_WINDOW_)" + ID[WIN] + R"(->)" + MEMBER_CODE + R"( )";
-
-		return CODE;
-	}
+	// std::string CG_WIN_MEMBER(std::string WIN, std::string MEMBER_CODE)
+	// {
+	// 	// Used by Operator:xx:yy
+	// 	std::string CODE = R"(
+	// 	// -----------------------------------------------
+	// 	// Win Members
+	// 	// -----------------------------------------------
+	// 	if (WINDOW_IS_CONSTRUCTION_)" + ID[WIN] + R"()
+	// 	{
+	// 		OBJ_CLASS_WINDOW_)" + ID[WIN] + R"(->)" + MEMBER_CODE + R"( )";
+	// 	return CODE;
+	// }
 
 	// ----------------------------------
-	// Window : members
+	// namespace : members
 	// ----------------------------------
 	/*
 
 	// We will need this, if we set a way to delete a control by alif code.
 
-	string CG_CONTROL_MEMBER(string WIN, string CONTROL, string MEMBER_CODE)
+	std::string CG_CONTROL_MEMBER(std::string WIN, std::string CONTROL, std::string MEMBER_CODE)
 	{
-		string CODE = R"(
+		std::string CODE = R"(
 		// -----------------------------------------------
 		// Control Members
 		// -----------------------------------------------
@@ -5366,31 +5617,31 @@
 	// C++ CODE INITIALIZATION
 	// ----------------------------------
 
-	string CG_WINX_CODE()
+	std::string CG_WINX_CODE()
 	{
-		string CODE;
-		string BUFFER;
+		std::string CODE;
+		std::string BUFFER;
 
 		for (int i = 1; i <= Namespace_Total; i++) 
 		{
 			BUFFER = R"( 
 	// ========================================================================
-	// Window X )" + ID[Namespace_Total_Names[i]] + R"( 
+	// Namespace X )" + ID[Namespace_Total_Names[i]] + R"( 
 	// ========================================================================
 
 	// --------------------
-	// Window )" + ID[Namespace_Total_Names[i]] + R"( Definition
+	// Namespace )" + ID[Namespace_Total_Names[i]] + R"( Definition
 	// --------------------
 
-	class CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"( : public wxFrame
+	class NS_)" + ID[Namespace_Total_Names[i]] + R"( : public wxFrame
 	{
 		public:
 			void OnClose(wxCloseEvent& event);
-			CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"( ();
-			virtual ~CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(();
+			NS_)" + ID[Namespace_Total_Names[i]] + R"( ();
+			virtual ~NS_)" + ID[Namespace_Total_Names[i]] + R"(();
 			
 			// --------------------
-			// Window )" + ID[Namespace_Total_Names[i]] + R"( Functions Declaration
+			// Namespace )" + ID[Namespace_Total_Names[i]] + R"( Functions Declaration
 			// --------------------
 			
 			// +++++++++ >
@@ -5398,20 +5649,20 @@
 			// +++++++++ >
 
 		private:
-			DECLARE_NO_COPY_CLASS(CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"()
+			DECLARE_NO_COPY_CLASS(NS_)" + ID[Namespace_Total_Names[i]] + R"()
 			DECLARE_EVENT_TABLE()
 	};
 
-	CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"( *OBJ_CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(;
-	CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(::~CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"((){}
+	NS_)" + ID[Namespace_Total_Names[i]] + R"( *OBJ_CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(;
+	NS_)" + ID[Namespace_Total_Names[i]] + R"(::~NS_)" + ID[Namespace_Total_Names[i]] + R"((){}
 
 	// --------------------
-	// Window )" + ID[Namespace_Total_Names[i]] + R"( Constructor
+	// Namespace )" + ID[Namespace_Total_Names[i]] + R"( Constructor
 	// --------------------
 
-	CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"( :: CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(() : 
+	NS_)" + ID[Namespace_Total_Names[i]] + R"( :: NS_)" + ID[Namespace_Total_Names[i]] + R"(() : 
 		wxFrame(NULL, ID_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(, 
-		wxT(")" + CPP_WINDOW[std::make_pair(Namespace_Total_Names[i], "نص")] + R"("),
+		(")" + CPP_WINDOW[std::make_pair(Namespace_Total_Names[i], "نص")] + R"("),
 		wxPoint()" + CPP_WINDOW[std::make_pair(Namespace_Total_Names[i], "افصول")] + R"(, )" + CPP_WINDOW[std::make_pair(Namespace_Total_Names[i], "ارتوب")] + R"(),
 		wxSize()" + CPP_WINDOW[std::make_pair(Namespace_Total_Names[i], "عرض")] + R"(, )" + CPP_WINDOW[std::make_pair(Namespace_Total_Names[i], "ارتفاع")] + R"(), )" + 
 		CPP_WINDOW[std::make_pair(Namespace_Total_Names[i], "شكل")] + R"( ) 
@@ -5431,10 +5682,10 @@
 	}
 
 	// ------------------------------------------------
-	// Window Winx Close
+	// Namespace Winx Close
 	// ------------------------------------------------
 
-	void CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(::OnClose(wxCloseEvent& event)
+	void NS_)" + ID[Namespace_Total_Names[i]] + R"(::OnClose(wxCloseEvent& event)
 	{
 		event.Skip();
 
@@ -5450,8 +5701,8 @@
 	// Event Table
 	// ------------------------------------------------
 
-	BEGIN_EVENT_TABLE(CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(, wxFrame)
-		EVT_CLOSE(CLASS_WINDOW_)" + ID[Namespace_Total_Names[i]] + R"(::OnClose)
+	BEGIN_EVENT_TABLE(NS_)" + ID[Namespace_Total_Names[i]] + R"(, wxFrame)
+		EVT_CLOSE(NS_)" + ID[Namespace_Total_Names[i]] + R"(::OnClose)
 		
 		// +++++++++ >
 			)" + CPP_WINDOW[std::make_pair(Namespace_Total_Names[i], "EVENT")] + R"(
@@ -5476,7 +5727,7 @@
 	// the app not continue the fucntion... so, solution is be sure
 	// the windows is constructed before control:GetValue() [ MyControl:نص ]
 
-	// string CODE_GENERATOR_GET_PC_GUI_old()
+	// std::string CODE_GENERATOR_GET_PC_GUI_old()
 	// {
 	// 	return R"( 
 	// 	// ------------------------------------------------
@@ -5493,7 +5744,7 @@
 	// 		#define _WCHAR_H_CPLUSPLUS_98_CONFORMANCE_
 	// 	#endif
 
-	// 	#include <sstream> // stringstream (int To string)
+	// 	#include <sstream> // stringstream (int To std::string)
 	// 	#include <wx/wx.h>
 
 	// 	#include "wx/webview.h"
@@ -5532,15 +5783,15 @@
 	// 	int Generated_ID = 10000;
 	// 	int ALIFCORE_ID_GENERATOR(){return Generated_ID++;}
 
-	// 	string alifcore_IntToString(double INT_VAL)
+	// 	std::string alifcore_IntToString(double INT_VAL)
 	// 	{
 	// 		stringstream STRING_STREAM_BUFFER;
 	// 		STRING_STREAM_BUFFER << INT_VAL;
-	// 		string STRING_BUFFER = STRING_STREAM_BUFFER.str();
+	// 		std::string STRING_BUFFER = STRING_STREAM_BUFFER.str();
 	// 		return STRING_BUFFER;
 	// 	}
 
-	// 	double alifcore_StringToInt(wxString STR_VAL)
+	// 	double alifcore_StringToInt(std::string STR_VAL)
 	// 	{
 	// 		double value;
 
@@ -5554,7 +5805,7 @@
 	// 		}
 	// 	}
 
-	// 	bool alifcore_StringToBool(wxString Value){
+	// 	bool alifcore_StringToBool(std::string Value){
 	// 		if (Value == "true" || 
 	// 			Value == "TRUE" || 
 	// 			Value == "1" || 
@@ -5565,7 +5816,7 @@
 	// 		else return false;
 	// 	}
 
-	// 	string alifcore_BoolToString(bool Value){
+	// 	std::string alifcore_BoolToString(bool Value){
 	// 		if(Value) return "true";
 	// 		else return "false";
 	// 	}
@@ -5585,7 +5836,7 @@
 	// 	// GLOBAL Declaration
 	// 	// --------------------
 
-	// 	const static wxString ALIFCORE_NEW_LINE  =  wxT("\n"); // FIX
+	// 	const static std::string ALIFCORE_NEW_LINE  =  ("\n"); // FIX
 	// 	bool WINDOW_IS_SHOW_)" + ID["رئيسية"] + R"( = false; // FIX
 	// 	bool WINDOW_IS_CONSTRUCTION_)" + ID["رئيسية"] + R"( = false; // FIX
 	// 	void WINDOW_LOAD_)" + ID["رئيسية"] + R"((); // FIX
@@ -5605,22 +5856,22 @@
 	// 	// +++++++++ >
 
 	// 	// ========================================================================
-	// 	// Window Main )" + ID["رئيسية"] + R"( Fixed Code
+	// 	// Namespace Main )" + ID["رئيسية"] + R"( Fixed Code
 	// 	// ========================================================================
 
 	// 	// ------------------------------------------------
-	// 	// Window )" + ID["رئيسية"] + R"( Definition
+	// 	// Namespace )" + ID["رئيسية"] + R"( Definition
 	// 	// ------------------------------------------------
 
-	// 	class CLASS_WINDOW_)" + ID["رئيسية"] + R"( : public wxFrame
+	// 	class NS_)" + ID["رئيسية"] + R"( : public wxFrame
 	// 	{
 	// 		public:
 	// 			void OnClose(wxCloseEvent& event);
-	// 			CLASS_WINDOW_)" + ID["رئيسية"] + R"( ();
-	// 			virtual ~CLASS_WINDOW_)" + ID["رئيسية"] + R"(();
+	// 			NS_)" + ID["رئيسية"] + R"( ();
+	// 			virtual ~NS_)" + ID["رئيسية"] + R"(();
 				
 	// 			// --------------------
-	// 			// Window )" + ID["رئيسية"] + R"( Functions Declaration
+	// 			// Namespace )" + ID["رئيسية"] + R"( Functions Declaration
 	// 			// --------------------
 				
 	// 			// +++++++++ >
@@ -5628,20 +5879,20 @@
 	// 			// +++++++++ >
 
 	// 		private:
-	// 			DECLARE_NO_COPY_CLASS(CLASS_WINDOW_)" + ID["رئيسية"] + R"()
+	// 			DECLARE_NO_COPY_CLASS(NS_)" + ID["رئيسية"] + R"()
 	// 			DECLARE_EVENT_TABLE()
 	// 	};
 
-	// 	CLASS_WINDOW_)" + ID["رئيسية"] + R"( *OBJ_CLASS_WINDOW_)" + ID["رئيسية"] + R"(;
-	// 	CLASS_WINDOW_)" + ID["رئيسية"] + R"(::~CLASS_WINDOW_)" + ID["رئيسية"] + R"((){}
+	// 	NS_)" + ID["رئيسية"] + R"( *OBJ_CLASS_WINDOW_)" + ID["رئيسية"] + R"(;
+	// 	NS_)" + ID["رئيسية"] + R"(::~NS_)" + ID["رئيسية"] + R"((){}
 
 	// 	// --------------------
-	// 	// Window )" + ID["رئيسية"] + R"( Constructor
+	// 	// Namespace )" + ID["رئيسية"] + R"( Constructor
 	// 	// --------------------
 
-	// 	CLASS_WINDOW_)" + ID["رئيسية"] + R"( :: CLASS_WINDOW_)" + ID["رئيسية"] + R"(() : 
+	// 	NS_)" + ID["رئيسية"] + R"( :: NS_)" + ID["رئيسية"] + R"(() : 
 	// 		wxFrame(NULL, ID_WINDOW_)" + ID["رئيسية"] + R"(, 
-	// 		wxT(")" + CPP_WINDOW[std::make_pair("رئيسية", "نص")] + R"("),
+	// 		(")" + CPP_WINDOW[std::make_pair("رئيسية", "نص")] + R"("),
 	// 		wxPoint()" + CPP_WINDOW[std::make_pair("رئيسية", "افصول")] + R"(, )" + CPP_WINDOW[std::make_pair("رئيسية", "ارتوب")] + R"(),
 	// 		wxSize()" + CPP_WINDOW[std::make_pair("رئيسية", "عرض")] + R"(, )" + CPP_WINDOW[std::make_pair("رئيسية", "ارتفاع")] + R"(), )" + 
 	// 		CPP_WINDOW[std::make_pair("رئيسية", "شكل")] + R"( )
@@ -5649,7 +5900,7 @@
 	// 		wxPanel *P = new wxPanel(this, wxID_ANY);
 			
 	// 		// --------------------
-	// 		// Window )" + ID["رئيسية"] + R"( Controls Constructor
+	// 		// Namespace )" + ID["رئيسية"] + R"( Controls Constructor
 	// 		// --------------------
 			
 	// 		// +++++++++ >
@@ -5685,7 +5936,7 @@
 
 	// 		// ---------------------------------------------
 
-	// 		OBJ_CLASS_WINDOW_)" + ID["رئيسية"] + R"( = new CLASS_WINDOW_)" + ID["رئيسية"] + R"(();
+	// 		OBJ_CLASS_WINDOW_)" + ID["رئيسية"] + R"( = new NS_)" + ID["رئيسية"] + R"(();
 	// 		OBJ_CLASS_WINDOW_)" + ID["رئيسية"] + R"(->SetLayoutDirection(wxLayout_RightToLeft);
 	// 		OBJ_CLASS_WINDOW_)" + ID["رئيسية"] + R"(->Show();
 	// 		SetTopWindow(OBJ_CLASS_WINDOW_)" + ID["رئيسية"] + R"();
@@ -5702,8 +5953,8 @@
 	// 	// Event Table
 	// 	// ------------------------------------------------
 
-	// 	BEGIN_EVENT_TABLE(CLASS_WINDOW_)" + ID["رئيسية"] + R"(, wxFrame)
-	// 		EVT_CLOSE(CLASS_WINDOW_)" + ID["رئيسية"] + R"(::OnClose)
+	// 	BEGIN_EVENT_TABLE(NS_)" + ID["رئيسية"] + R"(, wxFrame)
+	// 		EVT_CLOSE(NS_)" + ID["رئيسية"] + R"(::OnClose)
 			
 	// 		// +++++++++ >
 	// 			)" + CPP_WINDOW[std::make_pair("رئيسية", "EVENT")] + R"(
@@ -5728,7 +5979,7 @@
 	// 	// ========================================================================
 
 	// 	// +++++++++ >
-	// 		)" + CPP_FUN + R"(
+	// 		)" + CPP_GLOBAL_FUN + R"(
 	// 	// +++++++++ >
 
 	// 	// ========================================================================
@@ -5740,10 +5991,10 @@
 	// 	// +++++++++ >
 
 	// 	// ========================================================================
-	// 	// Window Main )" + ID["رئيسية"] + R"( Close
+	// 	// Namespace Main )" + ID["رئيسية"] + R"( Close
 	// 	// ========================================================================
 
-	// 	void CLASS_WINDOW_)" + ID["رئيسية"] + R"(::OnClose(wxCloseEvent& event)
+	// 	void NS_)" + ID["رئيسية"] + R"(::OnClose(wxCloseEvent& event)
 	// 	{
 	// 		event.Skip();
 
@@ -5756,7 +6007,7 @@
 	// 	}
 
 	// 	// ========================================================================
-	// 	// Window Main Load
+	// 	// Namespace Main Load
 	// 	// ========================================================================
 
 	// 	void WINDOW_LOAD_)" + ID["رئيسية"] + R"(()
@@ -5790,7 +6041,7 @@
 	// 	)";
 	// }
 
-	string CODE_GENERATOR_GET_PC_GUI(){
+	std::string CODE_GENERATOR_GET_PC_GUI(){
 
 		return R"( 
 			/*
@@ -5798,18 +6049,35 @@
 			www.aliflang.org
 			*/
 
-			#ifndef UNICODE
-				#define UNICODE
-			#endif
-			#ifndef _UNICODE
-				#define _UNICODE
-			#endif
-			#ifdef _WIN32
-				#include <windows.h>
-			#endif
-			#include <iostream>
+			// --[ Core ] -------------------------------------
+			)" + code_core + R"(
+			
+			// ++++++++++++++++++++++++++++++++++++++++++++++++
+			//                    Alif 2.x
+			//
+			// --[ CPP_ID_DECLARATION ]------------------------
+				)" + CPP_ID_DECLARATION + R"(
+			// --[ CPP_GLOBAL ]--------------------------------
+				)" + CPP_GLOBAL + R"(
+			// --[ CPP_OBJ_DECLARATION ]-----------------------
+				)" + CPP_OBJ_DECLARATION + R"(
+			// --[ CPP_WINDOW[][FUN_DECLARATION] ]-------------
+				)" + CPP_WINDOW[std::make_pair("", "FUN_DECLARATION")] + R"(
+			// --[ CPP_WINDOW[][LOAD] ]------------------------
+				)" + CPP_WINDOW[std::make_pair("", "LOAD")] + R"(
+			// --[ CPP_WINDOW[رئيسية][FUN_DECLARATION] ]------
+				)" + CPP_WINDOW[std::make_pair("رئيسية", "FUN_DECLARATION")] + R"(
+			// --[ CPP_WINDOW[رئيسية][LOAD] ]-----------------
+				)" + CPP_WINDOW[std::make_pair("رئيسية", "LOAD")] + R"(
+			// --[ CPP_CLASS ]---------------------------------
+				)" + CPP_CLASS + R"(
+			// --[ CPP_FUN ]-----------------------------------
+				// CPP_FUN
+			// --[ CPP_GLOBAL_FUN ]----------------------------
+				)" + CPP_GLOBAL_FUN + R"(
+			// ++++++++++++++++++++++++++++++++++++++++++++++++		
 
-			// --[ Stack auto declaration ] -------------------
+			// --[ Stack ] ------------------------------------
 			)" + code_stack + R"(
 
 			// --[ Code ] -------------------------------------
@@ -5829,14 +6097,16 @@
 	}
 
     // Phone Android
-	string CODE_GENERATOR_GET_PHONE_ANDROID(){
+	std::string CODE_GENERATOR_GET_PHONE_ANDROID(){
 
 		return "";
 	}
 
 // Parser *******************************************************
 
+	#include "alif_macro.hpp"
 	#include "alif_namespace.hpp"
+
 	//#include "alif_window.hpp"
 	//#include "alif_control.hpp"
 
@@ -5903,7 +6173,7 @@
 			// so Crash in convert loop fucntion like "CONVERT_STRING_ARRAY_TO_STRING()"
 			// Move from 'unsigned' to 'int' !
 			
-			string Token[2048];
+			std::string Token[2048];
 
 			// Clear TempToken[1024] on every line
 			// this is for fixing TempToken[p + 1] --> last token from last line!
@@ -5949,21 +6219,22 @@
 
 			if(DEBUG)DEBUG_MESSAGE(IntToString(o_tokens->Line) + ": ", o_tokens); // DEBUG
 
-	if (Token[1] == "#") // #
-	{
-		if (Token[2] == "")
-			ErrorCode("هاش غير محدد ' # '", o_tokens);
+	if (Token[1] == "#") {
+
+		// Macros
+		parser_macro_ui(Token, o_tokens);
 		
-		if (IsInsideNamespace || IsInsideFunction)
-			ErrorCode("يجب استعمال هاش ' # ' في مكان عام", o_tokens);
+		
+		
 		
 		// --------------------------------------------
-		
-		if (Token[2] == "واجهة_ويب"){
+		/*
+		if (Token[2] == "واجهة"){
 
-			// Create new Window
-			// Set Web control
-			// #واجهة_ويب رئيسية "UI_WEB_1"
+			// This macro basicaly read html file
+			// and save it into a const std string.
+
+			// #واجهة رئيسية "UI_WEB_1"
 
 			if (Token[3] == "")
 			ErrorCode("يجب تحديد اسم النافذة", o_tokens);
@@ -5983,7 +6254,7 @@
 			//parser_NewWindowWeb(Token, o_tokens);
 		}
 		else if (Token[2] == "أضف"		||	// #اضف "test.ALIF"
-				Token[2] == "واجهة"	||	// #واجهة "test.ALIFUI"
+				//Token[2] == "واجهة"	||	// #واجهة "test.ALIFUI"
 				Token[2] == "مكتبة" )		// #مكتبة "test.ALIFLIB"
 		{
 			if (Token[3] == "")
@@ -6011,26 +6282,26 @@
 				if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF] ... \n\n", o_tokens);
 				AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIF", false, o_tokens->TOKENS_PREDEFINED);
 			}
-			else if (Token[2] == "واجهة")
-			{
-				// Include local file, for user UI code.
+			// else if (Token[2] == "واجهة")
+			// {
+			// 	// Include local file, for user UI code.
 
-				//if (Token[4] != "")
-				//	ErrorCode("أمر غير معروف : ' " + Token[4] + " ' ", o_tokens);
+			// 	//if (Token[4] != "")
+			// 	//	ErrorCode("أمر غير معروف : ' " + Token[4] + " ' ", o_tokens);
 
-				if(!IsValidStringFormat(Token[3], o_tokens))
-					ErrorCode("خطأ في كتابة إسم الملف: "+ Token[3], o_tokens);
+			// 	if(!IsValidStringFormat(Token[3], o_tokens))
+			// 		ErrorCode("خطأ في كتابة إسم الملف: "+ Token[3], o_tokens);
 
-				if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF UI] ... \n\n", o_tokens);
-				AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIFUI", false, o_tokens->TOKENS_PREDEFINED);
-			}
+			// 	if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF UI] ... \n\n", o_tokens);
+			// 	AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIFUI", false, o_tokens->TOKENS_PREDEFINED);
+			// }
 			else if (Token[2] == "مكتبة")
 			{
 				// Include Library from Lib folder, or local folder.
 
-				if (GET_TXT_FROM_STRING(Token[3], o_tokens) == "رسالة" || 
-					GET_TXT_FROM_STRING(Token[3], o_tokens) == "الرسالة")
-					ErrorCode("ثم دمج مكتبة ' رسالة ' مع مكتبات ألف القياسية الرئيسية، لدى يقوم المترجم باستعمالها بشكل آلي، المرجو إزالة هذا السطر ", o_tokens);
+				// if (GET_TXT_FROM_STRING(Token[3], o_tokens) == "رسالة" || 
+				// 	GET_TXT_FROM_STRING(Token[3], o_tokens) == "الرسالة")
+				// 	ErrorCode("ثم دمج مكتبة ' رسالة ' مع مكتبات ألف القياسية الرئيسية، لدى يقوم المترجم باستعمالها بشكل آلي، المرجو إزالة هذا السطر ", o_tokens);
 				
 				// Python lib need 3 other var to setup
 				/* if(GET_TXT_FROM_STRING(Token[3], o_tokens) == "البايثون"){
@@ -6059,7 +6330,7 @@
 					PythonSetEnvirenment(	GET_TXT_FROM_STRING(Token[4], o_tokens),	// /usr/include/python3.5
 											GET_TXT_FROM_STRING(Token[5], o_tokens),	// /usr/lib/python3.5/config-3.5m-x86_64-linux-gnu
 											GET_TXT_FROM_STRING(Token[6], o_tokens));	// python3.5
-				} */
+				} * /
 
 				else {
 
@@ -6076,125 +6347,13 @@
 				if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF LIB] ... \n\n", o_tokens);
 				AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIFLIB", false, o_tokens->TOKENS_PREDEFINED);
 			}
-			else if (Token[2] == "أظف_أمر_ترجمة" || Token[2] == "أظف_أمر_ربط"){
-
-				// #أظف_أمر_ترجمة "..."
-				// #أظف_أمر_ربط "..."
-
-				if(!IsValidStringFormat(Token[3], o_tokens))
-					ErrorCode("خطأ في كتابة إسم الأمر: "+ Token[3], o_tokens);
-				
-				if (Token[2] == "أظف_أمر_ترجمة"){
-
-					CompileAddExtra_Compile(GET_TXT_FROM_STRING(Token[3], o_tokens));
-
-				} else {
-
-					CompileAddExtra_Link(GET_TXT_FROM_STRING(Token[3], o_tokens));
-				}
-			}
+			
 			
 			continue;
 		}
-
-		// --------------------------------------------
-		// البايثون
-		// --------------------------------------------
-
-		else if(Token[2] == "البايثون_مسار_عناوين"){
-
-			PythonInclude_path = GET_TXT_FROM_STRING(Token[3], o_tokens);
-			if(DEBUG)DEBUG_MESSAGE("[Setting Python Include '" + GET_TXT_FROM_STRING(Token[3], o_tokens) + "' ] \n\n", o_tokens);
-		}
-		else if(Token[2] == "البايثون_مسار_مكتبات"){
-
-			PythonLib_path = GET_TXT_FROM_STRING(Token[3], o_tokens);
-			if(DEBUG)DEBUG_MESSAGE("[Setting Python Lib '" + GET_TXT_FROM_STRING(Token[3], o_tokens) + "' ] \n\n", o_tokens);
-		}
-		else if(Token[2] == "البايثون_مكتبات"){
-
-			PythonLibName = GET_TXT_FROM_STRING(Token[3], o_tokens);
-			if(DEBUG)DEBUG_MESSAGE("[Setting Python LibName '" + GET_TXT_FROM_STRING(Token[3], o_tokens) + "' ] \n\n", o_tokens);
-		}
-		
-		// --------------------------------------------
-		// #ألف
-		// --------------------------------------------
-
-		else if (Token[2] == "ألف") // || Token[2] == "الف") // || Token[2] == "الف_اندرويد" || Token[2] == "الف_ايفون")
-		{
-			if (Token[3] != "")
-				ErrorCode("أمر غير معروف : ' " + Token[3] + " ' ", o_tokens);
-			
-			if (!o_tokens->TOKENS_PREDEFINED)
-			{
-				if (ALIF_FLAG_FILE[o_tokens->PATH_FULL_SOURCE])
-					ErrorCode("تم الاعلان عن علم ألف مسبقا في السطر : " + ALIF_FLAG_AT_LINE_FILE[o_tokens->PATH_FULL_SOURCE], o_tokens);
-
-				ALIF_FLAG_FILE[o_tokens->PATH_FULL_SOURCE] = true;
-				ALIF_FLAG_AT_LINE_FILE[o_tokens->PATH_FULL_SOURCE] = IntToString(o_tokens->Line);
-
-				continue;
-			}
-			
-			if(DEBUG)DEBUG_MESSAGE("[#ALIF] \n\n", o_tokens);
-
-			continue;
-			
-			/*
-			if (o_tokens->ALIF_FLAG)
-			{
-				if (ALIF_PROGRAM == "PC_BIN_32_64")
-					ErrorCode("Alif flag already set at line : " + o_tokens->ALIF_FLAG_AT_LINE + " (For PC) ", o_tokens);
-				
-				else if (ALIF_PROGRAM == "ANDROID")
-					ErrorCode("Alif flag already set at line : " + o_tokens->ALIF_FLAG_AT_LINE + " (For Android) ", o_tokens);
-				
-				else if (ALIF_PROGRAM == "IPHONE")
-					ErrorCode("Alif flag already set at line : " + o_tokens->ALIF_FLAG_AT_LINE + " (For iPhone) ", o_tokens);
-				
-				else
-					ErrorCode("علة: Unknow program type : ' " + ALIF_PROGRAM + " ' ", o_tokens);
-			}
-			
-			
-			if (ALIF_PROGRAM != "")
-				ErrorCode("علة: Unknow program : ' " + ALIF_PROGRAM + " ' ", o_tokens);
-			
-			if (Token[2] == "الف")
-			{
-				ALIF_PROGRAM = "PC_BIN_32_64";
-				if(DEBUG)DEBUG_MESSAGE("[#ALIF] \n\n", o_tokens);
-			}
-			else if (Token[2] == "الف_اندرويد")
-			{
-				ALIF_PROGRAM = "ANDROID";
-				if(DEBUG)DEBUG_MESSAGE("[#ALIF_ANDROID] \n\n", o_tokens);
-			}
-			else if (Token[2] == "الف_ايفون")
-			{
-				ALIF_PROGRAM = "IPHONE";
-				if(DEBUG)DEBUG_MESSAGE("[#ALIF-IPHONE] \n\n", o_tokens);
-			}
-			else
-				ErrorCode("علة: Unknow flag type : ' " + Token[2] + " ' ", o_tokens);
-			*/
-		}
-		// --------------------------------------------
-		else
-		{
-			if (Token[2] == "الف" ||
-				Token[2] == "ا" ||
-				Token[2] == "أ" ||
-				Token[2] == "الألف" ||
-				Token[2] == "الالف")
-			{
-				ErrorCode("أمر غير معروف : ' " + Token[2] + " '، هل تقصد ' ألف ' ؟ ", o_tokens);
-			}
-			else
-				ErrorCode("أمر غير معروف : ' " + Token[2] + " ' ", o_tokens);
-		}	
+		*/
 	}
+
 	// ---------------------------------------------------------------------------------
 	// General Erros
 	// ---------------------------------------------------------------------------------
@@ -6220,7 +6379,7 @@
 		
 		if (!LIB_INSIDE_CPP_CODE){
 
-			if(DEBUG)DEBUG_MESSAGE(" {_س_ START} " , o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("{_س_ START} " , o_tokens); // DEBUG
 
 			LIB_INSIDE_CPP_CODE = true;
 			LIB_PARSER_CG_BUFER = "";
@@ -6229,33 +6388,33 @@
 			{
 				if (Token[p] == "_س_") // End C++ Code
 				{
-					if(DEBUG)DEBUG_MESSAGE(" {_س_ END} ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("{_س_ END} ", o_tokens); // DEBUG
 					LIB_INSIDE_CPP_CODE = false;
 
 					// *** Generate Code ***
 					if (IsInsideClass)
 					{
 						// Class Area
-						//CPP_CLASS.append(" " + LIB_PARSER_CG_BUFER + " ");
-						code_add(CODE, LIB_PARSER_CG_BUFER);
+						CPP_CLASS.append(" " + LIB_PARSER_CG_BUFER + " ");
+						//code_add(CODE, LIB_PARSER_CG_BUFER);
 					}
 					else if (!IsInsideNamespace && !IsInsideFunction)
 					{
 						// Global Area
-						//CPP_GLOBAL.append(" " + LIB_PARSER_CG_BUFER + " ");
-						code_add(CODE, LIB_PARSER_CG_BUFER);
+						CPP_GLOBAL.append(" " + LIB_PARSER_CG_BUFER + " ");
+						//code_add(CODE, LIB_PARSER_CG_BUFER);
 					}
 					else if (!IsInsideNamespace && IsInsideFunction)
 					{
 						// Global Function
-						//CPP_GLOBAL_FUN.append(" " + LIB_PARSER_CG_BUFER + " ");
-						code_add(CODE, LIB_PARSER_CG_BUFER);
+						CPP_GLOBAL_FUN.append(" " + LIB_PARSER_CG_BUFER + " ");
+						//code_add(CODE, LIB_PARSER_CG_BUFER);
 					}
 					else if (IsInsideNamespace && IsInsideFunction)
 					{
 						// Local Function
-						//cpp_AddScript(TheFunction, " " + LIB_PARSER_CG_BUFER + " ");
-						code_add(CODE, LIB_PARSER_CG_BUFER);
+						cpp_AddScript(TheFunction, " " + LIB_PARSER_CG_BUFER + " ");
+						//code_add(CODE, LIB_PARSER_CG_BUFER);
 					}
 					else
 					{
@@ -6267,7 +6426,7 @@
 				{
 					// ...C++...@ Alif @...C++...
 
-					if(DEBUG)DEBUG_MESSAGE(" {@} " , o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("{@} " , o_tokens); // DEBUG
 
 					TempTokenCount = 1; // CheckForSyntax() Need this.
 					TempToken[0] = "="; // CheckForSyntax() Need this.
@@ -6290,28 +6449,28 @@
 					if (!AT_FOUND)
 						ErrorCode("نهايه شفرة سي++ غير موجوده ' @ '", o_tokens);
 
-					string CLASS_OR_WIN;
+					std::string CLASS_OR_WIN;
 					if (IsInsideClass)
 						CLASS_OR_WIN = TheClass;
 					else
 						CLASS_OR_WIN = TheNamespace;
 
 					ScriptSyntaxBuffer = CheckForSyntax("C++",				// OBJECTIF_TYPE
-													true,					// Accept Using Reference to Window:Controls
-													true,					// Accept Using Reference to Window:Function
+													true,					// Accept Using Reference to namespace:Controls
+													true,					// Accept Using Reference to namespace:Function
 													true,					// Accept Using Reference to Global Functions
 													true,					// Accept Using Reference to Local Functions
 													true,					// Accept Using Reference to Global VAR
 													true,					// Accept Using Reference to Local VAR
 													true,					// Accept Convertion from String To Int
 													true,					// Accept Convertion from Int To String
-													TempToken, 				// SYNTAX[] string
+													TempToken, 				// SYNTAX[] std::string
 													(TempTokenCount - 1),	// SYNTAX_LONG int
 													CLASS_OR_WIN,			// TMP_WINDOW_NAME
 													TheFunction,			// TMP_FUNCTION_NAME
 													o_tokens);
 				
-					if(DEBUG)DEBUG_MESSAGE(" {@} " , o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("{@} " , o_tokens); // DEBUG
 
 					// *** C++ ***
 					LIB_PARSER_CG_BUFER.append(" " + ScriptSyntaxBuffer + " ");
@@ -6323,13 +6482,13 @@
 				{
 					// Add C++ Code to the buffer
 					LIB_PARSER_CG_BUFER.append(Token[p]);
-					if(DEBUG)DEBUG_MESSAGE(" {" + Token[p] + "} ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("{" + Token[p] + "} ", o_tokens); // DEBUG
 				}
 			}
 		}
 		else
 		{
-			if(DEBUG)DEBUG_MESSAGE(" {_س_ END} ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("{_س_ END} ", o_tokens); // DEBUG
 			LIB_INSIDE_CPP_CODE = false;
 		}
 	}
@@ -6342,35 +6501,35 @@
 			{
 				if (Token[p] == "_س_") // End C++ Code
 				{
-					if(DEBUG)DEBUG_MESSAGE(" {_س_ END} ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("{_س_ END} ", o_tokens); // DEBUG
 					LIB_INSIDE_CPP_CODE = false;
 
-					//if(DEBUG)DEBUG_MESSAGE(" \n\n GENERATOR -------> |" + LIB_PARSER_CG_BUFER + "| \n\n", o_tokens); // DEBUG
+					//if(DEBUG)DEBUG_MESSAGE("\n\n GENERATOR -------> |" + LIB_PARSER_CG_BUFER + "| \n\n", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					if (IsInsideClass)
 					{
 						// Class Area
-						//CPP_CLASS.append(" " + LIB_PARSER_CG_BUFER + " ");
-						code_add(CODE, LIB_PARSER_CG_BUFER);
+						CPP_CLASS.append(" " + LIB_PARSER_CG_BUFER + " ");
+						//code_add(CODE, LIB_PARSER_CG_BUFER);
 					}
 					else if (!IsInsideNamespace && !IsInsideFunction)
 					{
 						// Global Area
-						//CPP_GLOBAL.append(" " + LIB_PARSER_CG_BUFER + " ");
-						code_add(CODE, LIB_PARSER_CG_BUFER);
+						CPP_GLOBAL.append(" " + LIB_PARSER_CG_BUFER + " ");
+						//code_add(CODE, LIB_PARSER_CG_BUFER);
 					}
 					else if (!IsInsideNamespace && IsInsideFunction)
 					{
 						// Global Function
-						//CPP_GLOBAL_FUN.append(" " + LIB_PARSER_CG_BUFER + " ");
-						code_add(CODE, LIB_PARSER_CG_BUFER);
+						CPP_GLOBAL_FUN.append(" " + LIB_PARSER_CG_BUFER + " ");
+						//code_add(CODE, LIB_PARSER_CG_BUFER);
 					}
 					else if (IsInsideNamespace && IsInsideFunction)
 					{
 						// Local Function
-						//cpp_AddScript(TheFunction, " " + LIB_PARSER_CG_BUFER + " ");
-						code_add(CODE, LIB_PARSER_CG_BUFER);
+						cpp_AddScript(TheFunction, " " + LIB_PARSER_CG_BUFER + " ");
+						//code_add(CODE, LIB_PARSER_CG_BUFER);
 					}
 					else
 					{
@@ -6382,7 +6541,7 @@
 				{
 					// ...C++...@ Alif @...C++...
 
-					if(DEBUG)DEBUG_MESSAGE(" {@} " , o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("{@} " , o_tokens); // DEBUG
 
 					TempTokenCount = 1; // CheckForSyntax() Need this.
 					TempToken[0] = "="; // CheckForSyntax() Need this.
@@ -6405,28 +6564,28 @@
 					if (!AT_FOUND)
 						ErrorCode("نهايه شفرة سي++ غير موجوده ' @ '", o_tokens);
 
-					string CLASS_OR_WIN;
+					std::string CLASS_OR_WIN;
 					if (IsInsideClass)
 						CLASS_OR_WIN = TheClass;
 					else
 						CLASS_OR_WIN = TheNamespace;
 					
 					ScriptSyntaxBuffer = CheckForSyntax("C++",				// OBJECTIF_TYPE
-													true,					// Accept Using Reference to Window:Controls
-													true,					// Accept Using Reference to Window:Function
+													true,					// Accept Using Reference to namespace:Controls
+													true,					// Accept Using Reference to namespace:Function
 													true,					// Accept Using Reference to Global Functions
 													true,					// Accept Using Reference to Local Functions
 													true,					// Accept Using Reference to Global VAR
 													true,					// Accept Using Reference to Local VAR
 													true,					// Accept Convertion from String To Int
 													true,					// Accept Convertion from Int To String
-													TempToken, 				// SYNTAX[] string
+													TempToken, 				// SYNTAX[] std::string
 													(TempTokenCount - 1),	// SYNTAX_LONG int
 													CLASS_OR_WIN,			// TMP_WINDOW_NAME
 													TheFunction,			// TMP_FUNCTION_NAME
 													o_tokens);
 				
-					if(DEBUG)DEBUG_MESSAGE(" {@} " , o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("{@} " , o_tokens); // DEBUG
 
 					// *** C++ ***
 					LIB_PARSER_CG_BUFER.append(" " + ScriptSyntaxBuffer + " ");
@@ -6438,7 +6597,7 @@
 				{
 					// Add C++ Code to the buffer
 					LIB_PARSER_CG_BUFER.append(Token[p]);
-					if(DEBUG)DEBUG_MESSAGE(" {" + Token[p] + "} ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("{" + Token[p] + "} ", o_tokens); // DEBUG
 				}
 			}
 	}
@@ -6522,7 +6681,7 @@
 		parser_ObjNew(Token, o_tokens);
 	}
 
-	else if (OBJ_IS_SET[std::make_pair(TheNamespace + TheFunction, Token[1])] || 	// Window -> Func. 	Local Obj.
+	else if (OBJ_IS_SET[std::make_pair(TheNamespace + TheFunction, Token[1])] || 	// Namespace -> Func. 	Local Obj.
 			OBJ_IS_SET[std::make_pair(TheClass + TheFunction, Token[1])] || 		// Class -> Func. 	Local Obj.
 			OBJ_IS_SET[std::make_pair(TheClass, Token[1])] ||						// Class. 			Global Class Obj.
 			OBJ_IS_SET[std::make_pair("", Token[1])]){								// Global Area. 	Global Obj.
@@ -6736,7 +6895,7 @@
 	// 		exit(EXIT_FAILURE);
 	// 	}
 
-	// 	string LINE8;
+	// 	std::string LINE8;
 
 	// 	while (getline(FILE_STREAM, LINE8))
 	// 	{
@@ -6756,7 +6915,7 @@
 
 	// 		size_t LINE_FIX_LAST_POS = LINE8.find_last_not_of("\r\n");
 
-	// 		if (LINE_FIX_LAST_POS != string::npos)
+	// 		if (LINE_FIX_LAST_POS != std::string::npos)
 	// 		{
 	// 			LINE8.substr(0, LINE_FIX_LAST_POS + 1).swap(LINE8);
 	// 		}
@@ -6782,7 +6941,7 @@
 	// 	FILE_STREAM.close();
 	// }
 
-	void ADD_TOKEN(string TOKEN_CHAR, bool NEW_TOKEN, bool NEW_TOKEN_AFTER, int REAL_CHAR_NUMBER, CLASS_TOKEN *o_tokens)
+	void ADD_TOKEN(std::string TOKEN_CHAR, bool NEW_TOKEN, bool NEW_TOKEN_AFTER, int REAL_CHAR_NUMBER, CLASS_TOKEN *o_tokens)
 	{
 		if (NEW_TOKEN)
 		{
@@ -6832,7 +6991,7 @@
 		}
 	}
 
-	void AlifLexerParser(string FILE_NAME, string FILE_TYPE, bool FIRST_FILE, bool TOKENS_ARE_PREDININED)
+	void AlifLexerParser(std::string FILE_NAME, std::string FILE_TYPE, bool FIRST_FILE, bool TOKENS_ARE_PREDININED)
 	{
 		// ------------------------------------------------------
 		// Create new object of tokens class
@@ -6853,7 +7012,7 @@
 		// ErrorCode("خطأ في كتابة إسم الملف: "+ Token[4], o_tokens);
 
 		int POS = FILE_NAME.find_last_of(".");
-		string EXTENTION;
+		std::string EXTENTION;
 
 		// Get extention
 		if (POS > 0)
@@ -6871,24 +7030,24 @@
 				else
 					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME + ".alif";
 			}
-			else if (FILE_TYPE == "ALIFUI")
-			{
-				if (IS_PATH(FILE_NAME))
-					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".alifui";
-				else
-					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME + ".alifui";
-			}
-			else if (FILE_TYPE == "ALIFUIW"){
+			// else if (FILE_TYPE == "ALIFUI")
+			// {
+			// 	if (IS_PATH(FILE_NAME))
+			// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".alifui";
+			// 	else
+			// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME + ".alifui";
+			// }
+			// else if (FILE_TYPE == "ALIFUIW"){
 
-				if (IS_PATH(FILE_NAME)){
-					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".alifuiw";
-					PATH_FULL_WINDOW_WEB = FILE_NAME + ".alifuiw";
-				}
-				else {
-					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME + ".alifuiw";
-					PATH_FULL_WINDOW_WEB = PATH_WORKING + SEPARATION + FILE_NAME + ".alifuiw";
-				}
-			}
+			// 	if (IS_PATH(FILE_NAME)){
+			// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".alifuiw";
+			// 		PATH_FULL_WINDOW_WEB = FILE_NAME + ".alifuiw";
+			// 	}
+			// 	else {
+			// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME + ".alifuiw";
+			// 		PATH_FULL_WINDOW_WEB = PATH_WORKING + SEPARATION + FILE_NAME + ".alifuiw";
+			// 	}
+			// }
 			else if (FILE_TYPE == "ALIFLIB")
 			{
 				// if (!LIB_FILE_NAME[FILE_NAME].empty())
@@ -6927,30 +7086,30 @@
 			else
 				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME;
 		}
-		else if (EXTENTION == "alifui" || EXTENTION == "ALIFUI")
-		{
-			if (FILE_TYPE != "ALIFUI")
-				ErrorCode("جب إستعمال #واجهة لترجمة هدا الملف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
+		// else if (EXTENTION == "alifui" || EXTENTION == "ALIFUI")
+		// {
+		// 	if (FILE_TYPE != "ALIFUI")
+		// 		ErrorCode("جب إستعمال #واجهة لترجمة هدا الملف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
 
-			if (IS_PATH(FILE_NAME))
-				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME;
-			else
-				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME;
-		}
-		else if (EXTENTION == "alifuiw" || EXTENTION == "ALIFUIW"){
+		// 	if (IS_PATH(FILE_NAME))
+		// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME;
+		// 	else
+		// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME;
+		// }
+		// else if (EXTENTION == "alifuiw" || EXTENTION == "ALIFUIW"){
 
-			if (FILE_TYPE != "ALIFUIW")
-				ErrorCode("جب إستعمال #واجهة_ويب لترجمة هدا الملف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
+		// 	if (FILE_TYPE != "ALIFUIW")
+		// 		ErrorCode("جب إستعمال #واجهة لترجمة هدا الملف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
 
-			if (IS_PATH(FILE_NAME)){
-				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME;
-				PATH_FULL_WINDOW_WEB = FILE_NAME;
-			}
-			else {
-				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME;
-				PATH_FULL_WINDOW_WEB = PATH_WORKING + SEPARATION + FILE_NAME;
-			}
-		}
+		// 	if (IS_PATH(FILE_NAME)){
+		// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME;
+		// 		PATH_FULL_WINDOW_WEB = FILE_NAME;
+		// 	}
+		// 	else {
+		// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME;
+		// 		PATH_FULL_WINDOW_WEB = PATH_WORKING + SEPARATION + FILE_NAME;
+		// 	}
+		// }
 		else if (EXTENTION == "aliflib" || EXTENTION == "ALIFLIB")
 		{
 			if (FILE_TYPE != "ALIFLIB")
@@ -7005,7 +7164,7 @@
 		// Log File Start
 		// ------------------------------------------------------
 
-		//if(DEBUG)DEBUG_MESSAGE(" ----------- DEBUGING START ----------- \n", &OBJ_CLASS_TOKEN);
+		//if(DEBUG)DEBUG_MESSAGE("----------- DEBUGING START ----------- \n", &OBJ_CLASS_TOKEN);
 
 		// ------------------------------------------------------
 		// Read Source file (UTF8 File name)
@@ -7013,17 +7172,17 @@
 
 		//Get it from Save folder...
 
-		//map < int , vector<string> > ZZZ;
-		//map < int , int, string > ZZZ;
+		//map < int , vector<std::string> > ZZZ;
+		//map < int , int, std::string > ZZZ;
 
-		//map<string, string> SSS;
+		//map<std::string, std::string> SSS;
 		//strMap["Monday"]    = "1";
 
 		//std::vector<std::string> VVV;
 		//VVV [1] = "xxx";
 		//VVV [2] = "xxx";
 
-		//std::map<std::pair<int,int>, string> ZZZ;
+		//std::map<std::pair<int,int>, std::string> ZZZ;
 		//myMap[std::make_pair(10,20)] = 25;
 
 		//ZZZ[std::make_pair(1,1)] = "aaa";
@@ -7071,7 +7230,7 @@
 
 		// ------------------------------------------------------
 
-		string LINE8;
+		std::string LINE8;
 
 		bool INSIDE_STRING_CPP = false;
 
@@ -7097,7 +7256,7 @@
 
 			size_t LINE_FIX_LAST_POS = LINE8.find_last_not_of("\r\n");
 
-			if (LINE_FIX_LAST_POS != string::npos)
+			if (LINE_FIX_LAST_POS != std::string::npos)
 			{
 				LINE8.substr(0, LINE_FIX_LAST_POS + 1).swap(LINE8);
 			}
@@ -7124,7 +7283,7 @@
 
 			int CHAR_NUMBER = 0;
 			int LINE_CHAR_TOTAL = 0;
-			string Char;
+			std::string Char;
 			bool INSIDE_STRING = false;
 
 			OBJ_CLASS_TOKEN.TOTAL[OBJ_CLASS_TOKEN.TOTAL_LINES] = 0;
@@ -7180,7 +7339,7 @@
 					(Char == "_" && (substr_utf8(LINE8, CHAR_NUMBER + 1, 1) == "ج") && (substr_utf8(LINE8, CHAR_NUMBER + 2, 1) == "_")) ||
 					(Char == "@" && (substr_utf8(LINE8, CHAR_NUMBER + 1, 1) != "@"))) // Skip '@@'
 				{
-					string CompletChar = "";
+					std::string CompletChar = "";
 
 					if(substr_utf8(LINE8, CHAR_NUMBER + 1, 1) == "س")
 						CompletChar = "_س_";
@@ -7195,13 +7354,13 @@
 						{
 							ADD_TOKEN(CompletChar, true, true, CHAR_NUMBER, &OBJ_CLASS_TOKEN);
 
-							//if(DEBUG)DEBUG_MESSAGE(" <NEW start:_س_> " , &OBJ_CLASS_TOKEN); // DEBUG
+							//if(DEBUG)DEBUG_MESSAGE("<NEW start:_س_> " , &OBJ_CLASS_TOKEN); // DEBUG
 						}
 						else
 						{
 							ADD_TOKEN("@", true, true, CHAR_NUMBER, &OBJ_CLASS_TOKEN);
 
-							//if(DEBUG)DEBUG_MESSAGE(" <NEW start:@> " , &OBJ_CLASS_TOKEN); // DEBUG
+							//if(DEBUG)DEBUG_MESSAGE("<NEW start:@> " , &OBJ_CLASS_TOKEN); // DEBUG
 						}
 
 						INSIDE_STRING_CPP = true;
@@ -7216,13 +7375,13 @@
 						{
 							ADD_TOKEN(CompletChar, true, true, CHAR_NUMBER, &OBJ_CLASS_TOKEN);
 
-							//if(DEBUG)DEBUG_MESSAGE(" <NEW END:_س_>|" + LIB_LEXER_CG_BUFER + "| " , &OBJ_CLASS_TOKEN); // DEBUG
+							//if(DEBUG)DEBUG_MESSAGE("<NEW END:_س_>|" + LIB_LEXER_CG_BUFER + "| " , &OBJ_CLASS_TOKEN); // DEBUG
 						}
 						else
 						{
 							ADD_TOKEN("@", true, true, CHAR_NUMBER, &OBJ_CLASS_TOKEN);
 
-							//if(DEBUG)DEBUG_MESSAGE(" <NEW END:@>|" + LIB_LEXER_CG_BUFER + "| " , &OBJ_CLASS_TOKEN); // DEBUG
+							//if(DEBUG)DEBUG_MESSAGE("<NEW END:@>|" + LIB_LEXER_CG_BUFER + "| " , &OBJ_CLASS_TOKEN); // DEBUG
 						}
 
 						LIB_LEXER_CG_BUFER = "";
@@ -7442,78 +7601,78 @@
 			if(DEBUG)
 				return;
 
-			string CLEAR_CMD;
+			std::string CLEAR_CMD;
 
 			if (!THIS_IS_ALIF_C_FILE)
 			{
 
-				CLEAR_CMD = string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_strip.bat\" ");
+				CLEAR_CMD = std::string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_strip.bat\" ");
 				if (system(CLEAR_CMD.c_str()) != 0)
 				{
 					//cout << endl << "Warning: Can't clean strip Bat temp file. " << endl;
 				}
 
-				CLEAR_CMD = string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_strip.log\" ");
+				CLEAR_CMD = std::string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_strip.log\" ");
 				if (system(CLEAR_CMD.c_str()) != 0)
 				{
 					//cout << endl << "Warning: Can't clean strip log temp file. " << endl;
 				}
 			}
-				CLEAR_CMD = string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_resource.bat\" ");
+				CLEAR_CMD = std::string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_resource.bat\" ");
 				if (system(CLEAR_CMD.c_str()) != 0)
 				{
 					//cout << endl << "Warning: Can't clean resource Bat temp file. " << endl;
 				}
 
-				CLEAR_CMD = string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_resource.log\" ");
+				CLEAR_CMD = std::string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_resource.log\" ");
 				if (system(CLEAR_CMD.c_str()) != 0)
 				{
 					//cout << endl << "Warning: Can't clean resource log temp file. " << endl;
 				}
 
-				CLEAR_CMD = string("del \"") + PATH_FULL_CPP + string("\" ");
+				CLEAR_CMD = std::string("del \"") + PATH_FULL_CPP + std::string("\" ");
 				if (system(CLEAR_CMD.c_str()) != 0)
 				{
 					//cout << endl << "Warning: Can't clean CPP temp file. " << endl;
 				}
 
-				CLEAR_CMD = string("del \"") + PATH_FULL_RC + string("\" ");
+				CLEAR_CMD = std::string("del \"") + PATH_FULL_RC + std::string("\" ");
 				if (system(CLEAR_CMD.c_str()) != 0)
 				{
 					//cout << endl << "Warning: Can't clean RC temp file. " << endl;
 				}
 
-				CLEAR_CMD = string("del \"" + PATH_FULL_RC + ".res\" ");
+				CLEAR_CMD = std::string("del \"" + PATH_FULL_RC + ".res\" ");
 				if (system(CLEAR_CMD.c_str()) != 0)
 				{
 					//cout << endl << "Warning: Can't clean compiled RES temp file. " << endl;
 				}
 
-			CLEAR_CMD = string("del \"") + PATH_FULL_OBJ + string("\" ");
+			CLEAR_CMD = std::string("del \"") + PATH_FULL_OBJ + std::string("\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean OBJ temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\" ");
+			CLEAR_CMD = std::string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean compile log temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\" ");
+			CLEAR_CMD = std::string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean link log temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.bat\" ");
+			CLEAR_CMD = std::string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.bat\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean compile Bat temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_linker.bat\" ");
+			CLEAR_CMD = std::string("del \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_linker.bat\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean link Bat temp file. " << endl;
@@ -7526,16 +7685,16 @@
 			//stringstream GCC_RESOURCE_CMD;
 			//stringstream GCC_LINK_CMD;
 			
-			string CMD;
+			std::string CMD;
 
-			string LOG_PATH;
-			string LOG_LINE8;
-			string LOG_LINE8_Buffer;
+			std::string LOG_PATH;
+			std::string LOG_LINE8;
+			std::string LOG_LINE8_Buffer;
 
 			// Need file Bach to set Path=...
 			// for GCC Envirenment.
 			ofstream FILE_BATCH;
-			string FILE_BATCH_PATH;
+			std::string FILE_BATCH_PATH;
 
 			// Compile: WebUI - TDM (GCC) 9.2 C++17 64Bit - Windows
 
@@ -7548,7 +7707,11 @@
 
 			CMD =	"@echo off\n"
 					"Set PATH=" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\n"
-					"\"" + cc_path_full + "\" -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -mthreads -DHAVE_W32API_H -DNDEBUG -c -o \"" + PATH_FULL_OBJ + "\" -I\"" + PATH_ABSOLUTE + "\\alifcore\\webui\\include\" \"" + PATH_FULL_CPP + "\" 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\"";
+					" \"" + cc_path_full + "\" -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -mthreads -DHAVE_W32API_H -DNDEBUG -c -o \"" + PATH_FULL_OBJ + "\" "
+					" -I\"" + PATH_ABSOLUTE + "\\alifcore\\boost\\include\" "
+					" -I\"" + PATH_ABSOLUTE + "\\alifcore\\webui\\include\" "
+					" \"" + PATH_FULL_CPP + "\" "
+					" 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\" ";
 
 			//ALIF_ERROR("CMD: " + CMD);
 
@@ -7617,9 +7780,13 @@
 			// Link
 			// ------------------------------------------------------
 
-			string GUI_CMD = " -Wl,--subsystem,console -mconsole ";
+			std::string GUI_CMD = " -Wl,--subsystem,console -mconsole ";
 
-			if (APP_TYPE == "PC_GUI")
+			bool build_as_console = true; // TODO: Allow this from alif macro + set this inside a struct.
+
+			if (build_as_console)
+				GUI_CMD = " -Wl,--subsystem,console -mconsole ";
+			else
 				GUI_CMD = " -Wl,--subsystem,windows -mwindows ";
 
 			// "C:\Alif3\alifcore\gcc\bin\g++.exe" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads 
@@ -7747,31 +7914,31 @@
 			if(DEBUG)
 				return;
 
-			string CLEAR_CMD = string("rm -rf \"") + PATH_FULL_CPP + string("\" ");
+			std::string CLEAR_CMD = std::string("rm -rf \"") + PATH_FULL_CPP + std::string("\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean CPP temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("rm -rf \"") + PATH_FULL_OBJ + string("\" ");
+			CLEAR_CMD = std::string("rm -rf \"") + PATH_FULL_OBJ + std::string("\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean OBJ temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("rm -rf \"") + PATH_FULL_CPP + string(".log\" ");
+			CLEAR_CMD = std::string("rm -rf \"") + PATH_FULL_CPP + std::string(".log\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean compile log temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("rm -rf \"") + PATH_FULL_BIN_TMP + string(".log\" ");
+			CLEAR_CMD = std::string("rm -rf \"") + PATH_FULL_BIN_TMP + std::string(".log\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean link log temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("rm -rf \"") + PATH_FULL_BIN_TMP + string(".strip.log\" ");
+			CLEAR_CMD = std::string("rm -rf \"") + PATH_FULL_BIN_TMP + std::string(".strip.log\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean strip log temp file. " << endl;
@@ -7780,9 +7947,9 @@
 
 		// ----------------------------------
 
-		void COMPILE_MAC_64BIT() //string RAND, string PATH_FULL_ICO, string APP_PLIST)
+		void COMPILE_MAC_64BIT() //std::string RAND, std::string PATH_FULL_ICO, std::string APP_PLIST)
 		{
-			string MAC_CMD;
+			std::string MAC_CMD;
 
 			// ------------------------------------------------------			
 			// macOS Compile
@@ -7821,7 +7988,7 @@
 			// Link
 			// ------------------------------------------------------
 
-			string GUI_CMD = "";
+			std::string GUI_CMD = "";
 
 			if (APP_TYPE == "PC_GUI")
 				GUI_CMD = " ............. ";
@@ -7933,44 +8100,44 @@
 			if(DEBUG)
 				return;
 
-			string CLEAR_CMD = string("rm -rf \"") + PATH_FULL_CPP + string("\" ");
+			std::string CLEAR_CMD = std::string("rm -rf \"") + PATH_FULL_CPP + std::string("\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean CPP temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("rm -rf \"") + PATH_FULL_OBJ + string("\" ");
+			CLEAR_CMD = std::string("rm -rf \"") + PATH_FULL_OBJ + std::string("\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean OBJ temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("rm -rf \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log\" ");
+			CLEAR_CMD = std::string("rm -rf \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean compile log temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("rm -rf \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_link.log\" ");
+			CLEAR_CMD = std::string("rm -rf \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_link.log\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean link log temp file. " << endl;
 			}
 
-			CLEAR_CMD = string("rm -rf \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_strip.log\" ");
+			CLEAR_CMD = std::string("rm -rf \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_strip.log\" ");
 			if (system(CLEAR_CMD.c_str()) != 0)
 			{
 				//cout << endl << "Warning: Can't clean strip log temp file. " << endl;
 			}
 		}
 
-		void COMPILE_LINUX_64BIT() // string RAND)
+		void COMPILE_LINUX_64BIT() // std::string RAND)
 		{
-			string LINUX_CMD;
+			std::string LINUX_CMD;
 
-			string LOG_PATH;
-			string LOG_LINE8;
-			string LOG_LINE8_Buffer;
+			std::string LOG_PATH;
+			std::string LOG_LINE8;
+			std::string LOG_LINE8_Buffer;
 
 			// ------------------------------------------------------
 			// Compile - WX3 Master - GTK2 - x86_64 - Optimized
@@ -8031,7 +8198,7 @@
 			// Link
 			// ------------------------------------------------------
 
-			string GUI_CMD = "";
+			std::string GUI_CMD = "";
 
 			if (APP_TYPE == "PC_GUI")
 				GUI_CMD = " ............. ";
@@ -8076,20 +8243,15 @@
 			CLEAN();
 		}
 
-
 	#endif
-
-
-
-
 
 // Tools ********************************************************
 
-	void set_input_file(string file){
+	void set_input_file(std::string file){
 
 		boost::filesystem::path p(file);
 
-		string p_buf = p.parent_path().string();
+		std::string p_buf = p.parent_path().string();
 		if(p_buf.empty())
 			p_buf = boost::filesystem::current_path().string();
 		
@@ -8111,7 +8273,7 @@
 		argument.input.fullpath = argument.input.path + argument.input.filename + argument.input.extension;
 	}
 
-	void set_output_file(string file){
+	void set_output_file(std::string file){
 
 		boost::filesystem::path p(file);
 
@@ -8127,12 +8289,42 @@
 		if(argument.output.extension == "")
 			argument.output.extension = settings.os.exe_ext;
 		else if(argument.output.extension != settings.os.exe_ext)
-		err("Unsupported output extention.\n"
-			"Extention: " + argument.output.extension + "\n"
-			"File: " + argument.output.path + 
-			argument.output.filename + argument.output.extension);
+			err("Unsupported output extention.\n"
+				"Extention: " + argument.output.extension + "\n"
+				"File: " + argument.output.path + 
+				argument.output.filename + argument.output.extension);
 		
 		argument.output.fullpath = argument.output.path + argument.output.filename + argument.output.extension;	
+	}
+
+	void set_log_file(std::string file){
+
+		boost::filesystem::path p(file);
+
+		argument.log.path = p.parent_path().string() + settings.os.path_sep;
+		argument.log.filename = p.stem().string();
+		argument.log.extension = p.extension().string();
+
+		// Check root path
+		if(argument.log.path == settings.os.path_sep)
+			argument.log.path = "";
+
+		// Check log extention
+		// if(argument.log.extension == "")
+		// 	argument.log.extension = ".log";
+		// if(argument.log.extension == "")
+		// 	argument.log.extension = settings.os.exe_ext;
+		// else if(argument.log.extension != settings.os.exe_ext)
+		// err("Unsupported log extention.\n"
+		// 	"Extention: " + argument.log.extension + "\n"
+		// 	"File: " + argument.log.path + 
+		// 	argument.outplogut.filename + argument.log.extension);
+
+		// Check log
+		if(argument.log.filename == "")
+			err("Log file is empty.");
+		
+		argument.log.fullpath = argument.log.path + argument.log.filename + argument.log.extension;
 	}
 
 // Main *********************************************************
@@ -8179,15 +8371,27 @@
 		// cout << "argument.output.extension: " << argument.output.extension << endl;
 		// cout << "argument.output.fullpath: " << argument.output.fullpath << endl;
 
-		// Temporary Immigrate setting from Alif3 style to Alif2.
+		// Temporary Immigrate setting from Alif v3 style to Alif v2.
 		PATH_FULL_ALIF	= argument.input.fullpath;
 		PATH_FULL_BIN	= argument.output.fullpath;
-		PATH_FULL_LOG	= argument.input.fullpath + ".log";
+		//PATH_FULL_LOG	= argument.input.fullpath + ".log";
+		PATH_FULL_LOG	= argument.log.fullpath;
 
 		// Check Setup Installation
 		if (!CHECK_SETUP()){
 
 			err("Please re-install Alif Compiler, or download the latest version from \n\nwww.aliflang.org");
+			exit(EXIT_FAILURE);
+		}
+
+		// --- Read Core Script --------------------
+		boost::filesystem::ifstream alifcore_if(PATH_ABSOLUTE + "\\alifcore\\alifcore.cc");
+		stringstream alifcore_ss;
+		alifcore_ss << alifcore_if.rdbuf();
+		code_core = alifcore_ss.str();
+		if(code_core == ""){
+
+			err("The core file is missing: [" + PATH_ABSOLUTE + "\\alifcore\\alifcore.cc]\nPlease re-install Alif Compiler, or download the latest version from http://www.aliflang.org");
 			exit(EXIT_FAILURE);
 		}
 
@@ -8218,17 +8422,17 @@
 
 		// Check if App Runing
 		#ifdef _WIN32
-			string CLEAR_BIN_CMD = string("@echo off & del /s \"") + PATH_FULL_BIN + string("\" >nul 2>&1");
+			std::string CLEAR_BIN_CMD = std::string("@echo off & del /s \"") + PATH_FULL_BIN + std::string("\" >nul 2>&1");
 			if (system(CLEAR_BIN_CMD.c_str()) != 0)
 				cout << endl << "Warning: Can't execut Windows remove EXE output command" << endl;
 			//boost::filesystem::remove(PATH_FULL_BIN);
 			//std::remove(PATH_FULL_BIN);
 		#elif  __APPLE__
-			string CLEAR_BIN_CMD = string("rm -rf \"") + PATH_FULL_BIN + string("\" 2> /dev/null");
+			std::string CLEAR_BIN_CMD = std::string("rm -rf \"") + PATH_FULL_BIN + std::string("\" 2> /dev/null");
 			if (system(CLEAR_BIN_CMD.c_str()) != 0)
 				cout << endl << "Warning: Can't execut macOS remove App output command" << endl;
 		#else
-			string CLEAR_BIN_CMD = string("rm -f \"") + PATH_FULL_BIN + string("\" 2> /dev/null");
+			std::string CLEAR_BIN_CMD = std::string("rm -f \"") + PATH_FULL_BIN + std::string("\" 2> /dev/null");
 			if (system(CLEAR_BIN_CMD.c_str()) != 0)
 				cout << endl << "Warning: Can't execut Linux remove Bin output command" << endl;
 		#endif
@@ -8364,8 +8568,9 @@
 			desc.add_options()
 				("h", "Produce help message")
 				("v", "Print compiler version")
-				("o", boost::program_options::value<string>(), "Set output file")
-				("input", boost::program_options::value< vector<string> >(), "Set input file (only one)");
+				("o", boost::program_options::value<std::string>(), "Set output file")
+				("log", boost::program_options::value<std::string>(), "Set log file")
+				("input", boost::program_options::value< vector<std::string> >(), "Set input file (only one)");
 
 			boost::program_options::positional_options_description optional_desc;
 			optional_desc.add("input", -1);
@@ -8395,18 +8600,18 @@
 			// Input file
 			if (vm.count("input")) {
 
-				if(vm["input"].as<vector<string>>().size() > 1){
+				if(vm["input"].as<vector<std::string>>().size() > 1){
 
 					cout << "Error: You need to set only one input source file." << endl;
 					cout << "Input files: ";
 
-					for (auto const& i: vm["input"].as<vector<string>>())
+					for (auto const& i: vm["input"].as<vector<std::string>>())
   						std::cout << i << ' ';
 					
 					return 1;
 				}
 
-				set_input_file(vm["input"].as<vector<string>>()[0]);
+				set_input_file(vm["input"].as<vector<std::string>>()[0]);
 			}
 			else {
 
@@ -8417,7 +8622,13 @@
 			// Output
 			if (vm.count("o")) {
 
-				set_output_file(vm["o"].as<string>());
+				set_output_file(vm["o"].as<std::string>());
+			}
+
+			// Log
+			if (vm.count("log")) {
+
+				set_log_file(vm["log"].as<std::string>());
 			}
 		}
 		catch(exception& e) {
