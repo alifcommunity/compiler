@@ -23,7 +23,7 @@
 #include <map> // vector
 // ----------------------------------
 
-void parser_Var(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_Var(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
 	// Local var
 	// a = 1 + 2
@@ -45,7 +45,7 @@ void parser_Var(string Token[2048], CLASS_TOKEN *o_tokens){
 	if (Token[3] == "")
 		ErrorCode("يجب اضافه قيمة بعد ' = ' ", o_tokens);
 	
-	string CLASS_OR_WIN;
+	std::string CLASS_OR_WIN;
 	if (IsInsideClass)
 		CLASS_OR_WIN = TheClass;
 	else
@@ -56,7 +56,7 @@ void parser_Var(string Token[2048], CLASS_TOKEN *o_tokens){
 		//if (L_VAR_IS_CONST[std::make_pair(CLASS_OR_WIN + TheFunction, Token[1])] == "ثابت")
 			//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + Token[1] + " ' لأنه من نوع ثابت ", o_tokens);
 
-		if(DEBUG)DEBUG_MESSAGE("		[LOCAL-INT (" + Token[1] + ")] = ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[LOCAL-INT (" + Token[1] + ")] = ", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		// Local INT = ...
@@ -81,7 +81,7 @@ void parser_Var(string Token[2048], CLASS_TOKEN *o_tokens){
 		//if (L_VAR_IS_CONST[std::make_pair(CLASS_OR_WIN + TheFunction, Token[1])] == "ثابت")
 			//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + Token[1] + " ' لأنه من نوع ثابت ", o_tokens);
 
-		if(DEBUG)DEBUG_MESSAGE("		[LOCAL-STRING (" + Token[1] + ")] = ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[LOCAL-STRING (" + Token[1] + ")] = ", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		// Local STRING = ...
@@ -106,7 +106,7 @@ void parser_Var(string Token[2048], CLASS_TOKEN *o_tokens){
 		//if (L_VAR_IS_CONST[std::make_pair(CLASS_OR_WIN + TheFunction, Token[1])] == "ثابت")
 			//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + Token[1] + " ' لأنه من نوع ثابت ", o_tokens);
 			
-		if(DEBUG)DEBUG_MESSAGE("		[LOCAL-BOOL (" + Token[1] + ")] = ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[LOCAL-BOOL (" + Token[1] + ")] = ", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		// Local BOOL = ...
@@ -157,21 +157,21 @@ void parser_Var(string Token[2048], CLASS_TOKEN *o_tokens){
 	// a = 1 + a * (_g - 3) ...
 	
 	ScriptSyntaxBuffer = CheckForSyntax(L_VAR_TYPE[std::make_pair(CLASS_OR_WIN + TheFunction, Token[1])], // OBJECTIF_TYPE
-									true, // Accept Using Reference to Window:Controls
-									true, // Accept Using Reference to Window:Function
+									true, // Accept Using Reference to Namespace:Controls
+									true, // Accept Using Reference to Namespace:Function
 									true, // Accept Using Reference to Global Functions
 									true, // Accept Using Reference to Local Functions
 									true, // Accept Using Reference to Global VAR
 									true, // Accept Using Reference to Local VAR
 									false, // Accept Convertion from String To Int
 									true, // Accept Convertion from Int To String
-									TempToken, 			// SYNTAX[] string
+									TempToken, 			// SYNTAX[] std::string
 									(TempTokenCount - 1), // SYNTAX_LONG int
 									CLASS_OR_WIN, 		// TMP_WINDOW_NAME
 									TheFunction, 		// TMP_FUNCTION_NAME
 									o_tokens);
 
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 
 	// *** Generate Code ***
 	// Local A = ...

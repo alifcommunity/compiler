@@ -4,10 +4,11 @@ set(Info_Title "Alif Compiler")
 set(Info_Source "alif.cpp")
 set(Info_App "alif")
 
-# --[ Alif ] -------------------------------------------------------------------
+# Working directory for Debugin & Testing
+set(WD_Windows "C:\\Alif3")
+set(WD_Linux "/bin")
 
-# include_directories(${AlifProject_SOURCE_DIR}/thirdparty/utf-8)
-# include_directories(${AlifProject_SOURCE_DIR}/thirdparty/webui)
+# --[ Alif ] -------------------------------------------------------------------
 
 link_directories(${AlifProject_BIN_DIR}/alif)
 
@@ -21,26 +22,40 @@ if(UNIX)
 else()
 
 	# Windows
-	message("[*] Using embeded copy of Boost for Windows.")
+	message("[*] Using embedded copy of Boost for Windows.")
 	include_directories(${AlifProject_SOURCE_DIR}/thirdparty/boost/include)
 	link_directories(${AlifProject_SOURCE_DIR}/thirdparty/boost/lib)
 	Set(Boost_INCLUDE_DIR ${AlifProject_SOURCE_DIR}/thirdparty/boost/include)
+	Set(Boost_LIBRARY_DIR ${AlifProject_SOURCE_DIR}/thirdparty/boost/lib)
 	Set(Boost_LIBRARY_DIR_RELEASE ${AlifProject_SOURCE_DIR}/thirdparty/boost/lib)
 
-endif (UNIX)
+endif ()
+
+if(CMAKE_BUILD_TYPE STREQUAL Release)
+	message("[*] Initializing Boost for Release build...")
+	set(Boost_DEBUG					OFF)
+	set(Boost_USE_DEBUG_LIBS		OFF)
+	set(Boost_USE_MULTITHREADED		ON)
+	set(Boost_USE_RELEASE_LIBS		ON)
+	set(Boost_USE_STATIC_LIBS		ON)
+	set(Boost_USE_STATIC_RUNTIME	ON)
+else()
+	message("[*] Initializing Boost for Debug build...")
+	set(Boost_DEBUG					OFF)
+	set(Boost_USE_DEBUG_LIBS		ON)
+	set(Boost_USE_MULTITHREADED		ON)
+	set(Boost_USE_RELEASE_LIBS		ON)
+	set(Boost_USE_STATIC_LIBS		ON)
+	set(Boost_USE_STATIC_RUNTIME	OFF)
+endif()
 
 if(UNIX)
 	message("[*] Searching for Boost Linux...")
-	find_package(Boost 1.70.0)
+	find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options locale filesystem)
 else()
-	message("[*] Searching for Boost Windows...") # REQUIRED COMPONENTS program_options locale filesystem
-	find_package(Boost 1.70.0)
-endif (UNIX)
-
-set(Boost_DEBUG 				OFF)
-set(Boost_USE_STATIC_LIBS       ON)
-set(Boost_USE_MULTITHREADED     OFF)
-set(Boost_USE_STATIC_RUNTIME    ON)
+	message("[*] Searching for Boost Windows...")
+	find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options locale filesystem)
+endif ()
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
@@ -54,27 +69,50 @@ endif()
 
 add_executable(${Info_App} ${Info_Source})
 
+if(UNIX)
+	message("[*] Setting working directory to ${WD_Linux}...")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WD_Linux})
+	set(EXECUTABLE_OUTPUT_PATH ${WD_Linux})
+	set_target_properties(${Info_App} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${WD_Linux})
+	set_target_properties(${Info_App} PROPERTIES CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WD_Linux})
+	set_target_properties(${Info_App} PROPERTIES EXECUTABLE_OUTPUT_PATH_DEBUG ${WD_Linux})
+	set_target_properties(${Info_App} PROPERTIES CMAKE_EXECUTABLE_OUTPUT_PATH ${WD_Linux})
+else()
+	message("[*] Setting working directory to ${WD_Windows}...")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WD_Windows})
+	set(EXECUTABLE_OUTPUT_PATH ${WD_Windows})
+	set_target_properties(${Info_App} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${WD_Windows})
+	set_target_properties(${Info_App} PROPERTIES CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WD_Windows})
+	set_target_properties(${Info_App} PROPERTIES EXECUTABLE_OUTPUT_PATH_DEBUG ${WD_Windows})
+	set_target_properties(${Info_App} PROPERTIES CMAKE_EXECUTABLE_OUTPUT_PATH ${WD_Windows})
+endif ()
+
 # --[ Compiler flags ] ----------------------------------------------------------
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
+	# using Clang
 	if(UNIX)
-		# using Clang
 		message("[*] Initializing '${Info_Title}' settings for Clang.")
 	else()
-		message("[!] Sorry. Alif don't support Clang on Windows, Please install MinGW-64, and build using 'cmake .. -G \"MinGW Makefiles\"'. ")
+		message("[!] Sorry. Alif don't support Clang on Windows, Please use Microsoft C++ compiler.")
 		return()
-	endif (UNIX)
+	endif ()
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
 	# using GCC
-	message("[*] Initializing '${Info_Title}' settings for GCC.")
+	if(UNIX)
+		message("[*] Initializing '${Info_Title}' settings for GCC.")
+	else()
+		message("[!] Sorry. Alif don't support GCC/MinGW on Windows, Please install Microsoft C++ compiler.")
+		return()
+	endif ()
 
 	# Flags
-	set_target_properties(${Info_App} PROPERTIES LINK_FLAGS_RELEASE -s)
-	set(CMAKE_CXX_FLAGS_RELEASE " -O3 ")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -m64 ")
+	# set_target_properties(${Info_App} PROPERTIES LINK_FLAGS_RELEASE -s)
+	# set(CMAKE_CXX_FLAGS_RELEASE " -O3 ")
+	# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -m64 ")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 
@@ -82,19 +120,20 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 	if(UNIX)
 		message("[!] Sorry. Alif don't support Intel C++ on Linux, Please install GCC or Clang.")
 	else()
-		message("[!] Sorry. Alif don't support Intel C++ on Windows, Please install MinGW-64.")
-	endif (UNIX)
+		message("[!] Sorry. Alif don't support Intel C++ on Windows, Please install Microsoft C++ compiler.")
+	endif ()
 
 	return()
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
-	# # Microsoft build tools
-	# message("[!] Sorry. Alif don't support Microsoft C++ on Windows, Please install MinGW-64, and build using 'cmake .. -G \"MinGW Makefiles\"'. ")
-	# return()
-
 	# Microsoft build tools
-	message("[*] Initializing '${Info_Title}' settings for MSVC.")
+	if(UNIX)
+		message("[!] Sorry. Alif don't support Microsoft C++ compiler on Linux, Please install GCC or Clang.")
+		return()
+	else()
+		message("[*] Initializing '${Info_Title}' settings for Microsoft C++ compiler.")
+	endif ()
 
 	# Flags
 	add_link_options("/SUBSYSTEM:CONSOLE")

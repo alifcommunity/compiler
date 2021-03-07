@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_End(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// نهاية
 
 	if (Token[2] == "")
@@ -56,7 +56,7 @@ void parser_End(string Token[2048], CLASS_TOKEN *o_tokens){
 			if (RETURN_FUN[std::make_pair(TheClass, TheFunction)] == "IF")
 				ErrorCode("لقد عينت إرجاع مشروطه للدالة ' " + TheFunction + " ' ", o_tokens);
 
-			if(DEBUG)DEBUG_MESSAGE("	[END CLASS-FUNCTION] {" + TheFunction + "} \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[END CLASS-FUNCTION] {" + TheFunction + "} \n\n", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// End Class Func()
@@ -81,8 +81,12 @@ void parser_End(string Token[2048], CLASS_TOKEN *o_tokens){
 			if(DEBUG)DEBUG_MESSAGE("[END GLOBAL-FUNCTION] {" + TheFunction + "} \n\n", o_tokens); // DEBUG
 
 			// *** Generate Code ***
-			// End Global Func()
+			// End Global Func() <-- Alif 2
 			CPP_GLOBAL_FUN.append(" \n } \n");
+
+			// Alif 3
+			// if(TheFunction != "رئيسية")
+			// 	CPP_GLOBAL_FUN.append(" \n } \n");
 			// *** *** *** *** *** ***
 		}
 		else
@@ -99,12 +103,12 @@ void parser_End(string Token[2048], CLASS_TOKEN *o_tokens){
 			if (RETURN_FUN[std::make_pair(TheNamespace, TheFunction)] == "IF")
 				ErrorCode("لقد عينت إرجاع مشروطه للدالة ' " + TheFunction + " ' ", o_tokens);
 
-			if(DEBUG)DEBUG_MESSAGE("	[END FUNCTION] {" + TheFunction + "} \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[END FUNCTION] {" + TheFunction + "} \n\n", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// End Local Func()
 			if (TheFunction != "رئيسية")
-				CPP_FUN.append(" \n } \n");
+				CPP_GLOBAL_FUN.append(" \n } \n");
 			// *** *** *** *** *** ***
 		}
 		
@@ -120,7 +124,7 @@ void parser_End(string Token[2048], CLASS_TOKEN *o_tokens){
 		if (ALIF_IF_STATUS < 1)
 			ErrorCode("بدايه الشرط غير موجود", o_tokens);
 		
-		if(DEBUG)DEBUG_MESSAGE("	[END IF " + IntToString(ALIF_IF_STATUS) + "] \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[END IF " + IntToString(ALIF_IF_STATUS) + "] \n\n", o_tokens); // DEBUG
 
 		if (IsInsideClass)
 		{
@@ -148,7 +152,7 @@ void parser_End(string Token[2048], CLASS_TOKEN *o_tokens){
 		if (ALIF_LOOP_STATUS < 1)
 			ErrorCode("بدايه كلما غير موجود", o_tokens);
 		
-		if(DEBUG)DEBUG_MESSAGE("	[END LOOP " + IntToString(ALIF_LOOP_STATUS) + "] \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[END LOOP " + IntToString(ALIF_LOOP_STATUS) + "] \n\n", o_tokens); // DEBUG
 
 		if (IsInsideClass)
 		{
@@ -171,7 +175,7 @@ void parser_End(string Token[2048], CLASS_TOKEN *o_tokens){
 	else if (Token[2] == "مجال")
 	{
 		if (!IsInsideNamespace)
-			ErrorCode("يجب ان تكون داخل داله", o_tokens);
+			ErrorCode("يجب ان تكون داخل مجال", o_tokens);
 		
 		if (IsInsideFunction)
 			ErrorCode("يجب اغلاق الدالة : " + TheFunction, o_tokens);
@@ -183,7 +187,9 @@ void parser_End(string Token[2048], CLASS_TOKEN *o_tokens){
 			return; // continue;
 		}
 		
-		if(DEBUG)DEBUG_MESSAGE("[END WINDOW] {" + TheNamespace + "} \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[END NAMESPACE] {" + TheNamespace + "} \n\n", o_tokens); // DEBUG
+
+		CPP_GLOBAL_FUN.append("\n }; \n "); // Close the namespace.
 		
 		IsInsideNamespace = false;
 		TheNamespace = "";

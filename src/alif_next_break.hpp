@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_NextBreak(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_NextBreak(std::string Token[2048], CLASS_TOKEN *o_tokens){
     // التالي - كسر
 
 	if (!o_tokens->TOKENS_PREDEFINED)
@@ -38,7 +38,7 @@ void parser_NextBreak(string Token[2048], CLASS_TOKEN *o_tokens){
 
     if (Token[1] == "التالي")
     {
-        if(DEBUG)DEBUG_MESSAGE("	[Continue] \n\n", o_tokens); // DEBUG
+        if(DEBUG)DEBUG_MESSAGE("[Continue] \n\n", o_tokens); // DEBUG
 
         // *** Generate Code ***
         if (!IsInsideNamespace)
@@ -55,7 +55,7 @@ void parser_NextBreak(string Token[2048], CLASS_TOKEN *o_tokens){
     }
     else
     {
-        if(DEBUG)DEBUG_MESSAGE("	[Break] \n\n", o_tokens); // DEBUG
+        if(DEBUG)DEBUG_MESSAGE("[Break] \n\n", o_tokens); // DEBUG
 
         // *** Generate Code ***
         if (!IsInsideNamespace)

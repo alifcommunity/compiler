@@ -43,12 +43,12 @@ std::string GetFormatedHTML(std::string HTML, std::string WindowName, CLASS_TOKE
 
 			int LINE_CHAR_TOTAL = 0;
 			int CHAR_NUMBER = 0;
-			string Char;
+			std::string Char;
 			LINE_CHAR_TOTAL = CharCount_utf8(AlifScript, o_tokens);
 			bool INSIDE_STRING = false;
 
 			int PramCount = 0;
-			string Pram;
+			std::string Pram;
 
 			while (CHAR_NUMBER < LINE_CHAR_TOTAL){
 				Char = substr_utf8(AlifScript, CHAR_NUMBER, 1);
@@ -216,18 +216,18 @@ std::string GetFormatedHTML(std::string HTML, std::string WindowName, CLASS_TOKE
 	return FormatedHTML;
 }
 
-void HTML_to_c(string sHTMLPath, string sCPath, string VarName, string WindowName, CLASS_TOKEN *o_tokens){
+void HTML_to_c(std::string sHTMLPath, std::string sCPath, std::string VarName, std::string WindowName, CLASS_TOKEN *o_tokens){
 	// This function can be completly replace in c++20 by <embed>
 	// In: test.html
 	// Out: test.c -> const test_content = "..test.html..";
 
 	// --- Read --------------------------
 	boost::filesystem::ifstream rBuffer(sHTMLPath);
-	std::stringstream sHTML;
+	stringstream sHTML;
 	sHTML << rBuffer.rdbuf();
 
 	// --- HTML to C++ -------------------
-	string sHTMLCode = "<!-- Alif compiler " + VERSION + " - HTML Start --> \n" 
+	std::string sHTMLCode = "<!-- Alif compiler " + VERSION + " - HTML Start --> \n" 
 						+ 
 						// --- Get formated AlifJavaScript ---
 						GetFormatedHTML(sHTML.str(), WindowName, o_tokens)
@@ -235,15 +235,15 @@ void HTML_to_c(string sHTMLPath, string sCPath, string VarName, string WindowNam
 						+ 
 						" \n<!-- Alif compiler " + VERSION + " - HTML End -->";
 
-	//string::size_type pos = 0;
-    //while ((pos = sHTMLCode.find('\"', pos)) != string::npos){
+	//std::string::size_type pos = 0;
+    //while ((pos = sHTMLCode.find('\"', pos)) != std::string::npos){
     //    sHTMLCode.replace(pos, 1, "\\\"");
     //    pos += 2;
     //}
 
-	string cppCode_start = "static const wxString " + VarName + " = wxT( R\"V0G0N( \n\n";
-	string cppCode_end = "\n\n )V0G0N\" );";
-	string cppCode = R"( 
+	std::string cppCode_start = "static const std::string " + VarName + " = ( R\"V0G0N( \n\n";
+	std::string cppCode_end = "\n\n )V0G0N\" );";
+	std::string cppCode = R"( 
 		// --- Const HTML script --------------------------
 		)" + cppCode_start + sHTMLCode + cppCode_end + R"(
 		// ------------------------------------------------
@@ -253,7 +253,7 @@ void HTML_to_c(string sHTMLPath, string sCPath, string VarName, string WindowNam
 	)";
 
 	// WebUI static html to global
-	string cppCodeWebUI = R"( 
+	std::string cppCodeWebUI = R"( 
 	const std::string )" + VarName  + R"(_webui_html = R"V0G0N(
 	)" + sHTML.str() + R"(
 	)V0G0N";
@@ -269,9 +269,9 @@ void HTML_to_c(string sHTMLPath, string sCPath, string VarName, string WindowNam
 	CPP_WINDOW[std::make_pair(TheNamespace, "LOAD")] = CBUFER + " \n " + VarName + "_webui_o.show( &" + VarName  + "_webui_html ); ";
 }
 
-void parser_NewWindowWeb(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
-	// #واجهة_ويب رئيسية "UI_WEB_1"
+	// #واجهة رئيسية "UI_WEB_1"
 	// #window_web MyWindow "MyFile.html"
 
 	if (IsInsideNamespace)
@@ -331,7 +331,7 @@ void parser_NewWindowWeb(string Token[2048], CLASS_TOKEN *o_tokens){
 		/*
 		if (CONTROL_WIN_IS_SET["رئيسية"]){
 
-			// Main Window already set by control (Alif lang UI)
+			// Main Namespace already set by control (Alif lang UI)
 			ErrorCode("النافذه الرئيسية تم انشاؤها مسبقا في السطر : " + CONTROL_WIN_AT_LINE[(Token[3])], o_tokens);
 		}
 		*/
@@ -343,17 +343,17 @@ void parser_NewWindowWeb(string Token[2048], CLASS_TOKEN *o_tokens){
 		//APP_TYPE = "PC_GUI";
 
 		// *** Generate Code ***
-		// New Web Window -> WebUI construction
+		// New Web Namespace -> WebUI construction
 		CBUFER_ID = "ID_CTR_" + ID["رئيسية"] + "_" + Control_ID["AlifUIWeb"];
 		CBUFER_OBJ = "OBJ_CTR_" + ID["رئيسية"] + "_" + Control_ID["AlifUIWeb"];
-		string CBUFER_VarName = ID["رئيسية"] + "_ConstHTML";
+		std::string CBUFER_VarName = ID["رئيسية"] + "_ConstHTML";
 		CPP_ID_DECLARATION.append(" int " + CBUFER_ID + " = ALIFCORE_ID_GENERATOR(); \n");
 		CPP_OBJ_DECLARATION.append(" wxWebView* " + CBUFER_OBJ + "; \n");
-		// New Web Window -> WebUI HTML
-		string PATH_FULL_HTML_CPP = PATH_TEMP + SEPARATION + "alifcompiler_html_" + ID["رئيسية"] + "_" + RANDOM + ".cpp";
+		// New Web Namespace -> WebUI HTML
+		std::string PATH_FULL_HTML_CPP = PATH_TEMP + SEPARATION + "alifcompiler_html_" + ID["رئيسية"] + "_" + RANDOM + ".cpp";
 		HTML_to_c(PATH_FULL_WINDOW_WEB, PATH_FULL_HTML_CPP, CBUFER_VarName, "رئيسية", o_tokens);
 		CPP_WINDOW[std::make_pair("رئيسية", "CTR_CONSTRUCTOR")] = 
-		"wxBoxSizer* o_TopSizer = new wxBoxSizer(wxVERTICAL); P->SetSizer(o_TopSizer); " + CBUFER_OBJ + " = wxWebView::New(P, wxID_ANY, \"\", wxPoint(10,10), wxSize(100, 100), wxWebViewBackendDefault, wxBORDER_NONE, wxT(\"Alif_Application\")); o_TopSizer->Add(" + CBUFER_OBJ + ", wxSizerFlags().Expand().Proportion(1)); " + CBUFER_OBJ + "->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewArchiveHandler(\"wxfs\"))); " + CBUFER_OBJ + "->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewFSHandler(\"memory\")));\n #include \"" + PATH_FULL_HTML_CPP + "\" \n " + CBUFER_OBJ + "->LoadURL(\"memory:" + CBUFER_VarName + ".htm\"); \n Center(); \n Bind(wxEVT_WEBVIEW_NEWWINDOW, &CLASS_WINDOW_" + ID["رئيسية"] + "::AlifJavaScript_OnNewWindow, this, " + CBUFER_OBJ + "->GetId()); \n Bind(wxEVT_WEBVIEW_NAVIGATING, &CLASS_WINDOW_" + ID["رئيسية"] + "::AlifJavaScript_OnNavigationRequest, this, " + CBUFER_OBJ + "->GetId()); \n " + CBUFER_OBJ + "->EnableContextMenu(false); \n " + CBUFER_OBJ + "->EnableHistory(false); \n ";
+		"wxBoxSizer* o_TopSizer = new wxBoxSizer(wxVERTICAL); P->SetSizer(o_TopSizer); " + CBUFER_OBJ + " = wxWebView::New(P, wxID_ANY, \"\", wxPoint(10,10), wxSize(100, 100), wxWebViewBackendDefault, wxBORDER_NONE, (\"Alif_Application\")); o_TopSizer->Add(" + CBUFER_OBJ + ", wxSizerFlags().Expand().Proportion(1)); " + CBUFER_OBJ + "->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewArchiveHandler(\"wxfs\"))); " + CBUFER_OBJ + "->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewFSHandler(\"memory\")));\n #include \"" + PATH_FULL_HTML_CPP + "\" \n " + CBUFER_OBJ + "->LoadURL(\"memory:" + CBUFER_VarName + ".htm\"); \n Center(); \n Bind(wxEVT_WEBVIEW_NEWWINDOW, &NS_" + ID["رئيسية"] + "::AlifJavaScript_OnNewWindow, this, " + CBUFER_OBJ + "->GetId()); \n Bind(wxEVT_WEBVIEW_NAVIGATING, &NS_" + ID["رئيسية"] + "::AlifJavaScript_OnNavigationRequest, this, " + CBUFER_OBJ + "->GetId()); \n " + CBUFER_OBJ + "->EnableContextMenu(false); \n " + CBUFER_OBJ + "->EnableHistory(false); \n ";
 
 		// WebUI
 		//CBUFER_VarName
@@ -364,10 +364,10 @@ void parser_NewWindowWeb(string Token[2048], CLASS_TOKEN *o_tokens){
 		// + CBUFER_OBJ + "->EnableHistory(false); " 
 		// + CBUFER_OBJ + "->Enable(true); \n 
 
-		// New Web Window -> WebUI AlifJavaScript
+		// New Web Namespace -> WebUI AlifJavaScript
 		CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
-		CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " \n void AlifJavaScript_OnNewWindow(wxWebViewEvent& evt); \n void AlifJavaScript_OnNavigationRequest(wxWebViewEvent& evt); \n void AlifJavaScript_Error(wxString sError); void AlifJavaScript_Run(wxString JSCode); \n void AlifJavaScriptBridge(wxString sLink); \n ";
-		// New Web Window -> Basic Window settings
+		CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " \n void AlifJavaScript_OnNewWindow(wxWebViewEvent& evt); \n void AlifJavaScript_OnNavigationRequest(wxWebViewEvent& evt); \n void AlifJavaScript_Error(std::string sError); void AlifJavaScript_Run(std::string JSCode); \n void AlifJavaScriptBridge(std::string sLink); \n ";
+		// New Web Namespace -> Basic Namespace settings
 		//CPP_WINDOW[std::make_pair(TheNamespace, "CTR_CONSTRUCTOR")] = " Center(); \n ";
 		// x = افصول
 		// y = ارتوب
@@ -428,7 +428,7 @@ void parser_NewWindowWeb(string Token[2048], CLASS_TOKEN *o_tokens){
 			return; // continue;
 		}
 
-		if(DEBUG)DEBUG_MESSAGE("[WINDOW] [" + Token[3] + "] {SET BASE CTR} \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[NAMESPACE] [" + Token[3] + "] {SET BASE CTR} \n\n", o_tokens); // DEBUG
 
 		// Not need this because we are in: #win web "MyWindow.alifui"
 		//IsInsideNamespace = true;
@@ -437,27 +437,27 @@ void parser_NewWindowWeb(string Token[2048], CLASS_TOKEN *o_tokens){
 		//APP_TYPE = "PC_GUI";
 
 		// *** Generate Code ***
-		// New Web Window -> WebUI construction
+		// New Web Namespace -> WebUI construction
 		CBUFER_ID = "ID_CTR_" + ID[Token[3]] + "_" + Control_ID["AlifUIWeb"];
 		CBUFER_OBJ = "OBJ_CTR_" + ID[Token[3]] + "_" + Control_ID["AlifUIWeb"];
-		string CBUFER_VarName = ID[Token[3]] + "_ConstHTML";
+		std::string CBUFER_VarName = ID[Token[3]] + "_ConstHTML";
 		CPP_ID_DECLARATION.append(" int " + CBUFER_ID + " = ALIFCORE_ID_GENERATOR(); \n");
 		CPP_OBJ_DECLARATION.append(" wxWebView* " + CBUFER_OBJ + "; \n");
-		// New Web Window -> WebUI HTML
-		string PATH_FULL_HTML_CPP = PATH_TEMP + SEPARATION + "alifcompiler_html_" + ID[Token[3]] + "_" + RANDOM + ".cpp";
+		// New Web Namespace -> WebUI HTML
+		std::string PATH_FULL_HTML_CPP = PATH_TEMP + SEPARATION + "alifcompiler_html_" + ID[Token[3]] + "_" + RANDOM + ".cpp";
 		HTML_to_c(PATH_FULL_WINDOW_WEB, PATH_FULL_HTML_CPP, CBUFER_VarName, Token[3], o_tokens);
 		CPP_WINDOW[std::make_pair(Token[3], "CTR_CONSTRUCTOR")] = 
-		"wxBoxSizer* o_TopSizer = new wxBoxSizer(wxVERTICAL); P->SetSizer(o_TopSizer); " + CBUFER_OBJ + " = wxWebView::New(P, wxID_ANY, \"\", wxPoint(10,10), wxSize(100, 100), wxWebViewBackendDefault, wxBORDER_NONE, wxT(\"Alif_Application\")); o_TopSizer->Add(" + CBUFER_OBJ + ", wxSizerFlags().Expand().Proportion(1)); " + CBUFER_OBJ + "->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewArchiveHandler(\"wxfs\"))); " + CBUFER_OBJ + "->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewFSHandler(\"memory\")));\n #include \"" + PATH_FULL_HTML_CPP + "\" \n " + CBUFER_OBJ + "->LoadURL(\"memory:" + CBUFER_VarName + ".htm\"); \n Center(); \n Bind(wxEVT_WEBVIEW_NEWWINDOW, &CLASS_WINDOW_" + ID[Token[3]] + "::AlifJavaScript_OnNewWindow, this, " + CBUFER_OBJ + "->GetId()); \n Bind(wxEVT_WEBVIEW_NAVIGATING, &CLASS_WINDOW_" + ID[Token[3]] + "::AlifJavaScript_OnNavigationRequest, this, " + CBUFER_OBJ + "->GetId()); \n " + CBUFER_OBJ + "->EnableContextMenu(false); \n " + CBUFER_OBJ + "->EnableHistory(false); \n ";
+		"wxBoxSizer* o_TopSizer = new wxBoxSizer(wxVERTICAL); P->SetSizer(o_TopSizer); " + CBUFER_OBJ + " = wxWebView::New(P, wxID_ANY, \"\", wxPoint(10,10), wxSize(100, 100), wxWebViewBackendDefault, wxBORDER_NONE, (\"Alif_Application\")); o_TopSizer->Add(" + CBUFER_OBJ + ", wxSizerFlags().Expand().Proportion(1)); " + CBUFER_OBJ + "->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewArchiveHandler(\"wxfs\"))); " + CBUFER_OBJ + "->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewFSHandler(\"memory\")));\n #include \"" + PATH_FULL_HTML_CPP + "\" \n " + CBUFER_OBJ + "->LoadURL(\"memory:" + CBUFER_VarName + ".htm\"); \n Center(); \n Bind(wxEVT_WEBVIEW_NEWWINDOW, &NS_" + ID[Token[3]] + "::AlifJavaScript_OnNewWindow, this, " + CBUFER_OBJ + "->GetId()); \n Bind(wxEVT_WEBVIEW_NAVIGATING, &NS_" + ID[Token[3]] + "::AlifJavaScript_OnNavigationRequest, this, " + CBUFER_OBJ + "->GetId()); \n " + CBUFER_OBJ + "->EnableContextMenu(false); \n " + CBUFER_OBJ + "->EnableHistory(false); \n ";
 
 		// " + CBUFER_OBJ + "->SetEditable(false); " 
 		// + CBUFER_OBJ + "->EnableContextMenu(false); " 
 		// + CBUFER_OBJ + "->EnableHistory(false); " 
 		// + CBUFER_OBJ + "->Enable(true); \n 
 
-		// New Web Window -> WebUI AlifJavaScript
+		// New Web Namespace -> WebUI AlifJavaScript
 		CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
-		CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " \n void AlifJavaScript_OnNewWindow(wxWebViewEvent& evt); \n void AlifJavaScript_OnNavigationRequest(wxWebViewEvent& evt); \n void AlifJavaScript_Error(wxString sError); void AlifJavaScript_Run(wxString JSCode); \n void AlifJavaScriptBridge(wxString sLink); \n ";
-		// New Web Window -> Basic Window settings
+		CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] = CBUFER + " \n void AlifJavaScript_OnNewWindow(wxWebViewEvent& evt); \n void AlifJavaScript_OnNavigationRequest(wxWebViewEvent& evt); \n void AlifJavaScript_Error(std::string sError); void AlifJavaScript_Run(std::string JSCode); \n void AlifJavaScriptBridge(std::string sLink); \n ";
+		// New Web Namespace -> Basic Namespace settings
 		//CPP_WINDOW[std::make_pair(TheNamespace, "CTR_CONSTRUCTOR")] = " Center(); \n ";
 		// x = افصول
 		// y = ارتوب
@@ -490,7 +490,7 @@ void parser_NewWindowWeb(string Token[2048], CLASS_TOKEN *o_tokens){
 	TheNamespace = "";
 }
 
-void parser_NewWindow(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_NewWindow(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
 	if (IsInsideNamespace)
 		ErrorCode("لا يمكن انشاء مجال داخل مجال، المجال الحالية : " + TheNamespace, o_tokens);
@@ -545,13 +545,13 @@ void parser_NewWindow(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		if (CONTROL_WIN_IS_SET["رئيسية"])
 		{
-			if(DEBUG)DEBUG_MESSAGE("[WINDOW] [MAIN] {CTR ALREADY SET} \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[NAMESPACE] [MAIN] {CTR ALREADY SET} \n\n", o_tokens); // DEBUG
 			
 			return; // continue;
 		}
 		else
 		{
-			if(DEBUG)DEBUG_MESSAGE("[WINDOW] [MAIN] {SET BASE CTR} \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[NAMESPACE] [MAIN] {SET BASE CTR} \n\n", o_tokens); // DEBUG
 			
 			// *** Generate Code ***
 			// CG_INITIALIZATION() // already done by 'alif.cpp'
@@ -591,15 +591,15 @@ void parser_NewWindow(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		if (CONTROL_WIN_IS_SET[Token[2]])
 		{
-			if(DEBUG)DEBUG_MESSAGE("[WINDOW] [" + Token[2] + "] {CTR ALREADY SET} \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[NAMESPACE] [" + Token[2] + "] {CTR ALREADY SET} \n\n", o_tokens); // DEBUG
 			return; // continue;
 		}
 		else
 		{
-			if(DEBUG)DEBUG_MESSAGE("[WINDOW] [" + Token[2] + "] {SET BASE CTR} \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[NAMESPACE] [" + Token[2] + "] {SET BASE CTR} \n\n", o_tokens); // DEBUG
 
 			// *** Generate Code ***
-			// New Window
+			// New Namespace
 			// x = افصول
 			// y = ارتوب
 			CPP_WINDOW[std::make_pair(Token[2], "نص")] = " (" + Token[2] + ") مجال بدون عنوان";

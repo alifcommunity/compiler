@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_While(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_While(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// كلما
 
     if (!o_tokens->TOKENS_PREDEFINED)
@@ -30,7 +30,7 @@ void parser_While(string Token[2048], CLASS_TOKEN *o_tokens){
     if (!IsInsideFunction)
 		ErrorCode("يجب استعمال كلما داخل دالة", o_tokens);
 
-    string PART[1024];
+    std::string PART[1024];
 	int PART_TOTAL;
 
     PART[0] = "=";
@@ -43,7 +43,7 @@ void parser_While(string Token[2048], CLASS_TOKEN *o_tokens){
 
     ALIF_LOOP_STATUS++;
 
-    if(DEBUG)DEBUG_MESSAGE("	[LOOP " + IntToString(ALIF_LOOP_STATUS) + "] ( ", o_tokens); // DEBUG
+    if(DEBUG)DEBUG_MESSAGE("[LOOP " + IntToString(ALIF_LOOP_STATUS) + "] ( ", o_tokens); // DEBUG
 
     /*
         while(condition)
@@ -65,7 +65,7 @@ void parser_While(string Token[2048], CLASS_TOKEN *o_tokens){
     }
 	// *** *** *** *** *** ***
 
-    string OBJECTIF_TYPE = "عادم";
+    std::string OBJECTIF_TYPE = "عادم";
 
     bool PART_A;
 	bool PART_B;
@@ -73,10 +73,10 @@ void parser_While(string Token[2048], CLASS_TOKEN *o_tokens){
     PART_A = false;
 	PART_B = false;
 
-	string PART_A_OBJECTIF_TYPE;
+	std::string PART_A_OBJECTIF_TYPE;
 	PART_A_OBJECTIF_TYPE = "";
 
-	string IF_SYNTAX_BUFFER;
+	std::string IF_SYNTAX_BUFFER;
 	IF_SYNTAX_BUFFER = "";
 
 	for (int p = Start; p <= o_tokens->TOTAL[o_tokens->Line]; p++) // Line loop after كلما
@@ -101,15 +101,15 @@ void parser_While(string Token[2048], CLASS_TOKEN *o_tokens){
 				// Check this condition-part for syntaxt
 				IS_IF_SYNTAX = true;
 				IF_SYNTAX_BUFFER.append(CheckForSyntax(OBJECTIF_TYPE,			// OBJECTIF_TYPE
-									 				true,					// Accept Using Reference to Window:Controls
-									  				true,					// Accept Using Reference to Window:Function
+									 				true,					// Accept Using Reference to Namespace:Controls
+									  				true,					// Accept Using Reference to Namespace:Function
 									  				true,					// Accept Using Reference to Global Functions
 									  				true,					// Accept Using Reference to Local Functions
 									  				true,					// Accept Using Reference to Global VAR
 									  				true,					// Accept Using Reference to Local VAR
 									  				false,					// Accept Convertion from String To Int
 									  				false,					// Accept Convertion from Int To String
-									  				PART, 					// SYNTAX[] string
+									  				PART, 					// SYNTAX[] std::string
 									  				(PART_TOTAL),			// SYNTAX_LONG int
 									  				TheNamespace,			// TMP_WINDOW_NAME
 									  				TheFunction,			// TMP_FUNCTION_NAME
@@ -338,15 +338,15 @@ void parser_While(string Token[2048], CLASS_TOKEN *o_tokens){
 	// Check this condition-part for syntaxt
 	IS_IF_SYNTAX = true;
 	IF_SYNTAX_BUFFER.append(CheckForSyntax(OBJECTIF_TYPE,			// OBJECTIF_TYPE
-									 	true,					// Accept Using Reference to Window:Controls
-									  	true,					// Accept Using Reference to Window:Function
+									 	true,					// Accept Using Reference to Namespace:Controls
+									  	true,					// Accept Using Reference to Namespace:Function
 									  	true,					// Accept Using Reference to Global Functions
 									  	true,					// Accept Using Reference to Local Functions
 									  	true,					// Accept Using Reference to Global VAR
 									  	true,					// Accept Using Reference to Local VAR
 									  	false,					// Accept Convertion from String To Int
 									  	false,					// Accept Convertion from Int To String
-									  	PART, 					// SYNTAX[] string
+									  	PART, 					// SYNTAX[] std::string
 									  	(PART_TOTAL),			// SYNTAX_LONG int
 									  	TheNamespace,			// TMP_WINDOW_NAME
 									  	TheFunction,			// TMP_FUNCTION_NAME
@@ -371,6 +371,6 @@ void parser_While(string Token[2048], CLASS_TOKEN *o_tokens){
 	}
 	// *** *** *** *** *** ***
 
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 	return; // continue;
 }

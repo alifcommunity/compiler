@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_VarGlobalClass(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_VarGlobalClass(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	
 	// Global Class var
 	// g1 = 1 + 2
@@ -43,7 +43,7 @@ void parser_VarGlobalClass(string Token[2048], CLASS_TOKEN *o_tokens){
 		//if (CLASS_G_VAR_IS_CONST[std::make_pair(TheClass, Token[1])] == "ثابت")
 			//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + G_VAR_WITHOUT_ + " ' لأنه من نوع ثابت ", o_tokens);
 
-		if(DEBUG)DEBUG_MESSAGE("		[CLASS-GLOBAL-INT (" + Token[1] + ")] = ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[CLASS-GLOBAL-INT (" + Token[1] + ")] = ", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		CPP_CLASS.append(" " + Global_ID[Token[1]] + " = ");
@@ -54,7 +54,7 @@ void parser_VarGlobalClass(string Token[2048], CLASS_TOKEN *o_tokens){
 		//if (CLASS_G_VAR_IS_CONST[std::make_pair(TheClass, Token[1])] == "ثابت")
 			//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + G_VAR_WITHOUT_ + " ' لأنه من نوع ثابت ", o_tokens);
 
-		if(DEBUG)DEBUG_MESSAGE("		[CLASS-GLOBAL-STRING (" + Token[1] + ")] = ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[CLASS-GLOBAL-STRING (" + Token[1] + ")] = ", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		CPP_CLASS.append(" " + Global_ID[Token[1]] + " = ");
@@ -65,7 +65,7 @@ void parser_VarGlobalClass(string Token[2048], CLASS_TOKEN *o_tokens){
 		//if (CLASS_G_VAR_IS_CONST[std::make_pair(TheClass, Token[1])] == "ثابت")
 			//ErrorCode("لا يمكن تغيير قيمة المتغير ' " + G_VAR_WITHOUT_ + " ' لأنه من نوع ثابت ", o_tokens);
 			
-		if(DEBUG)DEBUG_MESSAGE("		[CLASS-GLOBAL-BOOL (" + Token[1] + ")] = ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[CLASS-GLOBAL-BOOL (" + Token[1] + ")] = ", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		CPP_CLASS.append(" " + Global_ID[Token[1]] + " = ");
@@ -87,21 +87,21 @@ void parser_VarGlobalClass(string Token[2048], CLASS_TOKEN *o_tokens){
 	// a = 1 + a * (_g - 3) ...
 	
 	ScriptSyntaxBuffer = CheckForSyntax(CLASS_G_VAR_TYPE[std::make_pair(TheClass, Token[1])], // OBJECTIF_TYPE
-									true, // Accept Using Reference to Window:Controls
-									true, // Accept Using Reference to Window:Function
+									true, // Accept Using Reference to Namespace:Controls
+									true, // Accept Using Reference to Namespace:Function
 									true, // Accept Using Reference to Global Functions
 									true, // Accept Using Reference to Local Functions
 									true, // Accept Using Reference to Global VAR
 									true, // Accept Using Reference to Local VAR
 									false, // Accept Convertion from String To Int
 									true, // Accept Convertion from Int To String
-									TempToken, 			// SYNTAX[] string
+									TempToken, 			// SYNTAX[] std::string
 									(TempTokenCount - 1), // SYNTAX_LONG int
 									TheClass, 		// TMP_WINDOW_NAME
 									TheFunction, 		// TMP_FUNCTION_NAME
 									o_tokens);
 	
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 
 	// *** Generate Code ***
 	CPP_CLASS.append(ScriptSyntaxBuffer + " ; \n");

@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_FunctionCall(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
 	// *myfunction(a, b, c..)
 
@@ -44,7 +44,7 @@ void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
 
 	// --- Set current parent ---------------------------------------
 
-	string CurrentParent = "";
+	std::string CurrentParent = "";
 
 	if(IsInsideClass)
 		CurrentParent = TheClass;
@@ -55,9 +55,9 @@ void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
 
 	bool CallClassFun = false;
 	bool CallGlobalFun = false;
-	string FuncParent = "";
-	string FunName = "";
-	string FunType = "";
+	std::string FuncParent = "";
+	std::string FunName = "";
+	std::string FunType = "";
 
 	// --- Identify -------------------------------------------------
 
@@ -147,7 +147,7 @@ void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
 	} else {
 
 		// Call a Local func
-		ScriptBuffer = " OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "->FUNCTION_" + ID[FunName] + "(" + ScriptSyntaxBuffer + "); \n";
+		ScriptBuffer = " NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[FunName] + "(" + ScriptSyntaxBuffer + "); \n";
 	}
 
 	// --- Add. Code -------------------------------------------------
@@ -188,17 +188,17 @@ void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
 		if (L_FUN_TYPE[std::make_pair(TheNamespace, Token[1])] == "نص")
 			ErrorCode("الدالة المحلية ' " + Token[1] + "()' من نوع كلمة, لذلك أنت بحاجة إلى متغير للحصول على قيمة الرجوع", o_tokens);
 		
-		if(DEBUG)DEBUG_MESSAGE("		[CALL-LOCAL-FUNCTION ' " + Token[1] + " '] (", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION ' " + Token[1] + " '] (", o_tokens); // DEBUG
 
 		// *** Generate Code ***
 		// Call Local Func from inside Local Func
-		cpp_AddScript(TheFunction, " OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "->FUNCTION_" + ID[Token[1]] + " (");
+		cpp_AddScript(TheFunction, " NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[Token[1]] + " (");
 		// *** *** *** *** *** ***
 
 		// Check local fun Args and Syntax : fun (a + c, 2 * (b - 1))
 		ScriptSyntaxBuffer = CHECK_CALL_FUN_ARG(false, TheNamespace, Token[1], 0, TheNamespace, TheFunction, TempToken, (TempTokenCount - 1),  o_tokens);
 
-		if(DEBUG)DEBUG_MESSAGE(" ) ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE(") ", o_tokens); // DEBUG
 		
 		// *** Generate Code ***
 		cpp_AddScript(TheFunction, ScriptSyntaxBuffer + " ); \n");
@@ -216,7 +216,7 @@ void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		if (IsInsideClass)
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[CALL-GLOBAL-FUNCTION ' " + Token[1] + " '] ( ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION ' " + Token[1] + " '] ( ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Call Global Func from inside Class Func
@@ -225,7 +225,7 @@ void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
 		}
 		else if (!IsInsideNamespace)
 		{
-			if(DEBUG)DEBUG_MESSAGE("	[CALL-GLOBAL-FUNCTION ' " + Token[1] + " '] ( ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION ' " + Token[1] + " '] ( ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Call Global Func from inside Global Func
@@ -234,7 +234,7 @@ void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
 		}
 		else
 		{
-			if(DEBUG)DEBUG_MESSAGE("		[CALL-GLOBAL-FUNCTION ' " + Token[1] + " '] ( ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION ' " + Token[1] + " '] ( ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Call Global Func from inside Local Func
@@ -245,7 +245,7 @@ void parser_FunctionCall(string Token[2048], CLASS_TOKEN *o_tokens){
 		// Check Global fun Args and Syntax : gfun (a + c, 2 * (b - 1))
 		ScriptSyntaxBuffer = CHECK_CALL_FUN_ARG(true, "", Token[1], 0, WIN_OR_CLASS, TheFunction, TempToken, (TempTokenCount - 1),  o_tokens);
 
-		if(DEBUG)DEBUG_MESSAGE(" ) ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE(") ", o_tokens); // DEBUG
 
 		if (IsInsideClass)
 		{

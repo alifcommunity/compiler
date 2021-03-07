@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_Control(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	//أداة
 
 	if (IsInsideNamespace || IsInsideFunction || IsInsideClass)
@@ -65,10 +65,10 @@ void parser_Control(string Token[2048], CLASS_TOKEN *o_tokens){
 			return; // continue;
 		}
 		
-		if(DEBUG)DEBUG_MESSAGE("[CONTROL] [WINDOW] ['" + Token[4] + " '] \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[CONTROL] [NAMESPACE] ['" + Token[4] + " '] \n\n", o_tokens); // DEBUG
 		
 		// *** Generate Code ***
-		// New Window
+		// New Namespace
 		CPP_WINDOW[std::make_pair(Token[4], "افصول")] = Token[6];
 		CPP_WINDOW[std::make_pair(Token[4], "ارتوب")] = Token[8];
 		CPP_WINDOW[std::make_pair(Token[4], "عرض")] = Token[10];
@@ -109,7 +109,7 @@ void parser_Control(string Token[2048], CLASS_TOKEN *o_tokens){
 			ErrorCode("إشارة مفقودة ')' بعد ' " + Token[16] + " ' ", o_tokens);
 		
 		if (!CONTROL_WIN_IS_SET[Token[4]] && Token[4] != "رئيسية")
-			ErrorCode("نافذه غير موجوده : ' " + Token[4] + " ' ", o_tokens);
+			ErrorCode("مجال غير موجوده : ' " + Token[4] + " ' ", o_tokens);
 		
 		if (!IsValidName(Token[6], o_tokens))
 			ErrorCode("تعريف غير مقبول : ' " + Token[6] + " ' ", o_tokens);
@@ -143,7 +143,7 @@ void parser_Control(string Token[2048], CLASS_TOKEN *o_tokens){
 			CPP_OBJ_DECLARATION.append(" wxButton* " + CBUFER_OBJ + "; \n");
 			CBUFER = CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")];
 			CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")] = CBUFER + " \n" + 
-			CBUFER_OBJ + " = new wxButton (P, " + CBUFER_ID + ", wxT(\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + ")); \n";
+			CBUFER_OBJ + " = new wxButton (P, " + CBUFER_ID + ", (\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + ")); \n";
 		}
 		else if (Token[2] == "نص")
 		{
@@ -154,14 +154,14 @@ void parser_Control(string Token[2048], CLASS_TOKEN *o_tokens){
 			CPP_OBJ_DECLARATION.append(" wxTextCtrl* " + CBUFER_OBJ + "; \n");
 			CBUFER = CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")];
 			CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")] = CBUFER + " \n" + 
-			CBUFER_OBJ + " = new wxTextCtrl (P, " + CBUFER_ID + ", wxT(\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + "), wxTE_MULTILINE | wxTE_RIGHT); \n";
+			CBUFER_OBJ + " = new wxTextCtrl (P, " + CBUFER_ID + ", (\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + "), wxTE_MULTILINE | wxTE_RIGHT); \n";
 		}
 		else if (Token[2] == "ملصق")
 		{
 			CPP_OBJ_DECLARATION.append(" wxStaticText* " + CBUFER_OBJ + "; \n");
 			CBUFER = CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")];
 			CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")] = CBUFER + " \n" + 
-			CBUFER_OBJ + " = new wxStaticText (P, " + CBUFER_ID + ", wxT(\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + "), wxST_NO_AUTORESIZE | wxALIGN_RIGHT | wxST_ELLIPSIZE_END); \n";
+			CBUFER_OBJ + " = new wxStaticText (P, " + CBUFER_ID + ", (\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + "), wxST_NO_AUTORESIZE | wxALIGN_RIGHT | wxST_ELLIPSIZE_END); \n";
 		}
 		else
 		{

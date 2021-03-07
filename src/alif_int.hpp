@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
+void parser_Int(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// عدد
 
 	if (!o_tokens->TOKENS_PREDEFINED && IsInsideFunction)
@@ -67,7 +67,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 					return; // continue;
 				}
 
-				if(DEBUG)DEBUG_MESSAGE("	[PRIVATE] [CLASS-GLOBAL-INT] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[PRIVATE] [CLASS-GLOBAL-INT] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Class : New Private INT
@@ -76,7 +76,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 				{
 					CPP_CLASS.append(" = 0; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -89,7 +89,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 					return; // continue;
 				}
 
-				if(DEBUG)DEBUG_MESSAGE("	[CLASS-GLOBAL-INT] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[CLASS-GLOBAL-INT] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
 				
 				// *** Generate Code ***
 				// Class : New Public INT
@@ -98,7 +98,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 				{
 					CPP_CLASS.append(" = 0; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -120,7 +120,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 					//return; // continue;
 				//}
 
-				if(DEBUG)DEBUG_MESSAGE("		[CLASS-INT] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("[CLASS-INT] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
 
 				// *** Generate Code ***
 				// Class : New Local Class INT
@@ -129,7 +129,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 				{
 					CPP_CLASS.append(" = 0; \n");
 
-					if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 					return; // continue;
 				}
 				// *** *** *** *** *** ***
@@ -159,7 +159,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 		{
 			CPP_GLOBAL.append(" ; \n");
 
-			if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 			return; // continue;
 		}
 		// *** *** *** *** *** ***
@@ -173,7 +173,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 
 		SetNewVar(false, TheNamespace, TheFunction, Token[INT_POS + 1], "عدد", false, false, o_tokens->Line, o_tokens);
 		
-		if(DEBUG)DEBUG_MESSAGE("		[LOCAL-INT] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("[LOCAL-INT] [" + Token[INT_POS + 1] + "] ", o_tokens); // DEBUG
 		
 		// *** Generate Code ***
 		// Local Area
@@ -186,7 +186,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 			{
 				CPP_GLOBAL_FUN.append(" ; \n");
 
-				if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 				return; // continue;
 			}
 		}
@@ -198,7 +198,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 			{
 				cpp_AddScript(TheFunction, " = 0; \n");
 
-				if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+				if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 				return; // continue;
 			}
 		}
@@ -275,7 +275,7 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 			}
 		}
 		
-		string WIN_OR_CLASS;
+		std::string WIN_OR_CLASS;
 		if (IsInsideClass)
 			WIN_OR_CLASS = TheClass;
 		else
@@ -283,8 +283,8 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		// INT Syntax
 		ScriptSyntaxBuffer = CheckForSyntax("عدد", // OBJECTIF_TYPE
-								true, // Accept Using Reference to Window:Controls
-								true, // Accept Using Reference to Window:Function
+								true, // Accept Using Reference to Namespace:Controls
+								true, // Accept Using Reference to Namespace:Function
 								true, // Accept Using Reference to Global Functions
 								true, // Accept Using Reference to Local Functions
 								true, // Accept Using Reference to Global VAR
@@ -326,11 +326,11 @@ void parser_Int(string Token[2048], CLASS_TOKEN *o_tokens){
 			// *** *** *** *** *** ***
 		}
 
-		if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+		if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 		return; // continue;
 	}
 	else if (Token[INT_POS + 2] != "")
 		ErrorCode("أمر غير معروف '" + Token[INT_POS + 2] + "', ربما تقصد '=' ", o_tokens);
 
-	if(DEBUG)DEBUG_MESSAGE(" \n\n", o_tokens); // DEBUG
+	if(DEBUG)DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 }
