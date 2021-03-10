@@ -73,7 +73,7 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens){
 		CPP_WINDOW[std::make_pair(Token[4], "ارتوب")] = Token[8];
 		CPP_WINDOW[std::make_pair(Token[4], "عرض")] = Token[10];
 		CPP_WINDOW[std::make_pair(Token[4], "ارتفاع")] = Token[12];
-		CPP_WINDOW[std::make_pair(Token[4], "نص")] = GET_TXT_FROM_STRING(Token[14], o_tokens);
+		CPP_WINDOW[std::make_pair(Token[4], "نص")] = remove_quote(Token[14], o_tokens);
 		if (Token[4] != "رئيسية")
 		{
 			Namespace_Total++;
@@ -143,7 +143,7 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens){
 			CPP_OBJ_DECLARATION.append(" wxButton* " + CBUFER_OBJ + "; \n");
 			CBUFER = CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")];
 			CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")] = CBUFER + " \n" + 
-			CBUFER_OBJ + " = new wxButton (P, " + CBUFER_ID + ", (\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + ")); \n";
+			CBUFER_OBJ + " = new wxButton (P, " + CBUFER_ID + ", (\"" + remove_quote(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + ")); \n";
 		}
 		else if (Token[2] == "نص")
 		{
@@ -154,14 +154,14 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens){
 			CPP_OBJ_DECLARATION.append(" wxTextCtrl* " + CBUFER_OBJ + "; \n");
 			CBUFER = CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")];
 			CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")] = CBUFER + " \n" + 
-			CBUFER_OBJ + " = new wxTextCtrl (P, " + CBUFER_ID + ", (\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + "), wxTE_MULTILINE | wxTE_RIGHT); \n";
+			CBUFER_OBJ + " = new wxTextCtrl (P, " + CBUFER_ID + ", (\"" + remove_quote(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + "), wxTE_MULTILINE | wxTE_RIGHT); \n";
 		}
 		else if (Token[2] == "ملصق")
 		{
 			CPP_OBJ_DECLARATION.append(" wxStaticText* " + CBUFER_OBJ + "; \n");
 			CBUFER = CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")];
 			CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")] = CBUFER + " \n" + 
-			CBUFER_OBJ + " = new wxStaticText (P, " + CBUFER_ID + ", (\"" + GET_TXT_FROM_STRING(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + "), wxST_NO_AUTORESIZE | wxALIGN_RIGHT | wxST_ELLIPSIZE_END); \n";
+			CBUFER_OBJ + " = new wxStaticText (P, " + CBUFER_ID + ", (\"" + remove_quote(Token[16],o_tokens) + "\"), wxPoint(" + Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " + Token[14] + "), wxST_NO_AUTORESIZE | wxALIGN_RIGHT | wxST_ELLIPSIZE_END); \n";
 		}
 		else
 		{

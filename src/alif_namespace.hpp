@@ -48,6 +48,8 @@ void parser_new_namespace(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	if (!IsValidName(Token[2], o_tokens))
 		ErrorCode("اسم غير مقبول : ' " + Token[2] + " ' ", o_tokens);
 	
+	CheckForSameGlobalID(Token[2], o_tokens);
+
 	if (!o_tokens->TOKENS_PREDEFINED){
 			
 		if (namespace_is_set[Token[2]])
@@ -56,7 +58,7 @@ void parser_new_namespace(std::string Token[2048], CLASS_TOKEN *o_tokens){
 		
 		namespace_is_set[Token[2]] = true;
 		namespace_at_line[Token[2]] = IntToString(o_tokens->Line);
-		SET_C_NAME(Token[2]);
+		SET_GLOBAL_C_NAME(Token[2]); // TODO: is okay (SET_C_NAME -> SET_GLOBAL_C_NAME) ?
 
 		IsInsideNamespace = true; // Need by Tokens Predefined
 		TheNamespace = Token[2]; // Need by Tokens Predefined

@@ -64,6 +64,9 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens){
 			IsInsideFunction = true; // Need by Tokens Predefined
 			TheFunction = "رئيسية"; // Need by Tokens Predefined
 
+			script.main.is_set = true;
+			script.main.set_at_line = IntToString(o_tokens->Line);
+
 			return; // continue;
 		}
 	
