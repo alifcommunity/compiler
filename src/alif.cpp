@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.15 (Beta)"
+#define ALIF_VERSION "3.0.16 (Beta)"
 
 // Stack ********************************************************
 
@@ -453,7 +453,7 @@
 
 	// Complet path of Web UI window (HTML5) file
 	// Used by parser #window_web
-	std::string PATH_FULL_WINDOW_WEB;
+	//std::string PATH_FULL_WINDOW_WEB;
 
 	#ifdef _WIN32
 		std::string SEPARATION = "\\";
@@ -536,7 +536,7 @@
 	//void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens);
 
 	// Lexer
-	void AlifLexerParser(std::string FILE_NAME, std::string FILE_TYPE, bool FIRST_FILE, bool TOKENS_ARE_PREDININED);
+	void AlifLexerParser(std::string file, std::string target, bool is_first_file, bool is_predefined);
 
 // Log **********************************************************
 
@@ -635,6 +635,36 @@
 		// file.close();
 		
 		exit(EXIT_FAILURE);
+	}
+
+	std::string get_path(std::string str) {
+
+		return "";
+	}
+
+	bool is_file_exists(std::string f) {
+
+		boost::filesystem::ifstream infile(f);
+		return infile.good();
+	}
+
+	void file_embed(std::string file_path, std::string &var, CLASS_TOKEN *o_tokens){
+		
+		// This function can be completely be replaced in c++20 by <embed>
+		// This function basically read a file and update ref by the file
+		// content (const string).
+
+		if (!is_file_exists(file_path))
+			ErrorCode("ملف غير موجود : ' " + file_path + " ' ", o_tokens);
+
+		boost::filesystem::ifstream rBuffer(file_path);
+		stringstream buf;
+		buf << rBuffer.rdbuf();
+		rBuffer.close();
+
+		var.clear();
+		//var.append(buf.str());
+		var = buf.str();
 	}
 
 	// Old
@@ -1667,7 +1697,7 @@
 
 	// ====================================================
 
-	std::string GET_TXT_FROM_STRING(std::string STRING, CLASS_TOKEN *o_tokens)
+	std::string remove_quote(std::string STRING, CLASS_TOKEN *o_tokens)
 	{
 		std::string MESSAGE_BUFFER;
 
@@ -4564,16 +4594,17 @@
 				//if(DEBUG)DEBUG_MESSAGE("\n \n *** \n TMP_NAMESPACE_OR_CLASS : " + TMP_NAMESPACE_OR_CLASS + " \n", o_tokens);
 				//if(DEBUG)DEBUG_MESSAGE("TmpFunction : " + TmpFunction + " \n *** \n", o_tokens);
 
-				if (Control_ID[SYNTAX[p]] != "")
-				{
-					// show error description
-					// when, (no-win) CTR:OPTION
-					// in global area.
+				// if (Control_ID[SYNTAX[p]] != "")
+				// {
+				// 	// show error description
+				// 	// when, (no-win) CTR:OPTION
+				// 	// in global area.
 
-					ErrorCode("بناء الجملة غير مفهوم : ' " + SYNTAX[p] + " '، على العموم، إن كنت تقصد أداة، لا تنسى أن تحدد إسم النافذة قبل إسم الأداة  ", o_tokens);
-				}
+				// 	ErrorCode("بناء الجملة غير مفهوم : ' " + SYNTAX[p] + " '، على العموم، إن كنت تقصد أداة، لا تنسى أن تحدد إسم النافذة قبل إسم الأداة  ", o_tokens);
+				// }
+
 				// أو
-				else if (SYNTAX[p] == "او" || 
+				if (SYNTAX[p] == "او" || 
 						SYNTAX[p] == "ٱو" || 
 						SYNTAX[p] == "آو" ||
 						SYNTAX[p] == "والا" || 
@@ -4584,10 +4615,10 @@
 				}
 				else{
 
-					//L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])]
-					if(DEBUG)DEBUG_MESSAGE("TMP_NAMESPACE_OR_CLASS '" + TMP_NAMESPACE_OR_CLASS + "'\n ", o_tokens); // DEBUG
-					if(DEBUG)DEBUG_MESSAGE("TmpFunction '" + TmpFunction + "'\n ", o_tokens); // DEBUG
-					if(DEBUG)DEBUG_MESSAGE("SYNTAX[p] '" + SYNTAX[p] + "'\n ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("\nTMP_NAMESPACE_OR_CLASS --> '" + TMP_NAMESPACE_OR_CLASS + "'\n ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("TmpFunction --> '" + TmpFunction + "'\n ", o_tokens); // DEBUG
+					if(DEBUG)DEBUG_MESSAGE("SYNTAX[p] --> '" + SYNTAX[p] + "'\n ", o_tokens); // DEBUG
+
 					ErrorCode("بناء الجملة غير مفهوم : ' " + SYNTAX[p] + " ' ", o_tokens);
 				}	
 			}
@@ -4835,6 +4866,10 @@
 			// #Alif
 			if (!ALIF_FLAG_FILE[o_tokens->PATH_FULL_SOURCE])
 				ErrorCode("يجب الإعلان عن علم ألف اولا، المرجو اضافة ' #ألف ' في الأعلى", o_tokens);
+
+			// Main
+			if (!script.main.is_set)
+				ErrorCode("يجب إنشاء الدالة الرئيسية، لأنها تعتبر المدخل الرئيسي لهذا التطبيق.", o_tokens);
 		}
 	}
 
@@ -4915,7 +4950,7 @@
 		}
 	}
 
-	bool IS_PATH(std::string PATH_OR_FILE)
+	bool is_path(std::string PATH_OR_FILE)
 	{
 		// 'myfile.x'               --> false.
 		// '/abc/test/myfile.x'     --> true.
@@ -4975,28 +5010,6 @@
 		#endif
 	}
 	*/
-
-	bool CHECK_FILE_EXISTE(std::string PATH)
-	{
-		/*
-		std::string::iterator end_it = utf8::find_invalid(PATH.begin(), PATH.end());
-
-		if (end_it != PATH.end()) {
-			cout << "Invalid UTF-8 encoding detected at line " << "\n";
-		}
-		
-		vector<unsigned short> utf16line;
-		utf8::utf8to16(PATH.begin(), end_it, back_inserter(utf16line));
-
-		//std::string s = std::to_string(utf16line);
-
-		std::string str(utf16line.begin(), utf16line.end());
-		*/
-
-		// boost::filesystem::ifstream infile(PATH.c_str());
-		boost::filesystem::ifstream infile(PATH.c_str());
-		return infile.good();
-	}
 
 	bool CHECK_SETUP() // std::string ARGV_0, std::string OUTPUT)
 	{
@@ -6130,30 +6143,26 @@
 	#include "alif_operator.hpp"
 	#include "alif_end.hpp"
 
-	void ALIF_PARSER (CLASS_TOKEN *o_tokens)
-	{
-		// ------------------------------------------------------
-		// Already Parsed files
-		// -----------------------------------------------------
+	void ALIF_PARSER (CLASS_TOKEN *o_tokens) {
 
-		if (!o_tokens->TOKENS_PREDEFINED)
-		{
+		if (!o_tokens->TOKENS_PREDEFINED) {
+
 			// Check for tokens not predifined
 
-			if (ALREADY_PARSED_FILE_TOKENS_NOT_PREDEFINED[o_tokens->PATH_FULL_SOURCE])
-			{
+			if (ALREADY_PARSED_FILE_TOKENS_NOT_PREDEFINED[o_tokens->PATH_FULL_SOURCE]) {
+
 				if(DEBUG)DEBUG_MESSAGE("\n Already Parsed(Not-Predifined) [" + o_tokens->PATH_FULL_SOURCE + "] \n", o_tokens);
 				return;
 			}
 			else
 				ALREADY_PARSED_FILE_TOKENS_NOT_PREDEFINED[o_tokens->PATH_FULL_SOURCE] = true;
 		}
-		else
-		{
+		else {
+
 			// Check for tokens already predifined
 
-			if (ALREADY_PARSED_FILE_TOKENS_PREDEFINED[o_tokens->PATH_FULL_SOURCE])
-			{
+			if (ALREADY_PARSED_FILE_TOKENS_PREDEFINED[o_tokens->PATH_FULL_SOURCE]) {
+
 				if(DEBUG)DEBUG_MESSAGE("\n Already Parsed(Predifined) [" + o_tokens->PATH_FULL_SOURCE + "] \n", o_tokens);
 				return;
 			}
@@ -6161,25 +6170,17 @@
 				ALREADY_PARSED_FILE_TOKENS_PREDEFINED[o_tokens->PATH_FULL_SOURCE] = true;
 		}
 
-		// ------------------------------------------------------
-
 		// For every line
-		for(o_tokens->Line = 1; o_tokens->Line <= o_tokens->TOTAL_LINES; o_tokens->Line++)
-		{
+		for(o_tokens->Line = 1; o_tokens->Line <= o_tokens->TOTAL_LINES; o_tokens->Line++) {
+
 			if (o_tokens->TOTAL[o_tokens->Line] < 1){continue;}
-			//printf("\n");
-			
-			// 'unsigned' alway comparison false if '-1', 
-			// so Crash in convert loop fucntion like "CONVERT_STRING_ARRAY_TO_STRING()"
-			// Move from 'unsigned' to 'int' !
-			
+
 			std::string Token[2048];
 
 			// Clear TempToken[1024] on every line
-			// this is for fixing TempToken[p + 1] --> last token from last line!
-			for(int clear_p = 0; clear_p <= 1023; clear_p++){
+			// this is for fixing TempToken[p + 1] -> last token from last line!
+			for(int clear_p = 0; clear_p <= 1023; clear_p++)
 				TempToken[clear_p] = "";
-			}
 			
 			for(o_tokens->NUMBER = 1; 
 				o_tokens->NUMBER <= o_tokens->TOTAL[o_tokens->Line]; 
@@ -6191,41 +6192,21 @@
 				// Token 			: o_tokens->TOKEN[std::make_pair(o_tokens->Line, o_tokens->NUMBER)]
 				// -----------------------------------------------------------------
 				if (o_tokens->TOKEN[std::make_pair(o_tokens->Line, o_tokens->NUMBER)] != "")
-				{
 					Token[o_tokens->NUMBER] = o_tokens->TOKEN[std::make_pair(o_tokens->Line, o_tokens->NUMBER)];
-					//printf("%s | %d -> %d -> %s", &o_tokens->PATH_FULL_SOURCE, o_tokens->Line, o_tokens->NUMBER, Token[o_tokens->NUMBER]);
-
-					/*
-					if (Token[o_tokens->NUMBER] == "ادا" || 
-						Token[o_tokens->NUMBER] == "إدا" || 
-						Token[o_tokens->NUMBER] == "أدا" ||
-						Token[o_tokens->NUMBER] == "اذا" ||
-						Token[o_tokens->NUMBER] == "أذا")
-							Token[o_tokens->NUMBER] = "إذا";
-
-					else if (Token[o_tokens->NUMBER] == "او" || 
-							Token[o_tokens->NUMBER] == "ٱو" || 
-							Token[o_tokens->NUMBER] == "آو" ||
-							Token[o_tokens->NUMBER] == "والا" || 
-							Token[o_tokens->NUMBER] == "وإلا" || 
-							Token[o_tokens->NUMBER] == "وألا")
-								Token[o_tokens->NUMBER] = "أو";
-					*/
-				}
-			} // End Tokens Loop Log way..
-			//for (int i = 1; i <= o_tokens->NUMBER; i++){
-			if (Token[1] == "") continue;
-	// #######################################################
+				
+			}
+			
+			if (Token[1] == "")
+				continue;
 
 			if(DEBUG)DEBUG_MESSAGE(IntToString(o_tokens->Line) + ": ", o_tokens); // DEBUG
 
+	// ------------------------------------------------------------------------
+	
 	if (Token[1] == "#") {
 
 		// Macros
 		parser_macro_ui(Token, o_tokens);
-		
-		
-		
 		
 		// --------------------------------------------
 		/*
@@ -6249,13 +6230,13 @@
 				ErrorCode("خطأ في كتابة إسم الملف: "+ Token[4], o_tokens);
 
 			// Get PATH_FULL_WINDOW_WEB
-			AlifLexerParser(GET_TXT_FROM_STRING(Token[4], o_tokens), "ALIFUIW", false, o_tokens->TOKENS_PREDEFINED);
+			AlifLexerParser(remove_quote(Token[4], o_tokens), "ALIFUIW", false, o_tokens->TOKENS_PREDEFINED);
 
 			//parser_NewWindowWeb(Token, o_tokens);
 		}
 		else if (Token[2] == "أضف"		||	// #اضف "test.ALIF"
 				//Token[2] == "واجهة"	||	// #واجهة "test.ALIFUI"
-				Token[2] == "مكتبة" )		// #مكتبة "test.ALIFLIB"
+				Token[2] == "مكتبة" )		// #مكتبة "test.ALIF"
 		{
 			if (Token[3] == "")
 				ErrorCode("مسار الملف غير محدد" + Token[2], o_tokens);
@@ -6280,7 +6261,7 @@
 					ErrorCode("خطأ في كتابة إسم الملف: "+ Token[3], o_tokens);
 				
 				if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF] ... \n\n", o_tokens);
-				AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIF", false, o_tokens->TOKENS_PREDEFINED);
+				AlifLexerParser(remove_quote(Token[3], o_tokens), "ALIF", false, o_tokens->TOKENS_PREDEFINED);
 			}
 			// else if (Token[2] == "واجهة")
 			// {
@@ -6293,18 +6274,18 @@
 			// 		ErrorCode("خطأ في كتابة إسم الملف: "+ Token[3], o_tokens);
 
 			// 	if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF UI] ... \n\n", o_tokens);
-			// 	AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIFUI", false, o_tokens->TOKENS_PREDEFINED);
+			// 	AlifLexerParser(remove_quote(Token[3], o_tokens), "ALIFUI", false, o_tokens->TOKENS_PREDEFINED);
 			// }
 			else if (Token[2] == "مكتبة")
 			{
 				// Include Library from Lib folder, or local folder.
 
-				// if (GET_TXT_FROM_STRING(Token[3], o_tokens) == "رسالة" || 
-				// 	GET_TXT_FROM_STRING(Token[3], o_tokens) == "الرسالة")
+				// if (remove_quote(Token[3], o_tokens) == "رسالة" || 
+				// 	remove_quote(Token[3], o_tokens) == "الرسالة")
 				// 	ErrorCode("ثم دمج مكتبة ' رسالة ' مع مكتبات ألف القياسية الرئيسية، لدى يقوم المترجم باستعمالها بشكل آلي، المرجو إزالة هذا السطر ", o_tokens);
 				
 				// Python lib need 3 other var to setup
-				/* if(GET_TXT_FROM_STRING(Token[3], o_tokens) == "البايثون"){
+				/* if(remove_quote(Token[3], o_tokens) == "البايثون"){
 
 					//if (Token[7] != "")
 					//	ErrorCode("أمر غير معروف : ' " + Token[7] + " ' ", o_tokens);
@@ -6327,14 +6308,14 @@
 						ErrorCode("خطأ في كتابة إسم مكتبة البايثون: "+ Token[6], o_tokens);
 					
 					// Setup Python lib env.
-					PythonSetEnvirenment(	GET_TXT_FROM_STRING(Token[4], o_tokens),	// /usr/include/python3.5
-											GET_TXT_FROM_STRING(Token[5], o_tokens),	// /usr/lib/python3.5/config-3.5m-x86_64-linux-gnu
-											GET_TXT_FROM_STRING(Token[6], o_tokens));	// python3.5
+					PythonSetEnvirenment(	remove_quote(Token[4], o_tokens),	// /usr/include/python3.5
+											remove_quote(Token[5], o_tokens),	// /usr/lib/python3.5/config-3.5m-x86_64-linux-gnu
+											remove_quote(Token[6], o_tokens));	// python3.5
 				} * /
 
 				else {
 
-					if(GET_TXT_FROM_STRING(Token[3], o_tokens) == "البايثون")
+					if(remove_quote(Token[3], o_tokens) == "البايثون")
 						PythonSetEnvirenment();
 					
 					// Other librarys check..
@@ -6345,13 +6326,12 @@
 				}
 				
 				if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF LIB] ... \n\n", o_tokens);
-				AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIFLIB", false, o_tokens->TOKENS_PREDEFINED);
+				AlifLexerParser(remove_quote(Token[3], o_tokens), "ALIFLIB", false, o_tokens->TOKENS_PREDEFINED);
 			}
-			
-			
 			continue;
 		}
 		*/
+
 	}
 
 	// ---------------------------------------------------------------------------------
@@ -6991,174 +6971,98 @@
 		}
 	}
 
-	void AlifLexerParser(std::string FILE_NAME, std::string FILE_TYPE, bool FIRST_FILE, bool TOKENS_ARE_PREDININED)
-	{
-		// ------------------------------------------------------
-		// Create new object of tokens class
-		// referenced here in this func by ref &
-		// referenced in other func by pointer *
-		// ------------------------------------------------------
+	void AlifLexerParser(std::string file, std::string target, bool is_first_file, bool is_predefined) {
 
-		CLASS_TOKEN OBJ_CLASS_TOKEN; // Create Obj of Tokens Class, Also INITIALIZATION of Tokens
-		//OBJ_CLASS_TOKEN.TOTAL_LINES = 1;
+		// Alif lexer
+
+		CLASS_TOKEN OBJ_CLASS_TOKEN;
 
 		// ------------------------------------------------------
 		// ALIF FILE EXTENTION
 		// ------------------------------------------------------
 
-		// TODO: check file_name format
-		// check if file existe
-		// if(!IsValidStringFormat(Token[4], o_tokens))
-		// ErrorCode("خطأ في كتابة إسم الملف: "+ Token[4], o_tokens);
-
-		int POS = FILE_NAME.find_last_of(".");
+		int POS = file.find_last_of(".");
 		std::string EXTENTION;
 
 		// Get extention
 		if (POS > 0)
-			EXTENTION = FILE_NAME.substr(POS + 1);
+			EXTENTION = file.substr(POS + 1);
 		else
 			EXTENTION = "";
 
 		// check extention
-		if (EXTENTION == "") // #include "myfile" OR #include "/abc/folder/myfile"
-		{
-			if (FILE_TYPE == "ALIF")
-			{
-				if (IS_PATH(FILE_NAME))
-					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".alif";
+		if (EXTENTION == "") { 
+			
+			// #include "file"
+			// #include "/foo/folder/file"
+		
+			if (target == "ALIF") {
+
+				if (is_path(file))
+					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = file + ".alif";
 				else
-					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME + ".alif";
+					OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + file + ".alif";
 			}
-			// else if (FILE_TYPE == "ALIFUI")
-			// {
-			// 	if (IS_PATH(FILE_NAME))
-			// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".alifui";
-			// 	else
-			// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME + ".alifui";
-			// }
-			// else if (FILE_TYPE == "ALIFUIW"){
+			else if (target == "ALIFLIB") {
 
-			// 	if (IS_PATH(FILE_NAME)){
-			// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".alifuiw";
-			// 		PATH_FULL_WINDOW_WEB = FILE_NAME + ".alifuiw";
-			// 	}
-			// 	else {
-			// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME + ".alifuiw";
-			// 		PATH_FULL_WINDOW_WEB = PATH_WORKING + SEPARATION + FILE_NAME + ".alifuiw";
-			// 	}
-			// }
-			else if (FILE_TYPE == "ALIFLIB")
-			{
-				// if (!LIB_FILE_NAME[FILE_NAME].empty())
-				// 	FILE_NAME = LIB_FILE_NAME[FILE_NAME];
-
-				// #include "MyLib" OR #include "/abc/folder/MyLib"
-				// SO, need to Include Library file from Alif Lib folder.
+				// #lib "file"
+				// #lib "/foo/folder/file"
 
 				#ifdef _WIN32
-					if (IS_PATH(FILE_NAME))
-						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".aliflib";
+					if (is_path(file))
+						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = file + ".alif";
 					else
-						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_ABSOLUTE + "\\aliflib\\" + FILE_NAME + ".aliflib";
+						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_ABSOLUTE + "\\aliflib\\" + file + ".alif";
 				#elif  __APPLE__
-					if (IS_PATH(FILE_NAME))
-						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".aliflib";
+					if (is_path(file))
+						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = file + ".alif";
 					else
-						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = "/Library/Application Support/Aliflang/Alif_Compiler/aliflib/" + FILE_NAME + ".aliflib";
+						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = "/Library/Application Support/Aliflang/Alif_Compiler/aliflib/" + file + ".alif";
 				#else
-					if (IS_PATH(FILE_NAME))
-						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME + ".aliflib";
+					if (is_path(file))
+						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = file + ".alif";
 					else
-						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = "/usr/local/lib/aliflib/" + FILE_NAME + ".aliflib";
+						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = "/usr/local/lib/aliflib/" + file + ".alif";
 				#endif
 			}
 			else
-				ErrorCode("علة: نوع ملف غير معروف : ' " + FILE_TYPE + " ' ", &OBJ_CLASS_TOKEN);
+				ErrorCode("علة: نوع ملف غير معروف : ' " + target + " ' ", &OBJ_CLASS_TOKEN);
 		}
-		else if (EXTENTION == "alif" || EXTENTION == "ALIF") // #include "myfile.alif" OR "/abc/folder/myfile.alif" OR [alif myfile.alif ...]
-		{
-			if (FILE_TYPE != "ALIF")
-				ErrorCode("يجب إستعمال #اضف لترجمة هدا الملف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
+		else if (EXTENTION == "alif" || EXTENTION == "ALIF" || EXTENTION == "ألف") {
 
-			if (IS_PATH(FILE_NAME))
-				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME;
+			// #include "file.alif"
+			// #include "/foo/folder/file.alif"
+
+			if (target != "ALIF")
+				ErrorCode("يجب إستعمال #اضف لترجمة هدا الملف : ' " + file + " ' ", &OBJ_CLASS_TOKEN);
+
+			if (is_path(file))
+				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = file;
 			else
-				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME;
+				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + file;
 		}
-		// else if (EXTENTION == "alifui" || EXTENTION == "ALIFUI")
-		// {
-		// 	if (FILE_TYPE != "ALIFUI")
-		// 		ErrorCode("جب إستعمال #واجهة لترجمة هدا الملف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
-
-		// 	if (IS_PATH(FILE_NAME))
-		// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME;
-		// 	else
-		// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME;
-		// }
-		// else if (EXTENTION == "alifuiw" || EXTENTION == "ALIFUIW"){
-
-		// 	if (FILE_TYPE != "ALIFUIW")
-		// 		ErrorCode("جب إستعمال #واجهة لترجمة هدا الملف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
-
-		// 	if (IS_PATH(FILE_NAME)){
-		// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = FILE_NAME;
-		// 		PATH_FULL_WINDOW_WEB = FILE_NAME;
-		// 	}
-		// 	else {
-		// 		OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = PATH_WORKING + SEPARATION + FILE_NAME;
-		// 		PATH_FULL_WINDOW_WEB = PATH_WORKING + SEPARATION + FILE_NAME;
-		// 	}
-		// }
-		else if (EXTENTION == "aliflib" || EXTENTION == "ALIFLIB")
-		{
-			if (FILE_TYPE != "ALIFLIB")
-				ErrorCode("يجب إستعمال #مكتبة لترجمة هدا الملف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
-
-			// #include "MyLib.aliflib" OR #include "/abc/folder/MyLib.aliflib"
-
-			// This is custom user library file.
-			
-			ErrorCode("نأسف، حاليا مترجم ألف لا يقبل المكتبات الشخصية، أو مكتبات مسبقة الترجمة، المرجو إزالة إمتداد الملف من أجل إستعمال المكتبات المدمجة مع مترجم ألف : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
-		}
-		else
-		{
-			ErrorCode("امتداد الملف غير مقبول : ' " + FILE_NAME + " ' ", &OBJ_CLASS_TOKEN);
-		}
+		else 
+			ErrorCode("امتداد الملف غير مقبول : ' " + file + " ' ", &OBJ_CLASS_TOKEN);
 
 		// check file existe
-		if (!CHECK_FILE_EXISTE(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE))
-		{
+		if (!is_file_exists(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE)) {
+
 			SHOW_FILE_AND_LINE = false;
 			ErrorCode("ملف غير موجود : ' " + OBJ_CLASS_TOKEN.PATH_FULL_SOURCE + " ' ", &OBJ_CLASS_TOKEN);
-		}
-
-		// ------------------------------------------------------
-		// Lex/Pars for WebUI
-		// ------------------------------------------------------
-
-		if (FILE_TYPE == "ALIFUIW"){
-
-			// We don't need to do anything with Alif WindowWeb
-			// just back to privious parser to continue
-			// now, we have the full path of Alif WindowWeb file
-			// PATH_FULL_WINDOW_WEB
-			return;
 		}
 		
 		// ------------------------------------------------------
 		// Current File Type
 		// ------------------------------------------------------
 
-		OBJ_CLASS_TOKEN.ALIF_SCRIPT_TYPE = FILE_TYPE;
+		OBJ_CLASS_TOKEN.ALIF_SCRIPT_TYPE = target;
 
 		// ------------------------------------------------------
 		// ALIF VARIABLES INITIALIZATION
 		// ------------------------------------------------------
 
-		// Set Initialisation of general variables..
-		// Main window set, flag, inside fun or win..
-		ALIF_VAR_INITIALIZATION_FOR_NEW_SOURCE_FILE(FIRST_FILE); // true = first file to Lex, false = seconde file..
+		// Initialisation
+		ALIF_VAR_INITIALIZATION_FOR_NEW_SOURCE_FILE(is_first_file);
 
 		// ------------------------------------------------------
 		// Log File Start
@@ -7170,65 +7074,13 @@
 		// Read Source file (UTF8 File name)
 		// ------------------------------------------------------
 
-		//Get it from Save folder...
+		if (!is_file_exists(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE)) {
 
-		//map < int , vector<std::string> > ZZZ;
-		//map < int , int, std::string > ZZZ;
-
-		//map<std::string, std::string> SSS;
-		//strMap["Monday"]    = "1";
-
-		//std::vector<std::string> VVV;
-		//VVV [1] = "xxx";
-		//VVV [2] = "xxx";
-
-		//std::map<std::pair<int,int>, std::string> ZZZ;
-		//myMap[std::make_pair(10,20)] = 25;
-
-		//ZZZ[std::make_pair(1,1)] = "aaa";
-		//ZZZ[std::make_pair(1,2)] = "الف";
-
-		//ZZZ[std::make_pair(2,1)] = "ccc";
-		//ZZZ[std::make_pair(2,2)] = "ddd";
-
-		//ZZZ[3] = {"xxx","SSS"};
-		//ZZZ[1][1] = "aaa";
-		//ZZZ[1][2] = "bbb";
-
-		//ZZZ[2][1] = "ccc";
-		//ZZZ[2][2] = "ddd";
-
-		////cout << "1.1 : " << ZZZ[std::make_pair(1,1)] << endl;
-		////cout << "2.1 : " << ZZZ[std::make_pair(2,1)] << endl;
-
-		/*
-		if (ZZZ[std::make_pair(1,2)] == "الف")
-		{
-			//cout << "1.2 = ALIF YES" << endl;
-		}
-		else
-		{
-			//cout << "1.2 = ALIF NO." << endl;
-		}
-		*/
-
-		//OBJ_CLASS_TOKEN.TOTAL [1] = 10;
-
-		//exit(EXIT_FAILURE);
-
-		// ------------------------------------------------------
-		// Read Source file (ANSI File name)
-		// ------------------------------------------------------
-
-		ifstream FILE_STREAM(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE.c_str());
-
-		if (!FILE_STREAM.is_open())
-		{
 			ALIF_ERROR("ERROR [F001]: Could not open " + OBJ_CLASS_TOKEN.PATH_FULL_SOURCE);
 			exit(EXIT_FAILURE);
 		}
 
-		// ------------------------------------------------------
+		boost::filesystem::ifstream FILE_STREAM(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE);
 
 		std::string LINE8;
 
@@ -7517,7 +7369,7 @@
 		} // End Line loop.
 		// ------------------------------------------------------
 
-		if (FIRST_FILE)
+		if (is_first_file)
 		{
 			// This is the first file (main.alif)
 			// this file, need Tokens Predefinetion
@@ -7542,7 +7394,7 @@
 			// Read list of tokens
 			ALIF_PARSER(&OBJ_CLASS_TOKEN);
 			// Check final application code
-			FINAL_APPLICATION_CODE_CHECKING(&OBJ_CLASS_TOKEN, FIRST_FILE);
+			FINAL_APPLICATION_CODE_CHECKING(&OBJ_CLASS_TOKEN, is_first_file);
 			if(DEBUG)
 				DEBUG_MESSAGE("\n ----------- DEBUGING FINISH ------------- \n", &OBJ_CLASS_TOKEN);
 		}
@@ -7551,7 +7403,7 @@
 			// This is a seconde file (mylib.alif)
 			// so, check if this file need Tokens Predefinetion
 
-			if (!TOKENS_ARE_PREDININED)
+			if (!is_predefined)
 			{
 				// This file did not have any Tokens Predefinetion
 				// so, lets start one..
@@ -7581,7 +7433,7 @@
 				// Read list of tokens
 				ALIF_PARSER(&OBJ_CLASS_TOKEN);
 				// Check final application code
-				FINAL_APPLICATION_CODE_CHECKING(&OBJ_CLASS_TOKEN, FIRST_FILE);
+				FINAL_APPLICATION_CODE_CHECKING(&OBJ_CLASS_TOKEN, is_first_file);
 				if(DEBUG)
 					DEBUG_MESSAGE("\n ----------- DEBUGING FINISH ------------- \n", &OBJ_CLASS_TOKEN);
 			}
@@ -7679,7 +7531,7 @@
 			}
 		}
 
-		void COMPILE_WIN_32BIT() {
+		void compile_win64() {
 
 			//stringstream GCC_COMPILE_CMD;
 			//stringstream GCC_RESOURCE_CMD;
@@ -7707,9 +7559,9 @@
 
 			CMD =	"@echo off\n"
 					"Set PATH=" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\n"
-					" \"" + cc_path_full + "\" -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -mthreads -DHAVE_W32API_H -DNDEBUG -c -o \"" + PATH_FULL_OBJ + "\" "
+					" \"" + cc_path_full + "\" -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -mthreads -DHAVE_W32API_H -DNDEBUG -fvisibility=hidden -flto -fno-fat-lto-objects -c -o \"" + PATH_FULL_OBJ + "\" "
 					" -I\"" + PATH_ABSOLUTE + "\\alifcore\\boost\\include\" "
-					" -I\"" + PATH_ABSOLUTE + "\\alifcore\\webui\\include\" "
+					" -I\"" + PATH_ABSOLUTE + "\\aliflib\" "
 					" \"" + PATH_FULL_CPP + "\" "
 					" 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\" ";
 
@@ -7731,7 +7583,7 @@
 
 			LOG_PATH = PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log";
 
-			ifstream FILE_STREAM_COMPILER(LOG_PATH.c_str());
+			boost::filesystem::ifstream FILE_STREAM_COMPILER(LOG_PATH);
 
 			if (!FILE_STREAM_COMPILER.is_open())
 			{
@@ -7799,7 +7651,7 @@
 					"Set PATH=" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\n"
 					//"SLEEP 1 \n"
 					"\"" + cc_path_full + "\""
-					" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\alifcore\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\alifcore\\webui\\lib\" -lwebui -lboost_date_time-mgw9-mt-s-x64-1_75 -lboost_filesystem-mgw9-mt-s-x64-1_75 -lboost_regex-mgw9-mt-s-x64-1_75 -lws2_32 -lwsock32 " 
+					" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\alifcore\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_date_time-mgw9-mt-s-x64-1_75 -lboost_filesystem-mgw9-mt-s-x64-1_75 -lboost_regex-mgw9-mt-s-x64-1_75 -lws2_32 -lwsock32 " 
 					+ GUI_CMD + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\"";
 
 			//ALIF_ERROR("CMD: " + CMD);
@@ -7824,7 +7676,7 @@
 
 			LOG_PATH = PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log";
 
-			ifstream FILE_STREAM_LINKER(LOG_PATH.c_str());
+			boost::filesystem::ifstream FILE_STREAM_LINKER(LOG_PATH);
 
 			if (!FILE_STREAM_LINKER.is_open())
 			{
@@ -8164,7 +8016,7 @@
 
 			LOG_PATH = PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log";
 
-			ifstream FILE_STREAM_COMPILER(LOG_PATH.c_str());
+			boost::filesystem::ifstream FILE_STREAM_COMPILER(LOG_PATH);
 
 			if (!FILE_STREAM_COMPILER.is_open())
 			{
@@ -8351,15 +8203,18 @@
 	void alif(){
 
 		// Check Files extention
-		if (argument.input.extension != ".alif"){
+		if (argument.input.extension != ".alif")
 			err("Unsupported file extention.\n"
 				"Extention: " + argument.input.extension + "\n"
 				"File: " + argument.input.fullpath);
-		}
 
 		// Check output
 		if(argument.output.fullpath == "")
 			set_output_file(argument.input.path + argument.input.filename + settings.os.exe_ext);
+		
+		// Check log
+		if(argument.log.fullpath == "")
+			set_log_file(argument.input.path + argument.input.filename + argument.input.extension + ".log");
 
 		// Beta test log
 		// cout << "argument.input.path: " << argument.input.path << endl;
@@ -8438,9 +8293,9 @@
 		#endif
 
 		#ifdef __APPLE__
-			if (CHECK_FILE_EXISTE(PATH_FULL_BIN + "/Contents/MacOS/alif"))
+			if (is_file_exists(PATH_FULL_BIN + "/Contents/MacOS/alif"))
 		#else
-			if (CHECK_FILE_EXISTE(PATH_FULL_BIN))
+			if (is_file_exists(PATH_FULL_BIN))
 		#endif
 		{
 			ALIF_ERROR("\nأسف، لم تنجح عملية مسح هدا الملف، جرب غلق التطبيق: " + PATH_FULL_BIN);
@@ -8494,7 +8349,7 @@
 			FILE_RESOURCE.close();
 
 			// Compile
-			COMPILE_WIN_32BIT();
+			compile_win64();
 
 		#elif  __APPLE__
 			// app icon

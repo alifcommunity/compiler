@@ -35,8 +35,6 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
     if (IsInsideNamespace || IsInsideFunction)
 		ErrorCode("يجب استعمال الماكرو ' # ' في مكان عام", o_tokens);
     
-    check_macro_alif(o_tokens);
-    
     // --[ Macro - Alif ] -----------------------------------------------------
 
     if (Token[2] == "ألف") {
@@ -58,7 +56,9 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
     // --[ Macro - Library ] --------------------------------------------------
 
-    else if (Token[2] == "مكتبة") { 
+    else if (Token[2] == "مكتبة") {
+
+        check_macro_alif(o_tokens);
 
         if (Token[3] == "")
 			ErrorCode("مسار الملف غير محدد" + Token[2], o_tokens);
@@ -69,10 +69,10 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
         if (Token[4] != "")
             ErrorCode("أمر غير معروف : ' " + Token[4] + " ' ", o_tokens);
         
-        if(GET_TXT_FROM_STRING(Token[3], o_tokens) == "البايثون")
+        if(remove_quote(Token[3], o_tokens) == "البايثون")
 			PythonSetEnvirenment();
         
-        AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIFLIB", false, o_tokens->TOKENS_PREDEFINED);
+        AlifLexerParser(remove_quote(Token[3], o_tokens), "ALIFLIB", false, o_tokens->TOKENS_PREDEFINED);
 
         if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF LIB] ... \n\n", o_tokens);
     }
@@ -80,6 +80,8 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
     // --[ Macro - Include ] --------------------------------------------------
 
     else if (Token[2] == "أضف") {
+
+        check_macro_alif(o_tokens);
 
        if (Token[3] == "")
 			ErrorCode("مسار الملف غير محدد" + Token[2], o_tokens);
@@ -90,19 +92,53 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
         if (Token[4] != "")
             ErrorCode("أمر غير معروف : ' " + Token[4] + " ' ", o_tokens);
         
-		AlifLexerParser(GET_TXT_FROM_STRING(Token[3], o_tokens), "ALIF", false, o_tokens->TOKENS_PREDEFINED);
+		AlifLexerParser(remove_quote(Token[3], o_tokens), "ALIF", false, o_tokens->TOKENS_PREDEFINED);
 
         if(DEBUG)DEBUG_MESSAGE("[#INCLUDE " + Token[3] + " . ALIF] ... \n\n", o_tokens);
     }
 
    // --[ Macro - UI (WebUI) ] ------------------------------------------------
 
-    else if (Token[2] == "واجهة") {
+    else if (Token[2] == "نص") {
 
-        // This macro basicaly read html file
+        // This macro basically read a file
 		// and save it into a const std string.
+        // Struct:
+        // # نص my_str "my_file"
+        
+        check_macro_alif(o_tokens);
 
+        if (Token[3] == "")
+			ErrorCode("يجب تحديد اسم المتغير", o_tokens);
+        
+        if (Token[4] == "")
+			ErrorCode("يجب تحديد اسم الملف", o_tokens);
+        
+        if(!IsValidStringFormat(Token[4], o_tokens))
+			ErrorCode("خطأ في كتابة إسم الملف: "+ Token[4], o_tokens);
+        
+        if (Token[5] != "")
+			ErrorCode("أمر غير معروف : ' " + Token[5] + " ' ", o_tokens);
+        
+        if (!o_tokens->TOKENS_PREDEFINED) {
 
+			SET_GLOBAL_C_NAME(Token[3]);
+            SetNewVar(true, "", "", Token[3], "نص", false, false, o_tokens->Line, o_tokens);
+			return;
+		}
+
+        std::string path = remove_quote(Token[4], o_tokens);
+
+        if (!is_file_exists(path)) 
+			ErrorCode("ملف غير موجود : ' " + Token[4] + " ' ", o_tokens);
+        
+        std::string buf;
+
+        file_embed(path, buf, o_tokens);
+		
+        CPP_GLOBAL.append(" const std::string " + Global_ID[Token[3]] + " = R\"V0G0N(\n" + buf + "\n)V0G0N\"; \n");
+
+        if(DEBUG)DEBUG_MESSAGE("[#نص] [" + Token[3] + "] [" + Token[4] + "] ", o_tokens); // DEBUG
     }
 
     // --[ Macro - Extra Compile / Link ] -------------------------------------
@@ -116,39 +152,45 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
     //         ErrorCode("خطأ في كتابة إسم الأمر: "+ Token[3], o_tokens);
         
     //     if (Token[2] == "أظف_ترجمة")
-    //         add_extra_arg_to_compiler(GET_TXT_FROM_STRING(Token[3], o_tokens));
+    //         add_extra_arg_to_compiler(remove_quote(Token[3], o_tokens));
     //     else
-    //         add_extra_arg_to_linker(GET_TXT_FROM_STRING(Token[3], o_tokens));
+    //         add_extra_arg_to_linker(remove_quote(Token[3], o_tokens));
     // }
 
     // --[ Macro - Python ] ---------------------------------------------------
 
     else if(Token[2] == "البايثون_مسار_عناوين") {
 
+        check_macro_alif(o_tokens);
+
         if (!IsValidStringFormat(Token[3], o_tokens))
 			ErrorCode("الأمر غير صائب : ' " + Token[3] + " ' ", o_tokens);
 
-        PythonInclude_path = GET_TXT_FROM_STRING(Token[3], o_tokens);
+        PythonInclude_path = remove_quote(Token[3], o_tokens);
 
-        if(DEBUG)DEBUG_MESSAGE("[Setting Python Include '" + GET_TXT_FROM_STRING(Token[3], o_tokens) + "' ] \n\n", o_tokens);
+        if(DEBUG)DEBUG_MESSAGE("[Setting Python Include '" + remove_quote(Token[3], o_tokens) + "' ] \n\n", o_tokens);
     }
     else if(Token[2] == "البايثون_مسار_مكتبات") {
 
+        check_macro_alif(o_tokens);
+
         if (!IsValidStringFormat(Token[3], o_tokens))
 			ErrorCode("الأمر غير صائب : ' " + Token[3] + " ' ", o_tokens);
 
-        PythonLib_path = GET_TXT_FROM_STRING(Token[3], o_tokens);
+        PythonLib_path = remove_quote(Token[3], o_tokens);
 
-        if(DEBUG)DEBUG_MESSAGE("[Setting Python Lib '" + GET_TXT_FROM_STRING(Token[3], o_tokens) + "' ] \n\n", o_tokens);
+        if(DEBUG)DEBUG_MESSAGE("[Setting Python Lib '" + remove_quote(Token[3], o_tokens) + "' ] \n\n", o_tokens);
     }
     else if(Token[2] == "البايثون_مكتبات") {
 
+        check_macro_alif(o_tokens);
+
         if (!IsValidStringFormat(Token[3], o_tokens))
 			ErrorCode("الأمر غير صائب : ' " + Token[3] + " ' ", o_tokens);
 
-        PythonLibName = GET_TXT_FROM_STRING(Token[3], o_tokens);
+        PythonLibName = remove_quote(Token[3], o_tokens);
 
-        if(DEBUG)DEBUG_MESSAGE("[Setting Python LibName '" + GET_TXT_FROM_STRING(Token[3], o_tokens) + "' ] \n\n", o_tokens);
+        if(DEBUG)DEBUG_MESSAGE("[Setting Python LibName '" + remove_quote(Token[3], o_tokens) + "' ] \n\n", o_tokens);
     }
 
     // --[ Macro - Unknow ] ---------------------------------------------------
