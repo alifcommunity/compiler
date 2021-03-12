@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.16 (Beta)"
+#define ALIF_VERSION "3.0.17 (Beta)"
 
 // Stack ********************************************************
 
@@ -5069,11 +5069,11 @@
 			// Other Path
 			// -------------------
 
-			cc_path_full = PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\\g++.exe";
+			cc_path_full = PATH_ABSOLUTE + "\\gcc\\bin\\g++.exe";
 			PATH_FULL_CPP = PATH_TEMP + "\\alifcompiler_" + RANDOM + ".cpp";
 			PATH_FULL_OBJ = PATH_TEMP + "\\alifcompiler_" + RANDOM + ".o";
 			PATH_FULL_RC = PATH_TEMP + "\\alifcompiler_" + RANDOM + ".rc";
-			PATH_FULL_ICO = PATH_ABSOLUTE + "\\alifcore\\alif.ico";
+			PATH_FULL_ICO = PATH_ABSOLUTE + "\\aliflib\\alif.ico";
 
 			//PATH_FULL_LIB_SETTING = PATH_ABSOLUTE + "\\aliflib\\aliflib.inf";
 
@@ -5141,7 +5141,7 @@
 
 			PATH_FULL_LIB_SETTING = "/Library/Application Support/Aliflang/Alif_Compiler/aliflib/aliflib.inf";
 
-			PATH_FULL_PLIST = "/Library/Application Support/Aliflang/Alif_Compiler/Info.plist";
+			//PATH_FULL_PLIST = "/Library/Application Support/Aliflang/Alif_Compiler/Info.plist";
 		
 		#else
 
@@ -5206,7 +5206,7 @@
 			PATH_FULL_RC = "";
 			PATH_FULL_ICO = "";
 
-			PATH_FULL_LIB_SETTING = "/usr/local/lib/aliflib/aliflib.inf";
+			//PATH_FULL_LIB_SETTING = "/usr/local/lib/aliflib/aliflib.inf";
 
 		#endif
 
@@ -7550,17 +7550,14 @@
 
 			// Compile: WebUI - TDM (GCC) 9.2 C++17 64Bit - Windows
 
-			// @echo off
-			// Set PATH=C:\Alif3\alifcore\gcc\bin
-			// "C:\Alif3\alifcore\gcc\bin\g++.exe" -std=gnu++17 -m64 -finput-charset=utf-8 -O2 -mthreads -DHAVE_W32API_H -DNDEBUG -c -o
-			// "C:\Users\HASSAN~1\AppData\Local\Temp\alifcompiler_0000.o" -I"C:\Alif3\alifcore\webui\include" "C:\Users\HASSAN~1\AppData\Local\Temp\alifcompiler_0000.cpp"
+		
 
 			//ALIF_ERROR("PATH_FULL_CPP: " + PATH_FULL_CPP);
 
 			CMD =	"@echo off\n"
-					"Set PATH=" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\n"
+					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
 					" \"" + cc_path_full + "\" -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -mthreads -DHAVE_W32API_H -DNDEBUG -fvisibility=hidden -flto -fno-fat-lto-objects -c -o \"" + PATH_FULL_OBJ + "\" "
-					" -I\"" + PATH_ABSOLUTE + "\\alifcore\\boost\\include\" "
+					" -I\"" + PATH_ABSOLUTE + "\\boost\\include\" "
 					" -I\"" + PATH_ABSOLUTE + "\\aliflib\" "
 					" \"" + PATH_FULL_CPP + "\" "
 					" 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\" ";
@@ -7611,13 +7608,11 @@
 			// Resource
 			// ------------------------------------------------------
 
-			// "C:\Alif3\alifcore\gcc\bin\windres.exe" -J rc -O coff -i "C:\Users\HASSAN~1\AppData\Local\Temp\alifcompiler_0000.rc" -o 
-			// "C:\Users\HASSAN~1\AppData\Local\Temp\alifcompiler_0000.rc.res" --define _UNICODE --define NOPCH
 			
 			CMD =	"@echo off\n"
-					"Set PATH=" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\n"
+					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
 					//"SLEEP 1 \n"
-					"\"" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\\windres.exe\""
+					"\"" + PATH_ABSOLUTE + "\\gcc\\bin\\windres.exe\""
 					" -J rc -O coff -i \"" + PATH_FULL_RC + "\" -o \"" + PATH_FULL_RC + ".res\" --define _UNICODE --define NOPCH 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_resource.log\"";
 			
 			FILE_BATCH_PATH = PATH_TEMP + "\\alifcompiler_" + RANDOM + "_resource.bat";
@@ -7641,17 +7636,13 @@
 			else
 				GUI_CMD = " -Wl,--subsystem,windows -mwindows ";
 
-			// "C:\Alif3\alifcore\gcc\bin\g++.exe" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads 
-			// -o "C:\Alif3\examples\test.exe" "C:\Users\HASSAN~1\AppData\Local\Temp\alifcompiler_0000.rc.res" "C:\Users\HASSAN~1\AppData\Local\Temp\alifcompiler_0000.o" 
-			// -L"C:\Alif3\alifcore\boost\lib" -L"C:\Alif3\alifcore\webui\lib" 
-			// -lwebui -lboost_date_time-mgw9-mt-s-x64-1_75 -lboost_filesystem-mgw9-mt-s-x64-1_75 -lboost_regex-mgw9-mt-s-x64-1_75 
-			// -lws2_32 -lwsock32  -Wl,--subsystem,windows -mwindows
+			
 
 			CMD =	"@echo off\n"
-					"Set PATH=" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\n"
+					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
 					//"SLEEP 1 \n"
 					"\"" + cc_path_full + "\""
-					" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\alifcore\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_date_time-mgw9-mt-s-x64-1_75 -lboost_filesystem-mgw9-mt-s-x64-1_75 -lboost_regex-mgw9-mt-s-x64-1_75 -lws2_32 -lwsock32 " 
+					" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_date_time-mgw9-mt-s-x64-1_75 -lboost_filesystem-mgw9-mt-s-x64-1_75 -lboost_regex-mgw9-mt-s-x64-1_75 -lws2_32 -lwsock32 " 
 					+ GUI_CMD + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\"";
 
 			//ALIF_ERROR("CMD: " + CMD);
@@ -7705,11 +7696,10 @@
 
 			if (!THIS_IS_ALIF_C_FILE)
 			{
-				// "C:\Alif3\alifcore\gcc\bin\strip.exe" --strip-all "C:\Alif3\examples\test.exe"
 				
 				CMD =	"@echo off\n"
-						"Set PATH=" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\n"
-						"\"" + PATH_ABSOLUTE + "\\alifcore\\gcc\\bin\\strip.exe\""
+						"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
+						"\"" + PATH_ABSOLUTE + "\\gcc\\bin\\strip.exe\""
 						" --strip-all \"" + PATH_FULL_BIN + "\" 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_strip.log\"";
 				
 				FILE_BATCH_PATH = PATH_TEMP + "\\alifcompiler_" + RANDOM + "_strip.bat";
@@ -7983,7 +7973,7 @@
 			}
 		}
 
-		void COMPILE_LINUX_64BIT() // std::string RAND)
+		void compile_linux64()
 		{
 			std::string LINUX_CMD;
 
@@ -8000,11 +7990,17 @@
 			// -Wno-ctor-dtor-privacy -Woverloaded-virtual  -D_FILE_OFFSET_BITS=64 -DwxDEBUG_LEVEL=0  
 			// -I"/usr/local/include/aliflibwx" -I"Src" -pthread -m64 -DG_DISABLE_CAST_CHECKS $cmd 
 			// -m64 -std=c++11 "Src/alifstudio.cpp"
+
+			LINUX_CMD = "g++ -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -pthread -DNDEBUG -fvisibility=hidden -flto -fno-fat-lto-objects -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -c -o \"" + PATH_FULL_OBJ + "\" "
+						" -I\"/usr/local/include\" "		// WebUI
+						" -I\"/usr/local/lib/aliflib\" "	// Alif lib
+						" \"" + PATH_FULL_CPP + "\" "
+						" 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log\" ";
 		
-			LINUX_CMD = "g++ -c -o \"" + PATH_FULL_OBJ + "\" -Wno-undef -Wno-unused-parameter "
-							"-D__WXGTK__ -Wno-ctor-dtor-privacy -Woverloaded-virtual -D_FILE_OFFSET_BITS=64 "
-							"-DwxDEBUG_LEVEL=0 -I\"/usr/local/include/aliflibwx\" -pthread -m64 -DG_DISABLE_CAST_CHECKS -O2 -m64 -std=c++11 " + Compile_ExtraCompile + " \"" +
-							PATH_FULL_CPP + "\" 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log\" ";
+			// LINUX_CMD = "g++ -c -o \"" + PATH_FULL_OBJ + "\" -Wno-undef -Wno-unused-parameter "
+			// 				"-D__WXGTK__ -Wno-ctor-dtor-privacy -Woverloaded-virtual -D_FILE_OFFSET_BITS=64 "
+			// 				"-DwxDEBUG_LEVEL=0 -I\"/usr/local/include/aliflibwx\" -pthread -m64 -DG_DISABLE_CAST_CHECKS -O2 -m64 -std=c++11 " + Compile_ExtraCompile + " \"" +
+			// 				PATH_FULL_CPP + "\" 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log\" ";
 
 			system(LINUX_CMD.c_str());
 
@@ -8052,16 +8048,20 @@
 
 			std::string GUI_CMD = "";
 
-			if (APP_TYPE == "PC_GUI")
-				GUI_CMD = " ............. ";
+			// if (APP_TYPE == "PC_GUI")
+			// 	GUI_CMD = " ............. ";
 
 			// g++ -o "Bin/Linux_64/alifstudio" "Bin/Linux_64/alifstudio.o" -L"/usr/local/lib/aliflibwx" -pthread -m64 -static-libgcc -static-libstdc++ -lwx_gtk2u_alif_webview-3.1 -lwx_gtk2u_alif_propgrid-3.1 -lwx_gtk2u_alif_aui-3.1 -lwebkitgtk-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lpangoft2-1.0 -lpango-1.0 -lfontconfig -lfreetype -lsoup-2.4 -lgio-2.0 -lgobject-2.0 -ljavascriptcoregtk-1.0 -lglib-2.0 -lwx_gtk2u_alif_stc-3.1 -lwx_gtk2u_alif_core-3.1 -lwx_baseu_alif-3.1 -lwxscintilla_alif-3.1 -lwxtiff_alif-3.1 -lwxjpeg_alif-3.1 -lwxpng_alif-3.1  -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lfontconfig -lfreetype -lgthread-2.0 -pthread -lglib-2.0 -lX11 -lXxf86vm -lSM -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lwxzlib_alif-3.1 -lwxregexu_alif-3.1 -lwxexpat_alif-3.1 -ldl -lm  -ldl -lm $cmd
 
 			// -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu" -lpython3.5
 			
-			LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\"  "
-							"-L\"/usr/local/lib/aliflibwx\" -lwx_gtk2u_alif_webview-3.1 -lwx_gtk2u_alif_propgrid-3.1 -lwx_gtk2u_alif_aui-3.1 -lwebkitgtk-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lpangoft2-1.0 -lpango-1.0 -lfontconfig -lfreetype -lsoup-2.4 -lgio-2.0 -lgobject-2.0 -ljavascriptcoregtk-1.0 -lglib-2.0 -lwx_gtk2u_alif_stc-3.1 -lwx_gtk2u_alif_core-3.1 -lwx_baseu_alif-3.1 -lwxscintilla_alif-3.1 -lwxtiff_alif-3.1 -lwxjpeg_alif-3.1 -lwxpng_alif-3.1  -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lfontconfig -lfreetype -lgthread-2.0 -pthread -lglib-2.0 -lX11 -lXxf86vm -lSM -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lwxzlib_alif-3.1 -lwxregexu_alif-3.1 -lwxexpat_alif-3.1 "
-							"-pthread -m64 -static-libgcc -static-libstdc++ -ldl -lm -ldl -lm -O2 -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu\" " + Compile_ExtraLink;
+			// LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\"  "
+			// 				"-L\"/usr/local/lib/aliflibwx\" -lwx_gtk2u_alif_webview-3.1 -lwx_gtk2u_alif_propgrid-3.1 -lwx_gtk2u_alif_aui-3.1 -lwebkitgtk-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lpangoft2-1.0 -lpango-1.0 -lfontconfig -lfreetype -lsoup-2.4 -lgio-2.0 -lgobject-2.0 -ljavascriptcoregtk-1.0 -lglib-2.0 -lwx_gtk2u_alif_stc-3.1 -lwx_gtk2u_alif_core-3.1 -lwx_baseu_alif-3.1 -lwxscintilla_alif-3.1 -lwxtiff_alif-3.1 -lwxjpeg_alif-3.1 -lwxpng_alif-3.1  -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lfontconfig -lfreetype -lgthread-2.0 -pthread -lglib-2.0 -lX11 -lXxf86vm -lSM -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lwxzlib_alif-3.1 -lwxregexu_alif-3.1 -lwxexpat_alif-3.1 "
+			// 				"-pthread -m64 -static-libgcc -static-libstdc++ -ldl -lm -ldl -lm -O2 -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu\" " + Compile_ExtraLink;
+			
+			LINUX_CMD =	"g++ -Os -static-libgcc -static-libstdc++ "
+						"-m64 -finput-charset=utf-8 -pthread -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\" "
+						"-L\"/usr/local/lib/aliflib\" -lwebui -lboost_filesystem";
 
 			if (system(LINUX_CMD.c_str()) != 0)
 			{
@@ -8240,13 +8240,20 @@
 		}
 
 		// --- Read Core Script --------------------
-		boost::filesystem::ifstream alifcore_if(PATH_ABSOLUTE + "\\alifcore\\alifcore.cc");
+		#ifdef _WIN32
+			std::string core_path = PATH_ABSOLUTE + "\\aliflib\\alifcore.cc";
+		#else
+			std::string core_path = "/usr/local/lib/aliflib/alifcore.cc";
+		#endif
+		boost::filesystem::ifstream alifcore_if(
+			core_path
+		);
 		stringstream alifcore_ss;
 		alifcore_ss << alifcore_if.rdbuf();
 		code_core = alifcore_ss.str();
 		if(code_core == ""){
 
-			err("The core file is missing: [" + PATH_ABSOLUTE + "\\alifcore\\alifcore.cc]\nPlease re-install Alif Compiler, or download the latest version from http://www.aliflang.org");
+			err("The core file is missing: [" + core_path + "]\nPlease re-install Alif Compiler, or download the latest version from http://www.aliflang.org");
 			exit(EXIT_FAILURE);
 		}
 
@@ -8392,7 +8399,7 @@
 			}
 
 			// Compile
-			COMPILE_LINUX_64BIT();
+			compile_linux64();
 
 		#endif
 		
@@ -8410,8 +8417,10 @@
 		int main(int argc, char** argv)
 	#endif
 	{
-		// Create and install global locale
-		std::locale::global(boost::locale::generator().generate(""));
+		#ifdef _WIN32
+			// Create and install global locale
+			std::locale::global(boost::locale::generator().generate(""));			
+		#endif
 
 		// Make boost.filesystem use it
 		boost::filesystem::path::imbue(std::locale());
@@ -8431,7 +8440,13 @@
 			optional_desc.add("input", -1);
 			
 			boost::program_options::variables_map vm;
-			boost::program_options::store(boost::program_options::wcommand_line_parser(argc, argv).options(desc).positional(optional_desc).run(), vm);
+			#ifdef _WIN32
+				boost::program_options::store(boost::program_options::wcommand_line_parser(argc, argv).options(desc).positional(optional_desc).run(), vm);
+			#elif  __APPLE__
+				boost::program_options::store(boost::program_options::wcommand_line_parser(argc, argv).options(desc).positional(optional_desc).run(), vm);
+			#else
+				boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(optional_desc).run(), vm);
+			#endif
 			boost::program_options::notify(vm);
 
 			// Version
