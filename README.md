@@ -20,6 +20,15 @@ $ cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
 $ nmake
 ```
 
+Linux - GCC.
+```
+$ mkdir build 
+$ cd build 
+$ cmake .. 
+$ make
+$ sudo make install
+```
+
 [ ! ] تنبيه
 
 مشروع ألف نسخة 3 هو قيد التطوير ولا يصلح حاليا للإستخدام
