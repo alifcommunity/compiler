@@ -1,0 +1,40 @@
+
+-- ------------------------
+-- WebUI Library (Wraper)
+-- مكتبة الواجهة 
+-- ------------------------
+
+#ألف
+
+_س_
+#include <webui.hpp>
+_س_
+
+صنف الواجهة
+
+			_س_
+			private: webui::window o_window;
+			private: std::string html;
+			_س_
+
+            دالة بناء (نص  ن)
+					_س_
+					html = @ن@ ;
+					_س_
+            نهاية دالة	
+
+			دالة  إظهار ()
+			_س_
+			if(!o_window.show(&html, webui::browser::chrome))
+					o_window.show(&html);
+			_س_
+			نهاية دالة
+
+			دالة  إنتظار ()
+			_س_
+			std::thread ui(webui::loop);
+			ui.join();
+			_س_
+			نهاية دالة
+
+نهاية صنف

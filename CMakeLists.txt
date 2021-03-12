@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15.0)
 
 # --[ Alif version ] --------------------------------------------------------------
 
-project(AlifProject VERSION 3.0.16 DESCRIPTION "Alif language compiler.")
+project(AlifProject VERSION 3.0.17 DESCRIPTION "Alif language compiler.")
 message("-- [ Alif version ${CMAKE_PROJECT_VERSION} ]")
 
 # --[ Settings ] -------------------------------------------------------------------
