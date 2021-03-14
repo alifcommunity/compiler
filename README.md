@@ -1,3 +1,5 @@
+<div dir=rtl>
+
 The Alif Arabic Programming Language - لغة البرمجة العربية ألف
 -----------------------------------------------------------
 
@@ -10,22 +12,30 @@ The Alif Arabic Programming Language - لغة البرمجة العربية أل
 طريقة ترجمة الشيفرة المصدرية للمشروع
 ---------
 
-Windows - Microsoft build tools 2019.
+<div dir=ltr>
+
+```bash
+git clone --depth=1 https://github.com/alifcommunity/compiler.git
+cd compiler
+mkdir build
+cd build
 ```
-$ mkdir build 
-$ cd build 
-$ cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release 
-$ nmake
+
+Windows - Microsoft build tools 2019.
+
+```bash
+cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release 
+nmake
 ```
 
 Linux - GCC.
+
+```bash
+cmake ..
+make && sudo make install
 ```
-$ mkdir build 
-$ cd build 
-$ cmake .. 
-$ make
-$ sudo make install
-```
+
+</div>
 
 [ ! ] تنبيه
 
@@ -36,3 +46,5 @@ $ sudo make install
 [www.aliflang.org](https://aliflang.org)
 
 بالتوفيق،
+
+</div>
