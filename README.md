@@ -15,8 +15,8 @@ The Alif Arabic Programming Language - لغة البرمجة العربية أل
 <div dir=ltr>
 
 ```bash
-git clone --depth=1 --branch=master https://github.com/alifcommunity/compiler.git alif-compiler
-cd alif-compiler
+git clone --depth=1 https://github.com/alifcommunity/compiler.git
+cd compiler
 mkdir build
 cd build
 ```
