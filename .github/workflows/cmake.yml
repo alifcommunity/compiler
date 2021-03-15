@@ -1,0 +1,52 @@
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Boost 
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt install libboost-all-dev
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Configure CMake
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE
+
+    - name: Configure CMake
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}/build
+      shell: cmd
+      run: |
+           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+           cmake .. . -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build .
+
+    - name: Build
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}/build
+      shell: cmd
+      run: |
+           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+           nmake
