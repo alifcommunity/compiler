@@ -21,12 +21,17 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.17 (Beta)"
+#define ALIF_VERSION "3.0.19 (Beta)"
 
 // Stack ********************************************************
 
-	#define UNICODE
-	#define _UNICODE
+	#ifndef UNICODE
+		#define UNICODE
+	#endif
+	#ifndef _UNICODE
+		#define _UNICODE
+	#endif
+
 	#define _HAS_STD_BYTE 0 // Fixing 'byte': ambiguous symbol
 
 // OS Include ***************************************************
@@ -78,7 +83,7 @@
 // Alif v2 ************************************************
 
 	using namespace std;
-	bool DEBUG = true;
+	bool DEBUG = false;
 	static const std::string VERSION = ALIF_VERSION;
 
 // Global *******************************************************
@@ -6285,7 +6290,7 @@
 				// 	ErrorCode("ثم دمج مكتبة ' رسالة ' مع مكتبات ألف القياسية الرئيسية، لدى يقوم المترجم باستعمالها بشكل آلي، المرجو إزالة هذا السطر ", o_tokens);
 				
 				// Python lib need 3 other var to setup
-				/* if(remove_quote(Token[3], o_tokens) == "البايثون"){
+				/ * if(remove_quote(Token[3], o_tokens) == "البايثون"){
 
 					//if (Token[7] != "")
 					//	ErrorCode("أمر غير معروف : ' " + Token[7] + " ' ", o_tokens);

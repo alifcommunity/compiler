@@ -29,66 +29,59 @@ if(UNIX)
 		return()
 	endif()	
 else()
-	message("[!] Not settings needed for ICU on Windows.")
+	message("[!] No need for ICU on Windows. Skip..")
 endif()
 
-# --[ Boost ] -------------------------------------------------------------------
+# --[ Boost ] -----------------------------------------------------------------
 
-if(UNIX)
+message("[*] Initializing Boost for ${Info_Title}...")
 
-	# Linux
-	message("[*] Using installed copy of Boost for Linux.")
+if (WIN32)
+	set(BOOST_ROOT ${Boost_Root})
+	set(Boost_LIBRARY_DIR ${Boost_Lib})
+	message("[*] Using Boost root: ${BOOST_ROOT}")
+	message("[*] Using Boost lib: ${Boost_LIBRARY_DIR}")
 
-else()
-
-	# Windows
-	message("[*] Using embedded copy of Boost for Windows.")
-	include_directories(${AlifProject_SOURCE_DIR}/thirdparty/boost/include)
-	link_directories(${AlifProject_SOURCE_DIR}/thirdparty/boost/lib)
-	Set(Boost_INCLUDE_DIR ${AlifProject_SOURCE_DIR}/thirdparty/boost/include)
-	Set(Boost_LIBRARY_DIR ${AlifProject_SOURCE_DIR}/thirdparty/boost/lib)
-	Set(Boost_LIBRARY_DIR_RELEASE ${AlifProject_SOURCE_DIR}/thirdparty/boost/lib)
-
-endif ()
-
-if(CMAKE_BUILD_TYPE STREQUAL Release)
-	message("[*] Initializing Boost for Release build...")
-	set(Boost_DEBUG					OFF)
-	set(Boost_USE_DEBUG_LIBS		OFF)
+	set(Boost_ARCHITECTURE "-x64")
+	# set(Boost_DEBUG					OFF)
+	# set(Boost_USE_STATIC_LIBS			ON)
 	set(Boost_USE_MULTITHREADED		ON)
-	set(Boost_USE_RELEASE_LIBS		ON)
-	set(Boost_USE_STATIC_LIBS		ON)
-	set(Boost_USE_STATIC_RUNTIME	ON)
+	# set(Boost_USE_STATIC_RUNTIME		ON)
+	# set(Boost_DETAILED_FAILURE_MSG	OFF)
+	# set(Boost_THREADAPI             	"win32")
+	# set(Boost_COMPILER				"-vc142")
+	add_definitions( -DBOOST_ALL_NO_LIB )
 else()
-	message("[*] Initializing Boost for Debug build...")
-	set(Boost_DEBUG					OFF)
-	set(Boost_USE_DEBUG_LIBS		ON)
-	set(Boost_USE_MULTITHREADED		ON)
-	set(Boost_USE_RELEASE_LIBS		ON)
-	set(Boost_USE_STATIC_LIBS		ON)
-	set(Boost_USE_STATIC_RUNTIME	OFF)
+    # set(Boost_DEBUG 					OFF)
+    set(Boost_USE_STATIC_LIBS       	ON)
+    # set(Boost_USE_MULTITHREADED		ON)
+    # set(Boost_USE_STATIC_RUNTIME		ON)
+    # set(Boost_ARCHITECTURE			"-x64")
+    # set(Boost_THREADAPI				"pthread")
+    # set(Boost_DETAILED_FAILURE_MSG	ON)
+    # set(Boost_COMPILER				"-gcc")
+	add_definitions( -DBOOST_ALL_NO_LIB )
 endif()
 
-if(UNIX)
-	message("[*] Searching for Boost Linux...")
-	find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options locale filesystem)
-else()
-	message("[*] Searching for Boost Windows...")
-	find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options locale filesystem)
-endif ()
+message("[*] Searching for Boost libs...")
+
+find_package(Boost ${Boost_Version_Needed} REQUIRED COMPONENTS date_time filesystem regex)
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
 	link_directories(${Boost_LIBRARY_DIRS})
 else()
-	message("[!] Please install Boost +1.70 libraries (static).")
+	message("[!] Please install Boost lib.")
 	return()
 endif()
 
-# if (NOT FO_BOOST_STATIC_LINK)
-# 	message("[*] Boost static ?")
-# 	add_definitions(-DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK -DBOOST_LOG_DYN_LINK)
-# endif()
+# --[ pThread ] ---------------------------------------------------------------
+
+if(UNIX)
+	message("[*] Using POSIX threading (pThread).")
+	set(THREADS_PREFER_PTHREAD_FLAG ON)
+	find_package(Threads REQUIRED)
+endif (UNIX)
 
 # --[ Target ] ------------------------------------------------------------------
 
@@ -130,14 +123,19 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	if(UNIX)
 		message("[*] Initializing '${Info_Title}' settings for GCC.")
 	else()
-		message("[!] Sorry. Alif don't support GCC/MinGW on Windows, Please install Microsoft C++ compiler.")
-		return()
+		#message("[!] Sorry. Alif don't support GCC/MinGW on Windows, Please install Microsoft C++ compiler.")
+		#return()
+		message("[*] Initializing '${Info_Title}' settings for GCC.")
 	endif ()
 
 	# Flags
 	# set_target_properties(${Info_App} PROPERTIES LINK_FLAGS_RELEASE -s)
 	# set(CMAKE_CXX_FLAGS_RELEASE " -O3 ")
 	# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -m64 ")
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -Wno-deprecated -municode")
+	#add_definitions(-DBOOST_SYSTEM_NO_DEPRECATED=1)
+	target_link_libraries(${Info_App} ${Boost_LIBRARIES} boost_locale-mgw9-mt-d-x64-1_75 boost_program_options-mgw9-mt-d-x64-1_75)
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 

@@ -1,38 +1,36 @@
-cmake_minimum_required(VERSION 3.15.0)
+cmake_minimum_required(VERSION 3.13.0)
 
 # --[ Alif version ] --------------------------------------------------------------
 
-project(AlifProject VERSION 3.0.17 DESCRIPTION "Alif language compiler.")
+project(AlifProject VERSION 3.0.19 DESCRIPTION "Alif Programming Language - Compiler.")
 message("-- [ Alif version ${CMAKE_PROJECT_VERSION} ]")
 
-# --[ Settings ] -------------------------------------------------------------------
+# --[ Boost ] ----------------------------------------------------------------------
+
+set(Boost_Version_Needed "1.70.0")
+
+if (WIN32)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+        # Boost GCC/MinGW
+        # Example: C:/boost_1_60_0
+        set(Boost_Root "C:/Alif3/boost/include")
+        set(Boost_Lib "C:/Alif3/boost/lib")
+
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+
+        # Boost Microsoft C++
+        # Example: C:/boost_1_60_0
+        set(Boost_Root "C:/boost_1_75_0")
+        set(Boost_Lib "C:/boost_1_75_0/lib64-msvc-14.2")
+
+    endif()
+endif()
+
+# --[ C++ ] ------------------------------------------------------------------------
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(CMAKE_VERBOSE_MAKEFILE OFF)
-
-# Default build
-set(default_build_type "Debug")
-if(CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
-if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
-endif()
-
-# if(NOT CMAKE_BUILD_TYPE)
-#     set(CMAKE_BUILD_TYPE Release)
-#     message("[!] Build type changed to ${CMAKE_BUILD_TYPE}.")
-#     if(NOT CMAKE_CONFIGURATION_TYPES)
-#         set(CMAKE_CONFIGURATION_TYPES Release)
-#         message("[!] Configuration type changed to ${CMAKE_CONFIGURATION_TYPES}.")
-#     endif()
-# endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL Debug)  
-    message("[!] Warning: Build type set to Debug. Make sure you have Debug version of Boost libs.")
-endif()
 
 # --[ Directories ] ----------------------------------------------------------------
 

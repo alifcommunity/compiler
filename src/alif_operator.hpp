@@ -51,7 +51,7 @@ void parser_TwoPointOperator(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	std::string CTR_OPTION;
 	std::string CTR_OPTION_TYPE;
 	std::string CTR_OPTION_CPP_END;
-	int CTR_ARG;
+	//int CTR_ARG;
 	//int CTR_OPERATOR_POSITION;
 
 	// TODO: main:center() not work if main set only by code !
