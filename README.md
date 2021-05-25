@@ -25,7 +25,7 @@ Windows - GCC (TDM/MinGW).
 
 ```bash
 cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
-nmake
+mingw32-make
 ```
 
 Windows - Microsoft build tools 2019.
