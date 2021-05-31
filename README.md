@@ -20,6 +20,13 @@ cd compiler
 mkdir build
 cd build
 ```
+  
+Windows - GCC (TDM/MinGW).
+
+```bash
+cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+mingw32-make
+```
 
 Windows - Microsoft build tools 2019.
 
