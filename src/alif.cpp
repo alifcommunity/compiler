@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.19 (Beta)"
+#define ALIF_VERSION "3.0.20 (Beta)"
 
 // Stack ********************************************************
 
@@ -77,10 +77,14 @@
 	#include <boost/locale.hpp>
 	#include <boost/lexical_cast.hpp>
 
+	#include <boost/nowide/args.hpp>
+	#include <boost/nowide/fstream.hpp>
+	#include <boost/nowide/iostream.hpp>
+
 	// UTF-8
 	#include "utf8.h"
 
-// Alif v2 ************************************************
+// Alif v2 ******************************************************
 
 	using namespace std;
 	bool DEBUG = false;
@@ -649,7 +653,7 @@
 
 	bool is_file_exists(std::string f) {
 
-		boost::filesystem::ifstream infile(f);
+		boost::nowide::ifstream infile(f);
 		return infile.good();
 	}
 
@@ -662,7 +666,7 @@
 		if (!is_file_exists(file_path))
 			ErrorCode("ملف غير موجود : ' " + file_path + " ' ", o_tokens);
 
-		boost::filesystem::ifstream rBuffer(file_path);
+		boost::nowide::ifstream rBuffer(file_path);
 		stringstream buf;
 		buf << rBuffer.rdbuf();
 		rBuffer.close();
@@ -2131,7 +2135,7 @@
 			{
 				// Tokens not predifined, so we need only to set ARGs
 
-				if (SYNTAX[TYPE] != "عدد" && SYNTAX[TYPE] != "نص" && SYNTAX[TYPE] != "منطق")
+				if (SYNTAX[TYPE] != "عدد" && SYNTAX[TYPE] != "نص" && SYNTAX[TYPE] != "منطق" && SYNTAX[TYPE] != "مؤشر_دالة")
 				{
 					ErrorCode("نوع غير مقبول ' " + SYNTAX[TYPE] + " ' ", o_tokens);
 				}
@@ -2201,6 +2205,16 @@
 					// *** Generate Code ***
 					CPP_CODE.append(" bool " + ID[SYNTAX[VAR]] + " ");
 					NEW_FUNCTION_ARG.append(" bool " + ID[SYNTAX[VAR]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else if (SYNTAX[TYPE] == "مؤشر_دالة")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[POINTER " + SYNTAX[VAR] + "]", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" void(* " + ID[SYNTAX[VAR]] + " )() ");
+					NEW_FUNCTION_ARG.append(" void(* " + ID[SYNTAX[VAR]] + " )() ");
 					// *** *** *** *** *** ***
 				}
 				else
@@ -2357,6 +2371,9 @@
 				else
 					ErrorCode("نهايه شفرة غير موجود داخل البناء ' _س_ '", o_tokens);
 			}
+
+
+
 
 			// ----------------------
 			// OPERATION
@@ -2638,6 +2655,48 @@
 				{
 					if(DEBUG)
 						DEBUG_MESSAGE("[C++ Local STRING (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else
+				{
+					ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+			}
+
+			// -----------------------------------
+			// Local VARIABLE STRING
+			// -----------------------------------
+
+			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "مؤشر_دالة")
+			{
+				if (p > 0)
+					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
+						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
+
+				if (OBJECTIF_TYPE == "عدد")
+				{
+					ErrorCode("لا يمكن تحويل مؤشر_دالة إلى عدد ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+				else if (OBJECTIF_TYPE == "نص")
+				{
+					ErrorCode("لا يمكن تحويل مؤشر_دالة إلى نص ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+				else if (OBJECTIF_TYPE == "مؤشر_دالة")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[LOCAL-POINTER-FUNC (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else if (OBJECTIF_TYPE == "C++")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[C++ Local POINTER-FUNC (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
 
 					// *** Generate Code ***
 					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
@@ -3487,420 +3546,425 @@
 				if (!IsInsideFunction)
 					ErrorCode("يجب مناداة على الدالة من داخل دالة ' " + SYNTAX[p] + "()' ", o_tokens);
 
-				if (SYNTAX[p + 1] == "")
-					ErrorCode("يجب اضافه '(' بعد ' " + SYNTAX[p] + " ' ", o_tokens);
+				if (OBJECTIF_TYPE == "مؤشر_دالة"){
 
-				if (SYNTAX[p + 1] != "(")
-					ErrorCode("أمر غير معروف ' " + SYNTAX[p + 1] + " ' ", o_tokens);
+					// ... function_name -> to an pointer-func
 
-				bool ThisIsClassFunction = false;
-				if(CLASS_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])])
-					ThisIsClassFunction = true;
-				
-				if(ThisIsClassFunction)
-					ErrorCode("ggggggggggggggg' " + SYNTAX[p + 1] + " ' ", o_tokens);
-				
-				int TMP_FUN_LONG = p + 2; // a + b + 'p'fun ( c + (1 * 2) ) + c
-				int OPEN_PARENTIZE = 0;
-
-				while (TMP_FUN_LONG <= SYNTAX_LONG)
-				{
-					if (SYNTAX[TMP_FUN_LONG] == "(") // مفتوح inside الدالة args : fun( a + (b))
-						OPEN_PARENTIZE++;
-					else if (SYNTAX[TMP_FUN_LONG] == ")" && OPEN_PARENTIZE > 0) // Close inside الدالة args
-						OPEN_PARENTIZE--;
-					else if (SYNTAX[TMP_FUN_LONG] == ")" && OPEN_PARENTIZE < 1) // Close final الدالة call
-					{
-						if (TMP_FUN_LONG < SYNTAX_LONG)
-						{
-							// a = fun( a + (b)) + 123
-							// str / عدد = متغير + (fun(var)) * (fun(var) / fun(var, fun(var), var) - var)
-
-							if ((SYNTAX[TMP_FUN_LONG + 1] != "+") &&
-								(SYNTAX[TMP_FUN_LONG + 1] != "-") &&
-								(SYNTAX[TMP_FUN_LONG + 1] != "*") &&
-								(SYNTAX[TMP_FUN_LONG + 1] != "/") &&
-								(SYNTAX[TMP_FUN_LONG + 1] != "،") &&
-								(SYNTAX[TMP_FUN_LONG + 1] != ",") &&
-								(SYNTAX[TMP_FUN_LONG + 1] != ")"))
-							{
-								ErrorCode("نص غير معروف بعد نداء ' " + SYNTAX[p] + "()' : ' " +
-											SYNTAX[TMP_FUN_LONG + 1] + " ' ",
-											o_tokens);
-							}
-						}
-						else if (TMP_FUN_LONG == SYNTAX_LONG)
-						{
-							// a = fun( a + (b))
-							if (SYNTAX[TMP_FUN_LONG] != ")") // double check!
-								ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p] + "()' بالإشارة ')' ", o_tokens);
-						}
-
-						break;
-					}
-
-					TMP_FUN_LONG++;
-				}
-
-				if (SYNTAX[TMP_FUN_LONG] != ")") // Double check!
-					ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p] + "()' بالإشارة ')' ", o_tokens);
-					//ErrorCode("===== |" + SYNTAX[TMP_FUN_LONG - 1] + "| =====", o_tokens);
-
-				std::string TempToken[1024];
-				int TempTokenCount = 0;
-				for (int i = p + 2; i <= TMP_FUN_LONG; i++)
-				{
-					if (SYNTAX[i] != "")
-					{
-						TempToken[TempTokenCount] = SYNTAX[i];
-						TempTokenCount++;
-					}
-				}
-
-				bool IS_LOCAL_FUN = false;
-				IS_LOCAL_FUN = L_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
-
-				std::string FUN_TYPE;
-
-				if (IS_LOCAL_FUN)
-				{
-					FUN_TYPE = L_FUN_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
-
-					if (FUN_TYPE == "عادم")
-						ErrorCode("الدالة المحلية ' " + SYNTAX[p] + "()' من نوع عادم, لدى لا يمكن تحويلها إلى " + OBJECTIF_TYPE, o_tokens);
-				}
-				else
-				{
-					FUN_TYPE = G_FUN_TYPE[(SYNTAX[p])];
-
-					if (FUN_TYPE == "عادم")
-						ErrorCode("الدالة العامة ' " + SYNTAX[p] + "()' من نوع عادم, لدى لا يمكن تحويل إلى " + OBJECTIF_TYPE, o_tokens);
-				}
-
-				std::string CG_BUFFER;
-				
-				if (OBJECTIF_TYPE == "عدد")
-				{
-					if (FUN_TYPE == "عدد")
-					{
-						if (IS_LOCAL_FUN)
-						{
-							// Call a local fun int
-
-							if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-INT ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
-							// *** *** *** *** *** ***
-
-							CG_BUFFER.append( CHECK_CALL_FUN_ARG( 	false, 
-																	TMP_NAMESPACE_OR_CLASS, 
-																	SYNTAX[p], 
-																	0, 
-																	TMP_NAMESPACE_OR_CLASS, 
-																	TheFunction, 
-																	TempToken, 
-																	(TempTokenCount - 1), 
-																	o_tokens));
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" ) ");
-							// *** *** *** *** *** ***
-						}
-						else
-						{
-							// Call a Global fun int
-
-							if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION-INT ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
-							// *** *** *** *** *** ***
-
-							CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
-																		"", 
-																		SYNTAX[p], 
-																		0, 
-																		TMP_NAMESPACE_OR_CLASS, 
-																		TheFunction, 
-																		TempToken, 
-																		(TempTokenCount - 1), 
-																		o_tokens));
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" ) ");
-							// *** *** *** *** *** ***
-						}
-					}
-					else if (FUN_TYPE == "نص")
-					{
-						if (IS_LOCAL_FUN)
-							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من نص إلى عدد ", o_tokens);
-						else
-							ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من نص إلى عدد ", o_tokens);
-					}
-					else if (FUN_TYPE == "منطق")
-					{
-						if (IS_LOCAL_FUN)
-							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من منطق إلى عدد ", o_tokens);
-						else
-							ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من منطق إلى عدد ", o_tokens);
-					}
-					else
-					{
-						ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + "()' ", o_tokens);
-					}
-				}
-				else if (OBJECTIF_TYPE == "نص")
-				{
-					if (FUN_TYPE == "عدد")
-					{
-						if (IS_LOCAL_FUN)
-						{
-							// Call a local fun int.ToString
-
-							if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-INT.ToString ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" alifcore_IntToString( OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
-							// *** *** *** *** *** ***
-
-							CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
-																		TMP_NAMESPACE_OR_CLASS, 
-																		SYNTAX[p], 
-																		0, 
-																		TMP_NAMESPACE_OR_CLASS, 
-																		TheFunction, 
-																		TempToken, 
-																		(TempTokenCount - 1), 
-																		o_tokens));
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" ) ) ");
-							// *** *** *** *** *** ***
-						}
-						else
-						{
-							// Call a Global fun int.ToString
-
-							if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION-INT.ToString ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" alifcore_IntToString( FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
-							// *** *** *** *** *** ***
-
-							CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
-																		"", 
-																		SYNTAX[p], 
-																		0, 
-																		TMP_NAMESPACE_OR_CLASS, 
-																		TheFunction, 
-																		TempToken, 
-																		(TempTokenCount - 1), 
-																		o_tokens));
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" ) ) ");
-							// *** *** *** *** *** ***
-						}
-					}
-					else if (FUN_TYPE == "نص")
-					{
-						if (IS_LOCAL_FUN)
-						{
-							// Call a local fun std::string
-
-							if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-STRING ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
-							// *** *** *** *** *** ***
-
-							CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
-																	TMP_NAMESPACE_OR_CLASS, 
-																	SYNTAX[p], 
-																	0, 
-																	TMP_NAMESPACE_OR_CLASS, 
-																	TheFunction, 
-																	TempToken, 
-																	(TempTokenCount - 1), 
-																	o_tokens));
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" ) ");
-							// *** *** *** *** *** ***
-
-							if(DEBUG)DEBUG_MESSAGE(") ", o_tokens); // DEBUG
-						}
-						else
-						{
-							// Call a Global fun int
-
-							if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION-STRING ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
-							// *** *** *** *** *** ***
-
-							CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
-																		"", 
-																		SYNTAX[p], 
-																		0, 
-																		TMP_NAMESPACE_OR_CLASS, 
-																		TheFunction, 
-																		TempToken, 
-																		(TempTokenCount - 1), 
-																		o_tokens));
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" ) ");
-							// *** *** *** *** *** ***
-						}
-					}
-					else if (FUN_TYPE == "منطق")
-					{
-						if (IS_LOCAL_FUN)
-							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من منطق إلى نص ", o_tokens);
-						else
-							ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من منطق إلى نص ", o_tokens);
-					}
-					else
-					{
-						ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + "()' ", o_tokens);
-					}
-				}
-				else if (OBJECTIF_TYPE == "منطق")
-				{
-					if (FUN_TYPE == "عدد")
-					{
-						if (IS_LOCAL_FUN)
-							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من عدد إلى منطق ", o_tokens);
-						else
-							ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من عدد إلى منطق ", o_tokens);
-					}
-					else if (FUN_TYPE == "نص")
-					{
-						if (IS_LOCAL_FUN)
-							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من نص إلى منطق ", o_tokens);
-						else
-							ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من نص إلى منطق ", o_tokens);
-					}
-					else if (FUN_TYPE == "منطق")
-					{
-						if (IS_LOCAL_FUN)
-						{
-							// Call a local fun bool
-
-							if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-BOOL ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
-							// *** *** *** *** *** ***
-
-							CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
-																		TMP_NAMESPACE_OR_CLASS, 
-																		SYNTAX[p], 
-																		0, 
-																		TMP_NAMESPACE_OR_CLASS, 
-																		TheFunction, 
-																		TempToken, 
-																		(TempTokenCount - 1), 
-																		o_tokens));
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" ) ");
-							// *** *** *** *** *** ***
-						}
-						else
-						{
-							// Call a Global fun bool
-
-							if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION-BOOL ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
-							// *** *** *** *** *** ***
-
-							CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
-																		"", 
-																		SYNTAX[p], 
-																		0, 
-																		TMP_NAMESPACE_OR_CLASS, 
-																		TheFunction, 
-																		TempToken, 
-																		(TempTokenCount - 1), 
-																		o_tokens));
-
-							// *** Generate Code ***
-							// Buffer
-							CG_BUFFER.append(" ) ");
-							// *** *** *** *** *** ***
-						}
-					}
-					else
-					{
-						ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + "()' ", o_tokens);
-					}
-				}
-				else if (OBJECTIF_TYPE == "C++"){
-
-					// xType: We igiore type of function.. this is C++ targed
-					// user must take care of this!.
+					std::string FUN_TYPE;
+					bool IS_LOCAL_FUN = false;
+					IS_LOCAL_FUN = L_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
 
 					if (IS_LOCAL_FUN){
 
-						// Call a local fun xType
-
-						if(DEBUG)DEBUG_MESSAGE("[C++ CALL-LOCAL-FUNCTION-xType ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
-
-						// *** Generate Code ***
-						// Buffer
-						CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
-						// *** *** *** *** *** ***
-
-						CG_BUFFER.append( CHECK_CALL_FUN_ARG(	false, 
-																TMP_NAMESPACE_OR_CLASS, 
-																SYNTAX[p], 
-																0, 
-																TMP_NAMESPACE_OR_CLASS, 
-																TheFunction, 
-																TempToken, 
-																(TempTokenCount - 1), 
-																o_tokens));
+						FUN_TYPE = L_FUN_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
+						if(DEBUG)DEBUG_MESSAGE("[REFERENCE-OF-LOCAL-FUNCTION-" + FUN_TYPE + " ' " + SYNTAX[p] + " ']", o_tokens); // DEBUG
 
 						// *** Generate Code ***
-						// Buffer
-						CG_BUFFER.append(" ) ");
+						CPP_CODE.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + " ");
 						// *** *** *** *** *** ***
+					}
+					else {
+
+						FUN_TYPE = G_FUN_TYPE[(SYNTAX[p])];
+						if(DEBUG)DEBUG_MESSAGE("[REFERENCE-OF-GLOBAL-FUNCTION-" + FUN_TYPE + " ' " + SYNTAX[p] + " ']", o_tokens); // DEBUG
+
+						// *** Generate Code ***
+						CPP_CODE.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + " ");
+						// *** *** *** *** *** ***
+					}
+				}
+				else {
+
+					// ... function_name(...) -> to an anythings except pointers
+
+					if (SYNTAX[p + 1] == "")
+						ErrorCode("يجب اضافه '(' بعد ' " + SYNTAX[p] + " ' ", o_tokens);
+
+					if (SYNTAX[p + 1] != "(")
+						ErrorCode("أمر غير معروف ' " + SYNTAX[p + 1] + " ' ", o_tokens);
+
+					bool ThisIsClassFunction = false;
+					if(CLASS_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])])
+						ThisIsClassFunction = true;
+					
+					if(ThisIsClassFunction)
+						ErrorCode("_TEST_TEST_TEST_' " + SYNTAX[p + 1] + " ' ", o_tokens);
+					
+					int TMP_FUN_LONG = p + 2; // a + b + 'p'fun ( c + (1 * 2) ) + c
+					int OPEN_PARENTIZE = 0;
+
+					while (TMP_FUN_LONG <= SYNTAX_LONG)
+					{
+						if (SYNTAX[TMP_FUN_LONG] == "(") // مفتوح inside الدالة args : fun( a + (b))
+							OPEN_PARENTIZE++;
+						else if (SYNTAX[TMP_FUN_LONG] == ")" && OPEN_PARENTIZE > 0) // Close inside الدالة args
+							OPEN_PARENTIZE--;
+						else if (SYNTAX[TMP_FUN_LONG] == ")" && OPEN_PARENTIZE < 1) // Close final الدالة call
+						{
+							if (TMP_FUN_LONG < SYNTAX_LONG)
+							{
+								// a = fun( a + (b)) + 123
+								// str / عدد = متغير + (fun(var)) * (fun(var) / fun(var, fun(var), var) - var)
+
+								if ((SYNTAX[TMP_FUN_LONG + 1] != "+") &&
+									(SYNTAX[TMP_FUN_LONG + 1] != "-") &&
+									(SYNTAX[TMP_FUN_LONG + 1] != "*") &&
+									(SYNTAX[TMP_FUN_LONG + 1] != "/") &&
+									(SYNTAX[TMP_FUN_LONG + 1] != "،") &&
+									(SYNTAX[TMP_FUN_LONG + 1] != ",") &&
+									(SYNTAX[TMP_FUN_LONG + 1] != ")"))
+								{
+									ErrorCode("نص غير معروف بعد نداء ' " + SYNTAX[p] + "()' : ' " +
+												SYNTAX[TMP_FUN_LONG + 1] + " ' ",
+												o_tokens);
+								}
+							}
+							else if (TMP_FUN_LONG == SYNTAX_LONG)
+							{
+								// a = fun( a + (b))
+								if (SYNTAX[TMP_FUN_LONG] != ")") // double check!
+									ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p] + "()' بالإشارة ')' ", o_tokens);
+							}
+
+							break;
+						}
+
+						TMP_FUN_LONG++;
+					}
+
+					if (SYNTAX[TMP_FUN_LONG] != ")") // Double check!
+						ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p] + "()' بالإشارة ')' ", o_tokens);
+						//ErrorCode("===== |" + SYNTAX[TMP_FUN_LONG - 1] + "| =====", o_tokens);
+
+					std::string TempToken[1024];
+					int TempTokenCount = 0;
+					for (int i = p + 2; i <= TMP_FUN_LONG; i++)
+					{
+						if (SYNTAX[i] != "")
+						{
+							TempToken[TempTokenCount] = SYNTAX[i];
+							TempTokenCount++;
+						}
+					}
+
+					bool IS_LOCAL_FUN = false;
+					IS_LOCAL_FUN = L_FUN_IS_SET[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
+
+					std::string FUN_TYPE;
+
+					if (IS_LOCAL_FUN)
+					{
+						FUN_TYPE = L_FUN_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
+
+						if (FUN_TYPE == "عادم")
+							ErrorCode("الدالة المحلية ' " + SYNTAX[p] + "()' من نوع عادم, لدى لا يمكن تحويلها إلى " + OBJECTIF_TYPE, o_tokens);
 					}
 					else
 					{
-						// Call a Global fun xType
+						FUN_TYPE = G_FUN_TYPE[(SYNTAX[p])];
 
-						if(DEBUG)DEBUG_MESSAGE("[C++ CALL-GLOBAL-FUNCTION-xType ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+						if (FUN_TYPE == "عادم")
+							ErrorCode("الدالة العامة ' " + SYNTAX[p] + "()' من نوع عادم, لدى لا يمكن تحويل إلى " + OBJECTIF_TYPE, o_tokens);
+					}
 
-						// *** Generate Code ***
-						// Buffer
-						CG_BUFFER.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
-						// *** *** *** *** *** ***
+					std::string CG_BUFFER;
+					
+					if (OBJECTIF_TYPE == "عدد")
+					{
+						if (FUN_TYPE == "عدد")
+						{
+							if (IS_LOCAL_FUN)
+							{
+								// Call a local fun int
 
-						CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
-																	"", 
+								if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-INT ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
+								// *** *** *** *** *** ***
+
+								CG_BUFFER.append( CHECK_CALL_FUN_ARG( 	false, 
+																		TMP_NAMESPACE_OR_CLASS, 
+																		SYNTAX[p], 
+																		0, 
+																		TMP_NAMESPACE_OR_CLASS, 
+																		TheFunction, 
+																		TempToken, 
+																		(TempTokenCount - 1), 
+																		o_tokens));
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" ) ");
+								// *** *** *** *** *** ***
+							}
+							else
+							{
+								// Call a Global fun int
+
+								if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION-INT ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
+								// *** *** *** *** *** ***
+
+								CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
+																			"", 
+																			SYNTAX[p], 
+																			0, 
+																			TMP_NAMESPACE_OR_CLASS, 
+																			TheFunction, 
+																			TempToken, 
+																			(TempTokenCount - 1), 
+																			o_tokens));
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" ) ");
+								// *** *** *** *** *** ***
+							}
+						}
+						else if (FUN_TYPE == "نص")
+						{
+							if (IS_LOCAL_FUN)
+								ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من نص إلى عدد ", o_tokens);
+							else
+								ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من نص إلى عدد ", o_tokens);
+						}
+						else if (FUN_TYPE == "منطق")
+						{
+							if (IS_LOCAL_FUN)
+								ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من منطق إلى عدد ", o_tokens);
+							else
+								ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من منطق إلى عدد ", o_tokens);
+						}
+						else
+						{
+							ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + "()' ", o_tokens);
+						}
+					}
+					else if (OBJECTIF_TYPE == "نص")
+					{
+						if (FUN_TYPE == "عدد")
+						{
+							if (IS_LOCAL_FUN)
+							{
+								// Call a local fun int.ToString
+
+								if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-INT.ToString ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" alifcore_IntToString( OBJ_CLASS_WINDOW_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
+								// *** *** *** *** *** ***
+
+								CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
+																			TMP_NAMESPACE_OR_CLASS, 
+																			SYNTAX[p], 
+																			0, 
+																			TMP_NAMESPACE_OR_CLASS, 
+																			TheFunction, 
+																			TempToken, 
+																			(TempTokenCount - 1), 
+																			o_tokens));
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" ) ) ");
+								// *** *** *** *** *** ***
+							}
+							else
+							{
+								// Call a Global fun int.ToString
+
+								if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION-INT.ToString ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" alifcore_IntToString( FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
+								// *** *** *** *** *** ***
+
+								CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
+																			"", 
+																			SYNTAX[p], 
+																			0, 
+																			TMP_NAMESPACE_OR_CLASS, 
+																			TheFunction, 
+																			TempToken, 
+																			(TempTokenCount - 1), 
+																			o_tokens));
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" ) ) ");
+								// *** *** *** *** *** ***
+							}
+						}
+						else if (FUN_TYPE == "نص")
+						{
+							if (IS_LOCAL_FUN)
+							{
+								// Call a local fun std::string
+
+								if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-STRING ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
+								// *** *** *** *** *** ***
+
+								CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
+																		TMP_NAMESPACE_OR_CLASS, 
+																		SYNTAX[p], 
+																		0, 
+																		TMP_NAMESPACE_OR_CLASS, 
+																		TheFunction, 
+																		TempToken, 
+																		(TempTokenCount - 1), 
+																		o_tokens));
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" ) ");
+								// *** *** *** *** *** ***
+
+								if(DEBUG)DEBUG_MESSAGE(") ", o_tokens); // DEBUG
+							}
+							else
+							{
+								// Call a Global fun int
+
+								if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION-STRING ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
+								// *** *** *** *** *** ***
+
+								CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
+																			"", 
+																			SYNTAX[p], 
+																			0, 
+																			TMP_NAMESPACE_OR_CLASS, 
+																			TheFunction, 
+																			TempToken, 
+																			(TempTokenCount - 1), 
+																			o_tokens));
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" ) ");
+								// *** *** *** *** *** ***
+							}
+						}
+						else if (FUN_TYPE == "منطق")
+						{
+							if (IS_LOCAL_FUN)
+								ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من منطق إلى نص ", o_tokens);
+							else
+								ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من منطق إلى نص ", o_tokens);
+						}
+						else
+						{
+							ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + "()' ", o_tokens);
+						}
+					}
+					else if (OBJECTIF_TYPE == "منطق")
+					{
+						if (FUN_TYPE == "عدد")
+						{
+							if (IS_LOCAL_FUN)
+								ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من عدد إلى منطق ", o_tokens);
+							else
+								ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من عدد إلى منطق ", o_tokens);
+						}
+						else if (FUN_TYPE == "نص")
+						{
+							if (IS_LOCAL_FUN)
+								ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p] + "()' من نص إلى منطق ", o_tokens);
+							else
+								ErrorCode("لا يمكن تحويل الدالة العامة ' " + SYNTAX[p] + "()' من نص إلى منطق ", o_tokens);
+						}
+						else if (FUN_TYPE == "منطق")
+						{
+							if (IS_LOCAL_FUN)
+							{
+								// Call a local fun bool
+
+								if(DEBUG)DEBUG_MESSAGE("[CALL-LOCAL-FUNCTION-BOOL ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
+								// *** *** *** *** *** ***
+
+								CG_BUFFER.append( CHECK_CALL_FUN_ARG( false, 
+																			TMP_NAMESPACE_OR_CLASS, 
+																			SYNTAX[p], 
+																			0, 
+																			TMP_NAMESPACE_OR_CLASS, 
+																			TheFunction, 
+																			TempToken, 
+																			(TempTokenCount - 1), 
+																			o_tokens));
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" ) ");
+								// *** *** *** *** *** ***
+							}
+							else
+							{
+								// Call a Global fun bool
+
+								if(DEBUG)DEBUG_MESSAGE("[CALL-GLOBAL-FUNCTION-BOOL ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
+								// *** *** *** *** *** ***
+
+								CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
+																			"", 
+																			SYNTAX[p], 
+																			0, 
+																			TMP_NAMESPACE_OR_CLASS, 
+																			TheFunction, 
+																			TempToken, 
+																			(TempTokenCount - 1), 
+																			o_tokens));
+
+								// *** Generate Code ***
+								// Buffer
+								CG_BUFFER.append(" ) ");
+								// *** *** *** *** *** ***
+							}
+						}
+						else
+						{
+							ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + "()' ", o_tokens);
+						}
+					}
+					else if (OBJECTIF_TYPE == "C++"){
+
+						// xType: We igiore type of function.. this is C++ targed
+						// user must take care of this!.
+
+						if (IS_LOCAL_FUN){
+
+							// Call a local fun xType
+
+							if(DEBUG)DEBUG_MESSAGE("[C++ CALL-LOCAL-FUNCTION-xType ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+							// *** Generate Code ***
+							// Buffer
+							CG_BUFFER.append(" NS_" + ID[TheNamespace] + "::FUNCTION_" + ID[SYNTAX[p]] + "( ");
+							// *** *** *** *** *** ***
+
+							CG_BUFFER.append( CHECK_CALL_FUN_ARG(	false, 
+																	TMP_NAMESPACE_OR_CLASS, 
 																	SYNTAX[p], 
 																	0, 
 																	TMP_NAMESPACE_OR_CLASS, 
@@ -3909,18 +3973,45 @@
 																	(TempTokenCount - 1), 
 																	o_tokens));
 
-						// *** Generate Code ***
-						// Buffer
-						CG_BUFFER.append(" ) ");
-						// *** *** *** *** *** ***
+							// *** Generate Code ***
+							// Buffer
+							CG_BUFFER.append(" ) ");
+							// *** *** *** *** *** ***
+						}
+						else
+						{
+							// Call a Global fun xType
+
+							if(DEBUG)DEBUG_MESSAGE("[C++ CALL-GLOBAL-FUNCTION-xType ' " + SYNTAX[p] + " '] (", o_tokens); // DEBUG
+
+							// *** Generate Code ***
+							// Buffer
+							CG_BUFFER.append(" FUNCTION_" + Global_ID[SYNTAX[p]] + "( ");
+							// *** *** *** *** *** ***
+
+							CG_BUFFER.append( CHECK_CALL_FUN_ARG( true, 
+																		"", 
+																		SYNTAX[p], 
+																		0, 
+																		TMP_NAMESPACE_OR_CLASS, 
+																		TheFunction, 
+																		TempToken, 
+																		(TempTokenCount - 1), 
+																		o_tokens));
+
+							// *** Generate Code ***
+							// Buffer
+							CG_BUFFER.append(" ) ");
+							// *** *** *** *** *** ***
+						}
 					}
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + CG_BUFFER + " ");
+					// *** *** *** *** *** ***
+
+					p = TMP_FUN_LONG; // point to next token after fun(...)
 				}
-
-				// *** Generate Code ***
-				CPP_CODE.append(" " + CG_BUFFER + " ");
-				// *** *** *** *** *** ***
-
-				p = TMP_FUN_LONG; // point to next token after fun(...)
 			}
 
 			// -----------------------------------
@@ -7085,7 +7176,7 @@
 			exit(EXIT_FAILURE);
 		}
 
-		boost::filesystem::ifstream FILE_STREAM(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE);
+		boost::nowide::ifstream FILE_STREAM(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE);
 
 		std::string LINE8;
 
@@ -7585,7 +7676,7 @@
 
 			LOG_PATH = PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log";
 
-			boost::filesystem::ifstream FILE_STREAM_COMPILER(LOG_PATH);
+			boost::nowide::ifstream FILE_STREAM_COMPILER(LOG_PATH);
 
 			if (!FILE_STREAM_COMPILER.is_open())
 			{
@@ -7647,7 +7738,7 @@
 					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
 					//"SLEEP 1 \n"
 					"\"" + cc_path_full + "\""
-					" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_date_time-mgw9-mt-s-x64-1_75 -lboost_filesystem-mgw9-mt-s-x64-1_75 -lboost_regex-mgw9-mt-s-x64-1_75 -lws2_32 -lwsock32 " 
+					" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_date_time-mgw8-mt-s-x64-1_76 -lboost_filesystem-mgw8-mt-s-x64-1_76 -lboost_regex-mgw8-mt-s-x64-1_76 -lws2_32 -lwsock32 " 
 					+ GUI_CMD + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\"";
 
 			//ALIF_ERROR("CMD: " + CMD);
@@ -7672,7 +7763,7 @@
 
 			LOG_PATH = PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log";
 
-			boost::filesystem::ifstream FILE_STREAM_LINKER(LOG_PATH);
+			boost::nowide::ifstream FILE_STREAM_LINKER(LOG_PATH);
 
 			if (!FILE_STREAM_LINKER.is_open())
 			{
@@ -8017,7 +8108,7 @@
 
 			LOG_PATH = PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log";
 
-			boost::filesystem::ifstream FILE_STREAM_COMPILER(LOG_PATH);
+			boost::nowide::ifstream FILE_STREAM_COMPILER(LOG_PATH);
 
 			if (!FILE_STREAM_COMPILER.is_open())
 			{
@@ -8193,7 +8284,7 @@
 	// 			"Extention: " + argument.input.extension + "\n"
 	// 			"File: " + argument.input.fullpath);
 	// 	}
-	// 	boost::filesystem::ifstream ifile(argument.input.fullpath);
+	// 	boost::nowide::ifstream ifile(argument.input.fullpath);
 	// 	if(!ifile.is_open()) {
 	// 		err("Can't open input source file.\n"
 	// 			"File: " + argument.input.fullpath);
@@ -8250,7 +8341,7 @@
 		#else
 			std::string core_path = "/usr/local/lib/aliflib/alifcore.cc";
 		#endif
-		boost::filesystem::ifstream alifcore_if(
+		boost::nowide::ifstream alifcore_if(
 			core_path
 		);
 		stringstream alifcore_ss;
@@ -8292,7 +8383,7 @@
 			std::string CLEAR_BIN_CMD = std::string("@echo off & del /s \"") + PATH_FULL_BIN + std::string("\" >nul 2>&1");
 			if (system(CLEAR_BIN_CMD.c_str()) != 0)
 				cout << endl << "Warning: Can't execut Windows remove EXE output command" << endl;
-			//boost::filesystem::remove(PATH_FULL_BIN);
+			//boost::nowide::remove(PATH_FULL_BIN);
 			//std::remove(PATH_FULL_BIN);
 		#elif  __APPLE__
 			std::string CLEAR_BIN_CMD = std::string("rm -rf \"") + PATH_FULL_BIN + std::string("\" 2> /dev/null");
@@ -8416,6 +8507,7 @@
 
 	#ifdef _WIN32
 		int wmain(int argc, wchar_t* argv[])
+		// int wmain(int argc, char **argv)
 	#elif  __APPLE__
 		int main(int argc, char** argv)
 	#else
@@ -8520,7 +8612,39 @@
 		// Start parsing
 		alif();
 
+		// if (!is_file_exists(argument.input.fullpath)) {
+		// 	SHOW_FILE_AND_LINE = false;
+		// 	std::cout << "Not fouuund : ' " << argument.input.fullpath << " ' ";
+		// }
+		// else{
+		// 	SHOW_FILE_AND_LINE = false;
+		// 	std::cout << "!!!!! fouuund : ' " << argument.input.fullpath << " ' ";
+		// }
+
 		// Finish.
 		std::cout << "Finish." << std::endl;
 		exit(EXIT_SUCCESS);
 	}
+
+	/*
+	int wmain(int argc, char **argv)
+	{
+		boost::nowide::args a(argc,argv); // Fix arguments - make them UTF-8
+		boost::nowide::ifstream f(argv[1]); // argv[1] - is UTF-8
+
+		if(!f) {
+			// the console can display UTF-8
+			boost::nowide::cerr << "Can't open " << argv[1] << std::endl;
+			return 1;
+		}
+		int total_lines = 0;
+		while(f) {
+			if(f.get() == '\n')
+				total_lines++;
+		}
+		f.close();
+		// the console can display UTF-8
+		boost::nowide::cout << "File " << argv[1] << " has " << total_lines << " lines" << std::endl;
+		return 0;
+	}
+	*/

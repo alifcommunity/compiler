@@ -29,7 +29,7 @@ if(UNIX)
 		return()
 	endif()	
 else()
-	message("[!] No need for ICU on Windows. Skip..")
+	message("[*] No need for ICU on Windows. Skip..")
 endif()
 
 # --[ Boost ] -----------------------------------------------------------------
@@ -42,15 +42,17 @@ if (WIN32)
 	message("[*] Using Boost root: ${BOOST_ROOT}")
 	message("[*] Using Boost lib: ${Boost_LIBRARY_DIR}")
 
-	set(Boost_ARCHITECTURE "-x64")
-	# set(Boost_DEBUG					OFF)
-	# set(Boost_USE_STATIC_LIBS			ON)
-	set(Boost_USE_MULTITHREADED		ON)
-	# set(Boost_USE_STATIC_RUNTIME		ON)
+	set(Boost_ARCHITECTURE 				"-x64")
+	set(Boost_USE_STATIC_LIBS			ON)
+	set(Boost_USE_MULTITHREADED			ON)
+	set(Boost_USE_STATIC_RUNTIME		ON)
+	set(Boost_COMPILER					"-mgw8")
+
 	# set(Boost_DETAILED_FAILURE_MSG	OFF)
+	# set(Boost_DEBUG					OFF)	
 	# set(Boost_THREADAPI             	"win32")
 	# set(Boost_COMPILER				"-vc142")
-	add_definitions( -DBOOST_ALL_NO_LIB )
+	# add_definitions( -DBOOST_ALL_NO_LIB )
 else()
     # set(Boost_DEBUG 					OFF)
     set(Boost_USE_STATIC_LIBS       	ON)
@@ -65,7 +67,7 @@ endif()
 
 message("[*] Searching for Boost libs...")
 
-find_package(Boost ${Boost_Version_Needed} REQUIRED COMPONENTS date_time filesystem regex)
+find_package(Boost ${Boost_Version_Needed} REQUIRED COMPONENTS date_time filesystem regex nowide)
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
@@ -133,9 +135,9 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	# set(CMAKE_CXX_FLAGS_RELEASE " -O3 ")
 	# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -m64 ")
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -Wno-deprecated -municode")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -Wno-deprecated -municode -g")
 	#add_definitions(-DBOOST_SYSTEM_NO_DEPRECATED=1)
-	target_link_libraries(${Info_App} ${Boost_LIBRARIES} boost_locale-mgw9-mt-d-x64-1_75 boost_program_options-mgw9-mt-d-x64-1_75)
+	target_link_libraries(${Info_App} ${Boost_LIBRARIES} boost_locale-mgw8-mt-s-x64-1_76 boost_program_options-mgw8-mt-s-x64-1_76 iconv pthread -static)
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 
