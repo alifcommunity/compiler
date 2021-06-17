@@ -121,24 +121,30 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
-	# using GCC
-	if(UNIX)
-		message("[*] Initializing '${Info_Title}' settings for GCC.")
+	if (WIN32)
+
+		# using MinGW/GCC Windows
+		message("[*] Initializing '${Info_Title}' settings for MinGW/GCC (Windows).")
+
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -Wno-deprecated -municode -g")
+		target_link_libraries(${Info_App} ${Boost_LIBRARIES} boost_locale-mgw8-mt-s-x64-1_76 boost_program_options-mgw8-mt-s-x64-1_76 iconv pthread -static)
+
 	else()
-		#message("[!] Sorry. Alif don't support GCC/MinGW on Windows, Please install Microsoft C++ compiler.")
-		#return()
-		message("[*] Initializing '${Info_Title}' settings for GCC.")
-	endif ()
+
+		# using GCC Linux
+		message("[*] Initializing '${Info_Title}' settings for GCC (Linux).")
+
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -O3 -std=gnu++17" )
+		target_link_libraries(${Info_App} ${Boost_LIBRARIES} pthread)
+		
+	endif()
 
 	# Flags
 	# set_target_properties(${Info_App} PROPERTIES LINK_FLAGS_RELEASE -s)
 	# set(CMAKE_CXX_FLAGS_RELEASE " -O3 ")
 	# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -m64 ")
-
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -Wno-deprecated -municode -g")
 	#add_definitions(-DBOOST_SYSTEM_NO_DEPRECATED=1)
-	target_link_libraries(${Info_App} ${Boost_LIBRARIES} boost_locale-mgw8-mt-s-x64-1_76 boost_program_options-mgw8-mt-s-x64-1_76 iconv pthread -static)
-
+	
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 
 	# using Intel C++
