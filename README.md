@@ -52,6 +52,6 @@ make && sudo make install
 
 [www.aliflang.org](https://aliflang.org)
 
-بالتوفيق،
+بالتوفيق.
 
 </div>
