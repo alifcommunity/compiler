@@ -137,7 +137,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		message("[*] Initializing '${Info_Title}' settings for GCC (Linux).")
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -O3 -std=gnu++17" )
-		target_link_libraries(${Info_App} ${Boost_LIBRARIES} pthread)
+		target_link_libraries(${Info_App} ${Boost_LIBRARIES} boost_locale boost_program_options pthread)
 		
 	endif()
 
