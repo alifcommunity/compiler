@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.13.0)
 
 # --[ Alif version ] ---------------------------------------------------------------
 
-project(AlifProject VERSION 3.0.20 DESCRIPTION "Alif Programming Language - Compiler.")
+project(AlifProject VERSION 3.0.21 DESCRIPTION "Alif Programming Language - Compiler.")
 message("-- [ Alif version ${CMAKE_PROJECT_VERSION} ]")
 
 # --[ C++ Compiler ] ---------------------------------------------------------------
 
 if (WIN32)
     message("[*] Switch default compiler to C:\\Alif3\\gcc")
-    
+
     set(CMAKE_C_COMPILER                "C:/Alif3/gcc/bin/gcc.exe")
     set(CMAKE_C_COMPILER:FILEPATH       "C:/Alif3/gcc/bin/gcc.exe")
     set(CMAKE_CXX_COMPILER              "C:/Alif3/gcc/bin/g++.exe")
