@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.20 (Beta)"
+#define ALIF_VERSION "3.0.21 (Beta)"
 
 // Stack ********************************************************
 
@@ -88,6 +88,7 @@
 
 	using namespace std;
 	bool DEBUG = false;
+	bool SyntaxOnly = false;
 	static const std::string VERSION = ALIF_VERSION;
 
 // Global *******************************************************
@@ -120,6 +121,7 @@
 			std::string filename = "";
 			std::string extension = "";
 			std::string fullpath = "";
+			std::vector<std::string> includes;
 		} input;
 
 		struct _output {
@@ -623,7 +625,7 @@
 		
 		// Exit code must be 'success', to let IDE read from DEBUG_MESSAGE file
 		// if exit_failur, so IDE read data from process output
-		exit(EXIT_SUCCESS);
+		exit(EXIT_FAILURE);
 	}
 
 // Core *********************************************************
@@ -652,6 +654,8 @@
 	}
 
 	bool is_file_exists(std::string f) {
+
+		// std::cout << "is_file_exists(" << f << ");" << std::endl;
 
 		boost::nowide::ifstream infile(f);
 		return infile.good();
@@ -7141,11 +7145,51 @@
 			ErrorCode("امتداد الملف غير مقبول : ' " + file + " ' ", &OBJ_CLASS_TOKEN);
 
 		// check file existe
-		if (!is_file_exists(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE)) {
+        if (!is_file_exists(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE)) {
 
-			SHOW_FILE_AND_LINE = false;
-			ErrorCode("ملف غير موجود : ' " + OBJ_CLASS_TOKEN.PATH_FULL_SOURCE + " ' ", &OBJ_CLASS_TOKEN);
-		}
+            // Try second path
+            std::string second_path = argument.input.path;	// [/home/folder/]
+            second_path.append(file);						// [test]
+
+            if (is_file_exists(second_path)){				// [/home/folder/test]
+
+				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = second_path;
+			}
+			else if (is_file_exists(second_path + ".alif")){	// [/home/folder/test.alif]
+
+				OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = second_path + ".alif";
+			}
+			else {
+
+				// Search in all include path's
+				bool found = false;
+				for(auto inc_path : argument.input.includes) {
+
+					std::cout << "Look: |" << inc_path << "| ";
+			
+					if (is_file_exists(inc_path + file)){
+
+						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = inc_path + file;
+						found = true;
+						break;
+					}
+					else if (is_file_exists(inc_path + file + ".alif")){
+
+						OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = inc_path + file + ".alif";
+						found = true;
+						break;
+					}
+				}
+				
+				if(!found)
+					ErrorCode("ملف غير موجود : ' " + file + " ' ", &OBJ_CLASS_TOKEN);
+			}
+        }
+
+		// if (!is_file_exists(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE)) {
+		// 	SHOW_FILE_AND_LINE = false;
+		// 	ErrorCode("ملف غير موجود : ' " + OBJ_CLASS_TOKEN.PATH_FULL_SOURCE + " ' ", &OBJ_CLASS_TOKEN);
+		// }
 		
 		// ------------------------------------------------------
 		// Current File Type
@@ -7170,11 +7214,10 @@
 		// Read Source file (UTF8 File name)
 		// ------------------------------------------------------
 
-		if (!is_file_exists(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE)) {
-
-			ALIF_ERROR("ERROR [F001]: Could not open " + OBJ_CLASS_TOKEN.PATH_FULL_SOURCE);
-			exit(EXIT_FAILURE);
-		}
+		// if (!is_file_exists(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE)) {
+		// 	ALIF_ERROR("ERROR [F001]: Could not open " + OBJ_CLASS_TOKEN.PATH_FULL_SOURCE);
+		// 	exit(EXIT_FAILURE);
+		// }
 
 		boost::nowide::ifstream FILE_STREAM(OBJ_CLASS_TOKEN.PATH_FULL_SOURCE);
 
@@ -7455,7 +7498,8 @@
 				// ======================================================
 				CHAR_NUMBER++;
 			} // End char loop.
-		NEXT_LINE:
+
+			NEXT_LINE:
 
 			if (INSIDE_STRING_CPP)
 				//ADD_TOKEN("\n", false, false, CHAR_NUMBER, &OBJ_CLASS_TOKEN);
@@ -7534,6 +7578,8 @@
 					DEBUG_MESSAGE("\n ----------- DEBUGING FINISH ------------- \n", &OBJ_CLASS_TOKEN);
 			}
 		}
+
+		FILE_STREAM.close();
 	}
 
 // Compiler *****************************************************
@@ -7678,16 +7724,18 @@
 
 			boost::nowide::ifstream FILE_STREAM_COMPILER(LOG_PATH);
 
-			if (!FILE_STREAM_COMPILER.is_open())
-			{
-				ALIF_ERROR("ERROR: Could not open compile log file : " + LOG_PATH);
+			if (!FILE_STREAM_COMPILER.is_open()){
+
+				ALIF_ERROR("ERROR: Could not open compile log file: " + LOG_PATH);
 				exit(EXIT_FAILURE);
 			}
 
-			while (getline(FILE_STREAM_COMPILER, LOG_LINE8))
-			{
+			while (getline(FILE_STREAM_COMPILER, LOG_LINE8)){
+
 				LOG_LINE8_Buffer.append(LOG_LINE8);
 			}
+
+			FILE_STREAM_COMPILER.close();
 
 			if (!LOG_LINE8_Buffer.empty())
 			{
@@ -7732,13 +7780,11 @@
 			else
 				GUI_CMD = " -Wl,--subsystem,windows -mwindows ";
 
-			
-
 			CMD =	"@echo off\n"
 					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
 					//"SLEEP 1 \n"
 					"\"" + cc_path_full + "\""
-					" -Os -static-libgcc -static-libstdc++ -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_date_time-mgw8-mt-s-x64-1_76 -lboost_filesystem-mgw8-mt-s-x64-1_76 -lboost_regex-mgw8-mt-s-x64-1_76 -lws2_32 -lwsock32 " 
+					" -Os -static-libgcc -static-libstdc++ -static -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_date_time-mgw8-mt-s-x64-1_76 -lboost_filesystem-mgw8-mt-s-x64-1_76 -lboost_regex-mgw8-mt-s-x64-1_76 -lws2_32 -lwsock32 " 
 					+ GUI_CMD + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\"";
 
 			//ALIF_ERROR("CMD: " + CMD);
@@ -7775,6 +7821,8 @@
 			{
 				LOG_LINE8_Buffer.append(LOG_LINE8);
 			}
+
+			FILE_STREAM_LINKER.close();
 
 			if (!LOG_LINE8_Buffer.empty())
 			{
@@ -8121,6 +8169,8 @@
 				LOG_LINE8_Buffer.append(LOG_LINE8);
 			}
 
+			FILE_STREAM_COMPILER.close();
+
 			if (!LOG_LINE8_Buffer.empty())
 			{
 				// Error while compiling source code
@@ -8416,6 +8466,9 @@
 		//ALIF_ERROR("Compiling... ");
 		//exit(EXIT_SUCCESS);
 		// ++++++++
+
+		if(SyntaxOnly)
+			return; // This is syntax only checking no compile needed
 		
 		#ifdef _WIN32
 
@@ -8498,9 +8551,6 @@
 			compile_linux64();
 
 		#endif
-		
-		// Al Hamdo li ALLAH =)
-		exit(EXIT_SUCCESS);
 	}
 
 // Entry point **************************************************
@@ -8529,9 +8579,13 @@
 			desc.add_options()
 				("h", "Produce help message")
 				("v", "Print compiler version")
+				("debug", "Add debugging info to the log file")
+				("syntax-only", "Check only the Alif code syntax (no compile)")
 				("o", boost::program_options::value<std::string>(), "Set output file")
 				("log", boost::program_options::value<std::string>(), "Set log file")
-				("input", boost::program_options::value< vector<std::string> >(), "Set input file (only one)");
+				("input", 			boost::program_options::value<vector<std::string>>(), "Set input file (only one)")
+				("include-path,I",	boost::program_options::value<vector<std::string>>(), "Add include path")
+				;
 
 			boost::program_options::positional_options_description optional_desc;
 			optional_desc.add("input", -1);
@@ -8597,32 +8651,42 @@
 
 				set_log_file(vm["log"].as<std::string>());
 			}
+
+			// Log
+			if (vm.count("debug")) {
+
+				DEBUG = true;
+			}
+
+			// Syntax only
+			if (vm.count("syntax-only")) {
+
+				SyntaxOnly = true;
+			}
+
+			// Include path
+			if (vm.count("include-path")){
+
+				// std::cout << "Include paths are: " << vm["include-path"].as< vector<string> >() << "\n";
+				for (auto const& i: vm["include-path"].as<vector<std::string>>())
+  					argument.input.includes.push_back(i + settings.os.path_sep);
+			}
 		}
 		catch(exception& e) {
 
-			cerr << "error: " << e.what() << "\n";
+			cerr << "Error: " << e.what() << "\n";
 			return 1;
 		}
 		catch(...) {
 			
-			cerr << "Exception of unknown type!\n";
+			cerr << "Exception: Unknown type.\n";
 			return 1;
 		}
 		
 		// Start parsing
 		alif();
 
-		// if (!is_file_exists(argument.input.fullpath)) {
-		// 	SHOW_FILE_AND_LINE = false;
-		// 	std::cout << "Not fouuund : ' " << argument.input.fullpath << " ' ";
-		// }
-		// else{
-		// 	SHOW_FILE_AND_LINE = false;
-		// 	std::cout << "!!!!! fouuund : ' " << argument.input.fullpath << " ' ";
-		// }
-
-		// Finish.
-		std::cout << "Finish." << std::endl;
+		// Al Hamdo li ALLAH =)
 		exit(EXIT_SUCCESS);
 	}
 

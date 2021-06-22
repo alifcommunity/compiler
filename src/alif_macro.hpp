@@ -129,9 +129,39 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
         std::string path = remove_quote(Token[4], o_tokens);
 
-        if (!is_file_exists(path)) 
-			ErrorCode("ملف غير موجود : ' " + Token[4] + " ' ", o_tokens);
-        
+        if (!is_file_exists(path)){
+
+            // Try second path
+            std::string second_path = argument.input.path;  // [/home/folder/]
+            second_path.append(path);                       // [test]
+
+            if (is_file_exists(second_path))
+                path = second_path;
+            else {
+
+				// Search in all include path's
+				bool found = false;
+				for(auto inc_path : argument.input.includes) {
+			
+					if (is_file_exists(inc_path + path)){
+
+						path = inc_path + path;
+						found = true;
+						break;
+					}
+					else if (is_file_exists(inc_path + path + ".alif")){
+
+						path = inc_path + path + ".alif";
+						found = true;
+						break;
+					}
+				}
+				
+				if(!found)
+					ErrorCode("ملف غير موجود : ' " + path + " ' ", o_tokens);
+			}
+        }
+		
         std::string buf;
 
         file_embed(path, buf, o_tokens);

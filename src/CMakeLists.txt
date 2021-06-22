@@ -36,6 +36,8 @@ endif()
 
 message("[*] Initializing Boost for ${Info_Title}...")
 
+set(Boost_NO_WARN_NEW_VERSIONS ON)
+
 if (WIN32)
 	set(BOOST_ROOT ${Boost_Root})
 	set(Boost_LIBRARY_DIR ${Boost_Lib})
@@ -67,7 +69,7 @@ endif()
 
 message("[*] Searching for Boost libs...")
 
-find_package(Boost ${Boost_Version_Needed} REQUIRED COMPONENTS date_time filesystem regex nowide)
+find_package(Boost ${Boost_Version_Needed} REQUIRED COMPONENTS date_time filesystem regex nowide program_options locale)
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
@@ -127,7 +129,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		message("[*] Initializing '${Info_Title}' settings for MinGW/GCC (Windows).")
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -Wno-deprecated -municode -g")
-		target_link_libraries(${Info_App} ${Boost_LIBRARIES} boost_locale-mgw8-mt-s-x64-1_76 boost_program_options-mgw8-mt-s-x64-1_76 iconv pthread -static)
+		target_link_libraries(${Info_App} ${Boost_LIBRARIES} iconv pthread -static)
 
 	else()
 
