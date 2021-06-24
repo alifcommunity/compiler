@@ -39,11 +39,6 @@ message("[*] Initializing Boost for ${Info_Title}...")
 set(Boost_NO_WARN_NEW_VERSIONS ON)
 
 if (WIN32)
-	set(BOOST_ROOT ${Boost_Root})
-	set(Boost_LIBRARY_DIR ${Boost_Lib})
-	message("[*] Using Boost root: ${BOOST_ROOT}")
-	message("[*] Using Boost lib: ${Boost_LIBRARY_DIR}")
-
 	set(Boost_ARCHITECTURE 				"-x64")
 	set(Boost_USE_STATIC_LIBS			ON)
 	set(Boost_USE_MULTITHREADED			ON)
