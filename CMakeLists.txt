@@ -2,18 +2,30 @@ cmake_minimum_required(VERSION 3.13.0)
 
 # --[ Alif version ] ---------------------------------------------------------------
 
-project(AlifProject VERSION 3.0.21 DESCRIPTION "Alif Programming Language - Compiler.")
+project(AlifProject VERSION 3.0.22 DESCRIPTION "Alif Programming Language - Compiler.")
 message("-- [ Alif version ${CMAKE_PROJECT_VERSION} ]")
+
+# --[ Uninstall ] ------------------------------------------------------------------
+
+if(TARGET uninstall)
+    message("[!] By default, CMake does not provide the 'uninstall' target.")
+    message("[!] If you want to uninstall your project You need to delete the files listed in 'install_manifest.txt' file.")
+    return()
+endif()
 
 # --[ C++ Compiler ] ---------------------------------------------------------------
 
 if (WIN32)
-    message("[*] Switch default compiler to C:\\Alif3\\gcc")
+    IF(EXISTS "C:/Alif3/")
 
-    set(CMAKE_C_COMPILER                "C:/Alif3/gcc/bin/gcc.exe")
-    set(CMAKE_C_COMPILER:FILEPATH       "C:/Alif3/gcc/bin/gcc.exe")
-    set(CMAKE_CXX_COMPILER              "C:/Alif3/gcc/bin/g++.exe")
-    set(CMAKE_CXX_COMPILER:FILEPATH     "C:/Alif3/gcc/bin/g++.exe")
+        # Windows - MinGW64 - Boost
+        message("[*] Switch default compiler to 'C:/Alif3/gcc'")
+        set(CMAKE_C_COMPILER                "C:/Alif3/gcc/bin/gcc.exe")
+        set(CMAKE_C_COMPILER:FILEPATH       "C:/Alif3/gcc/bin/gcc.exe")
+        set(CMAKE_CXX_COMPILER              "C:/Alif3/gcc/bin/g++.exe")
+        set(CMAKE_CXX_COMPILER:FILEPATH     "C:/Alif3/gcc/bin/g++.exe")
+        
+    endif()
 endif()
 
 # --[ Boost ] ----------------------------------------------------------------------
@@ -23,17 +35,23 @@ set(Boost_Version_Needed "1.70.0")
 if (WIN32)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
-        # Boost GCC/MinGW
-        # Example: C:/boost_1_60_0
-        set(Boost_Root "C:/Alif3/boost/include")
-        set(Boost_Lib "C:/Alif3/boost/lib")
+        IF(EXISTS "C:/Alif3/")
+            # Windows - MinGW64 - Boost
+            set(Boost_Root "C:/Alif3/boost/include")
+            set(Boost_Lib "C:/Alif3/boost/lib")
+        endif()
 
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
-        # Boost Microsoft C++
-        # Example: C:/boost_1_60_0
-        set(Boost_Root "C:/boost_1_75_0")
-        set(Boost_Lib "C:/boost_1_75_0/lib64-msvc-14.2")
+        # Remove this line to force building Alif compiler using MSVC.
+        message("[!] Sorry. Alif don't support Microsoft C++ compiler on Windows, Please use MinGW64.")
+        return()
+
+        IF(EXISTS "C:/Alif3/")
+            # Windows - Microsoft C++ - Boost
+            set(Boost_Root "C:/Alif3/boost/include")
+            set(Boost_Lib "C:/Alif3/boost/lib")
+        endif()
 
     endif()
 endif()

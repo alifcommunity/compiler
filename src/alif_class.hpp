@@ -37,7 +37,7 @@ void parser_Class(std::string Token[2048], CLASS_TOKEN *o_tokens){
 		ErrorCode("يجب اعطاء اسم لهدا الصنف الجديدة", o_tokens);
 	
 	if (Token[3] != "" && Token[3] != "(")
-			ErrorCode("أمر غير معروف : ' " + Token[3] + " ' ", o_tokens);
+		ErrorCode("أمر غير معروف : ' " + Token[3] + " ' ", o_tokens);
 	
 	if (Token[3] == "(")
 		ErrorCode("الصنف لا يقبل خصائص ' ( ' ", o_tokens);

@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.21 (Beta)"
+#define ALIF_VERSION "3.0.22 (Beta)"
 
 // Stack ********************************************************
 
@@ -403,7 +403,7 @@
 
 	// Debug
 
-	static const bool DEBUG_PRINT_ON_SCREEN = false;
+	bool DEBUG_PRINT_ON_SCREEN = false;
 	bool THIS_IS_ALIF_C_FILE = false;
 	bool SHOW_FILE_AND_LINE = true;
 
@@ -5169,7 +5169,7 @@
 			// Other Path
 			// -------------------
 
-			cc_path_full = PATH_ABSOLUTE + "\\gcc\\bin\\g++.exe";
+			cc_path_full = PATH_ABSOLUTE + "\\gcc\\bin\\x86_64-w64-mingw32-g++.exe";
 			PATH_FULL_CPP = PATH_TEMP + "\\alifcompiler_" + RANDOM + ".cpp";
 			PATH_FULL_OBJ = PATH_TEMP + "\\alifcompiler_" + RANDOM + ".o";
 			PATH_FULL_RC = PATH_TEMP + "\\alifcompiler_" + RANDOM + ".rc";
@@ -6273,7 +6273,12 @@
 		// For every line
 		for(o_tokens->Line = 1; o_tokens->Line <= o_tokens->TOTAL_LINES; o_tokens->Line++) {
 
-			if (o_tokens->TOTAL[o_tokens->Line] < 1){continue;}
+			// Check total tokens on this current line
+			if (o_tokens->TOTAL[o_tokens->Line] < 1 || o_tokens->TOTAL[o_tokens->Line] > 1024){
+				
+				// Empty line, or the index is memory-non-allocated 
+				continue;
+			}
 
 			std::string Token[2048];
 
@@ -7327,7 +7332,7 @@
 				// _س_
 
 				if ((Char == "_" && (substr_utf8(LINE8, CHAR_NUMBER + 1, 1) == "س") && (substr_utf8(LINE8, CHAR_NUMBER + 2, 1) == "_")) ||
-					(Char == "_" && (substr_utf8(LINE8, CHAR_NUMBER + 1, 1) == "ج") && (substr_utf8(LINE8, CHAR_NUMBER + 2, 1) == "_")) ||
+					// (Char == "_" && (substr_utf8(LINE8, CHAR_NUMBER + 1, 1) == "ج") && (substr_utf8(LINE8, CHAR_NUMBER + 2, 1) == "_")) ||
 					(Char == "@" && (substr_utf8(LINE8, CHAR_NUMBER + 1, 1) != "@"))) // Skip '@@'
 				{
 					std::string CompletChar = "";
@@ -7389,7 +7394,7 @@
 				{
 					goto NEXT_LINE;
 				}
-				else if (Char == "\"")
+				else if (Char == "\"" && substr_utf8(LINE8, (CHAR_NUMBER - 1), 1) != "\\")
 				{
 					/*
 					if (INSIDE_STRING_CPP)
@@ -7698,7 +7703,7 @@
 
 			CMD =	"@echo off\n"
 					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
-					" \"" + cc_path_full + "\" -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -mthreads -DHAVE_W32API_H -DNDEBUG -fvisibility=hidden -flto -fno-fat-lto-objects -c -o \"" + PATH_FULL_OBJ + "\" "
+					" \"" + cc_path_full + "\" -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -O3 -DNDEBUG -c -o \"" + PATH_FULL_OBJ + "\" "
 					" -I\"" + PATH_ABSOLUTE + "\\boost\\include\" "
 					" -I\"" + PATH_ABSOLUTE + "\\aliflib\" "
 					" \"" + PATH_FULL_CPP + "\" "
@@ -7784,7 +7789,7 @@
 					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
 					//"SLEEP 1 \n"
 					"\"" + cc_path_full + "\""
-					" -Os -static-libgcc -static-libstdc++ -static -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_date_time-mgw8-mt-s-x64-1_76 -lboost_filesystem-mgw8-mt-s-x64-1_76 -lboost_regex-mgw8-mt-s-x64-1_76 -lws2_32 -lwsock32 " 
+					" -Os -static-libgcc -static-libstdc++ -static -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_thread-mgw8-mt-s-x64-1_76 -lboost_date_time-mgw8-mt-s-x64-1_76 -lboost_filesystem-mgw8-mt-s-x64-1_76 -lboost_regex-mgw8-mt-s-x64-1_76 -lws2_32 -lwsock32 " 
 					+ GUI_CMD + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\"";
 
 			//ALIF_ERROR("CMD: " + CMD);
@@ -8580,6 +8585,7 @@
 				("h", "Produce help message")
 				("v", "Print compiler version")
 				("debug", "Add debugging info to the log file")
+				("debug-screen", "Add debugging info to the log file, And print it on the screen")
 				("syntax-only", "Check only the Alif code syntax (no compile)")
 				("o", boost::program_options::value<std::string>(), "Set output file")
 				("log", boost::program_options::value<std::string>(), "Set log file")
@@ -8656,6 +8662,13 @@
 			if (vm.count("debug")) {
 
 				DEBUG = true;
+			}
+
+			// Print debug on the screen
+			if (vm.count("debug-screen")) {
+
+				DEBUG = true;
+				DEBUG_PRINT_ON_SCREEN = true;
 			}
 
 			// Syntax only
