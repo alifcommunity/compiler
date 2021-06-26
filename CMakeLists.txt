@@ -16,7 +16,7 @@ endif()
 # --[ C++ Compiler ] ---------------------------------------------------------------
 
 if (WIN32)
-    IF(EXISTS "C:/Alif3/")
+    if(EXISTS "C:/Alif3/")
 
         # Windows - MinGW64 - Boost
         message("[*] Switch default compiler to 'C:/Alif3/gcc'")
