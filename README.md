@@ -21,7 +21,7 @@ mkdir build
 cd build
 ```
   
-Windows - GCC (TDM/MinGW).
+Windows - GCC (MinGW64).
 
 ```bash
 cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
