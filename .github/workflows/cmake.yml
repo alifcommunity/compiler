@@ -1,52 +1,91 @@
+name: Build
+
 on:
   push:
   pull_request:
     branches:
-      - master
+      - main
 
 env:
   BUILD_TYPE: Release
+  BOOST_VER: 1.76.0
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+  GCC-Linux:
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Install Boost 
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt install libboost-all-dev
+      - name: Cache Boost
+        uses: actions/cache@v2
+        with:
+          path: '${{ runner.workspace }}/boost_*.tar.gz'
+          key: 'boost-${{env.BOOST_VER}}'
 
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{github.workspace}}/build
+      - name: Build Boost
+        id: boost
+        uses: egor-tensin/build-boost@v1
+        with:
+          version: ${{env.BOOST_VER}}
+          libraries: filesystem program_options system locale date_time regex nowide
+          platform: x64
+          configuration: ${{env.BUILD_TYPE}}
+          static: 1
 
-    - name: Configure CMake
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{github.workspace}}/build
 
-    - name: Configure CMake
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/build
-      shell: cmd
-      run: |
-           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-           cmake .. . -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      - name: Configure CMake
+        env:
+          BOOST_ROOT: ${{steps.boost.outputs.root}}
+          BOOST_LIBRARYDIR: ${{steps.boost.outputs.librarydir}}
+        working-directory: ${{github.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE
 
-    - name: Build
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}/build
-      run: cmake --build .
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        run: cmake --build .
 
-    - name: Build
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/build
-      shell: cmd
-      run: |
-           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-           nmake
+  MinGW-Windows:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Cache Boost
+        uses: actions/cache@v2
+        with:
+          path: '${{ runner.workspace }}/boost_*.tar.gz'
+          key: 'boost-${{env.BOOST_VER}}'
+
+      - name: Build Boost
+        id: boost
+        uses: egor-tensin/build-boost@v1
+        with:
+          version: ${{env.BOOST_VER}}
+          libraries: filesystem program_options system locale date_time regex nowide
+          platform: x64
+          configuration: ${{env.BUILD_TYPE}}
+          toolset: mingw
+          static: 1
+          static-runtime: 1
+          directory: ${{github.workspace}}/boost
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Configure CMake
+        env:
+          BOOST_ROOT: ${{steps.boost.outputs.root}}
+          BOOST_LIBRARYDIR: ${{steps.boost.outputs.librarydir}}
+        working-directory: ${{github.workspace}}/build
+        shell: cmd
+        run: |
+             cmake ${{github.workspace}} -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        shell: cmd
+        run: |
+             mingw32-make
