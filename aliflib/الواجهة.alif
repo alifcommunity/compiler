@@ -8,6 +8,22 @@
 
 _س_
 #include <webui.hpp>
+std::map<std::string, void(*)()> func_ref;
+
+void __alif_webui_events(webui::event e){
+
+	// std::cout << "__alif_webui_events: Window ID: " << e.window_id << std::endl;
+	// std::cout << "__alif_webui_events: Element ID: " << e.element_id << std::endl;
+	// std::cout << "__alif_webui_events: Element Name: " << e.element_name << std::endl << std::endl;
+
+	std::string buf;
+	buf.append(std::to_string(e.window_id));
+	buf.append("_");
+	buf.append(e.element_name);
+
+	if(func_ref[buf])
+		func_ref[buf]();
+}
 _س_
 
 صنف الواجهة
@@ -15,26 +31,47 @@ _س_
 			_س_
 			private: webui::window o_window;
 			private: std::string html;
+			private: unsigned short window_id;
 			_س_
 
             دالة بناء (نص  ن)
 					_س_
-					html = @ن@ ;
+					html = @ن@;
+					window_id = o_window.get_window_id();
+					o_window.bind_all(__alif_webui_events);
 					_س_
             نهاية دالة	
 
+			دالة  ربط (نص  ن، مؤشر_دالة  م)
+				_س_
+				std::string buf;
+				buf.append(std::to_string(window_id));
+				buf.append("_");
+				buf.append(@ن@);
+				func_ref[buf] = @م@;
+				_س_
+			نهاية دالة
+
 			دالة  إظهار ()
-			_س_
-			if(!o_window.show(&html, webui::browser::chrome))
-					o_window.show(&html);
-			_س_
+				_س_
+				if(!o_window.show(&html, webui::browser::chrome))
+						o_window.show(&html);
+				_س_
 			نهاية دالة
 
 			دالة  إنتظار ()
-			_س_
-			std::thread ui(webui::loop);
-			ui.join();
-			_س_
+				_س_
+				std::thread ui(webui::loop);
+				ui.join();
+				_س_
+			نهاية دالة
+
+			دالة نص جافاسكريبت (نص  ج)
+				نص  النتيجة
+				_س_
+				@النتيجة@ = o_window.run_js(@ج@);
+				_س_
+				إرجاع النتيجة
 			نهاية دالة
 
 نهاية صنف

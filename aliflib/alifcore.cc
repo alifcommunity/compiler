@@ -3,8 +3,8 @@
  compiled by Alif 3.x Series, which 
  conain all functions and tools needed 
  by the app in the runtimes.
-
- Version: Alif Runtimes Core 1.0.1
+ File: [Alif folder]/alifcore/alifcore.cc
+ Version: Alif CC Core 1.0.0
 */
 
 #ifndef UNICODE
@@ -22,6 +22,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <map>
 using namespace std;
 
 const static string ALIFCORE_NEW_LINE = "\n";

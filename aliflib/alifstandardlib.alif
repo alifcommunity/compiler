@@ -9,6 +9,22 @@
 
 #ألف
 
+_س_
+#include <iostream>
+#include <chrono>
+#include <thread>
+#include <boost/thread/thread.hpp>
+_س_
+
 دالة اطبع (نص الجملة)
 	_س_ std::cout << @الجملة@ ; _س_
+نهاية دالة
+
+دالة نم (عدد أجزاء_الثانية)
+	_س_
+	long ms = (long) @أجزاء_الثانية@;
+	boost::system_time t = boost::get_system_time();
+	t += boost::posix_time::milliseconds(ms);
+	boost::thread::sleep(t);
+	_س_
 نهاية دالة
