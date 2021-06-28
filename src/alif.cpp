@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.22 (Beta)"
+#define ALIF_VERSION "3.0.30 (Beta)"
 
 // Stack ********************************************************
 
@@ -476,17 +476,21 @@
 	// Compile Extra commands
 	// -----------------------------------------------------------
 
-	std::string Compile_ExtraCompile = " ";	// -I/...
+	std::string Compile_ExtraCompile = " ";		// -I/...
 	std::string Compile_ExtraLink = " ";		// -L\"/...\" -lmylib...
 
 	void add_extra_arg_to_compiler (std::string cmd){
 
 		Compile_ExtraCompile.append(cmd);
+		Compile_ExtraCompile.append(" ");
+		//std::cout << "\n\n--------------\nAdd compile: |" << cmd << "|\n--------------\n";
 	}
 
 	void add_extra_arg_to_linker (std::string cmd){
 
 		Compile_ExtraLink.append(cmd);
+		Compile_ExtraLink.append(" ");
+		//std::cout << "\n\n--------------\nAdd link: |" << cmd << "|\n--------------\n";
 	}
 
 	// -----------------------------------------------------------
@@ -631,6 +635,16 @@
 // Core *********************************************************
 
 	// New
+
+	void str_arr_remove_elem(std::string* arr, int to_remove, int len){
+
+		for (int i = to_remove; i < len; ++i) {
+			
+			arr[i] = arr[i + 1];
+		}
+
+		arr[len] = "\0";
+	}
 
 	void err(std::string des) {
 
@@ -7170,7 +7184,7 @@
 				bool found = false;
 				for(auto inc_path : argument.input.includes) {
 
-					std::cout << "Look: |" << inc_path << "| ";
+					//std::cout << "Look: |" << inc_path << "| ";
 			
 					if (is_file_exists(inc_path + file)){
 
@@ -7311,21 +7325,70 @@
 					Char = "8";
 				else if (Char == "۹")
 					Char = "9";
-
 				else if (Char == "“")
 					Char = "\"";
 				else if (Char == "”")
 					Char = "\"";
-
 				else if (Char == "‘")
 					Char = "'";
 
 				// Comments
 				//if ( (Char == "\\") && (substr_utf8(LINE8, (CHAR_NUMBER + 1), 1) == "\\") && !INSIDE_STRING)
-				if ((CHAR_NUMBER == 0) && (Char == "'") && !INSIDE_STRING) // '
+				if ((CHAR_NUMBER == 0) && !INSIDE_STRING && (Char == "'")) // '
 				{
 					goto NEXT_LINE;
 				}
+
+				// Macro OS
+				/*
+				if ((CHAR_NUMBER == 0) && !INSIDE_STRING && (Char == "#") && (substr_utf8(LINE8, 1, 1) == "إذا"))
+				{
+					
+					if(substr_utf8(LINE8, 2, 1) == "لينكس"){
+
+						// #إذا لينكس ...
+
+						#ifdef _WIN32
+							goto NEXT_LINE;
+						#elif  __APPLE__
+							goto NEXT_LINE;
+						#else
+							CHAR_NUMBER = 3; // Point to after : #إذا لينكس
+							Char = substr_utf8(LINE8, CHAR_NUMBER, 1);
+						#endif
+					}
+					else if(substr_utf8(LINE8, 2, 1) == "ويندوز"){
+
+						// #إذا ويندوز ...
+
+						#ifdef _WIN32
+							CHAR_NUMBER = 3; // Point to after : #إذا ويندوز
+							Char = substr_utf8(LINE8, CHAR_NUMBER, 1);
+						#elif  __APPLE__
+							goto NEXT_LINE;
+						#else
+							goto NEXT_LINE;
+						#endif
+					}
+					else if(substr_utf8(LINE8, 2, 1) == "ماك"){
+
+						// #إذا ماك ...
+
+						#ifdef _WIN32
+							goto NEXT_LINE;
+						#elif  __APPLE__
+							CHAR_NUMBER = 3; // Point to after : #إذا ماك
+							Char = substr_utf8(LINE8, CHAR_NUMBER, 1);
+						#else
+							goto NEXT_LINE;
+						#endif
+					}
+					else {
+
+						ALIF_ERROR("Alif Lexer error: The Alif macro is invalide (" + substr_utf8(LINE8, 2, 1) + ") at line " + std::to_string(OBJ_CLASS_TOKEN.TOTAL_LINES));
+					}
+				}
+				*/
 
 				// -------------------------------------------------------------
 
@@ -7697,19 +7760,25 @@
 
 			// Compile: WebUI - TDM (GCC) 9.2 C++17 64Bit - Windows
 
-		
-
 			//ALIF_ERROR("PATH_FULL_CPP: " + PATH_FULL_CPP);
 
+			// CMD =	"@echo off\n"
+			// 		"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
+			// 		" \"" + cc_path_full + "\" -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -O3 -DNDEBUG -c -o \"" + PATH_FULL_OBJ + "\" "
+			// 		" -I\"" + PATH_ABSOLUTE + "\\boost\\include\" "
+			// 		" -I\"" + PATH_ABSOLUTE + "\\aliflib\" "
+			// 		" \"" + PATH_FULL_CPP + "\" "
+			// 		" 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\" ";
+			
 			CMD =	"@echo off\n"
 					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
-					" \"" + cc_path_full + "\" -Wa,-mbig-obj -fvisibility=hidden -Wall -O3 -std=gnu++17 -O3 -DNDEBUG -c -o \"" + PATH_FULL_OBJ + "\" "
+					" \"" + cc_path_full + "\" -c -o \"" + PATH_FULL_OBJ + "\" "
 					" -I\"" + PATH_ABSOLUTE + "\\boost\\include\" "
 					" -I\"" + PATH_ABSOLUTE + "\\aliflib\" "
 					" \"" + PATH_FULL_CPP + "\" "
-					" 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\" ";
+					+ Compile_ExtraCompile + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.log\" ";
 
-			//ALIF_ERROR("CMD: " + CMD);
+			if(DEBUG)LogMessage("Compile script (Windows) : " + CMD + " \n");
 
 			FILE_BATCH_PATH = PATH_TEMP + "\\alifcompiler_" + RANDOM + "_compile.bat";
 
@@ -7757,7 +7826,6 @@
 			// Resource
 			// ------------------------------------------------------
 
-			
 			CMD =	"@echo off\n"
 					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
 					//"SLEEP 1 \n"
@@ -7776,23 +7844,20 @@
 			// Link
 			// ------------------------------------------------------
 
-			std::string GUI_CMD = " -Wl,--subsystem,console -mconsole ";
-
-			bool build_as_console = true; // TODO: Allow this from alif macro + set this inside a struct.
-
-			if (build_as_console)
-				GUI_CMD = " -Wl,--subsystem,console -mconsole ";
-			else
-				GUI_CMD = " -Wl,--subsystem,windows -mwindows ";
-
+			// CMD =	"@echo off\n"
+			// 		"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
+			// 		//"SLEEP 1 \n"
+			// 		"\"" + cc_path_full + "\""
+			// 		" -Os -static-libgcc -static-libstdc++ -static -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_thread-mgw8-mt-s-x64-1_76 -lboost_date_time-mgw8-mt-s-x64-1_76 -lboost_filesystem-mgw8-mt-s-x64-1_76 -lboost_regex-mgw8-mt-s-x64-1_76 -lws2_32 -lwsock32 " 
+			// 		+ GUI_CMD + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\"";
+			
 			CMD =	"@echo off\n"
 					"Set PATH=" + PATH_ABSOLUTE + "\\gcc\\bin\n"
 					//"SLEEP 1 \n"
-					"\"" + cc_path_full + "\""
-					" -Os -static-libgcc -static-libstdc++ -static -m64 -finput-charset=utf-8 -mthreads -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" -lwebui -lboost_thread-mgw8-mt-s-x64-1_76 -lboost_date_time-mgw8-mt-s-x64-1_76 -lboost_filesystem-mgw8-mt-s-x64-1_76 -lboost_regex-mgw8-mt-s-x64-1_76 -lws2_32 -lwsock32 " 
-					+ GUI_CMD + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\"";
+					"\"" + cc_path_full + "\" -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_RC + ".res\" \"" + PATH_FULL_OBJ + "\" -L\"" + PATH_ABSOLUTE + "\\boost\\lib\" -L\"" + PATH_ABSOLUTE + "\\aliflib\" " 
+					+ Compile_ExtraLink + " 2> \"" + PATH_TEMP + "\\alifcompiler_" + RANDOM + "_link.log\"";
 
-			//ALIF_ERROR("CMD: " + CMD);
+			if(DEBUG)LogMessage("Link script (Windows) : " + CMD + " \n");
 			
 			FILE_BATCH_PATH = PATH_TEMP + "\\alifcompiler_" + RANDOM + "_linker.bat";
 			
@@ -8142,12 +8207,19 @@
 
 			// -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -pthread -DNDEBUG -fvisibility=hidden -lfto -fno-fat-lto-objects -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK
 
-			LINUX_CMD = "g++ -Wall -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -pthread -DNDEBUG -fvisibility=hidden -c -o \"" + PATH_FULL_OBJ + "\" "
-						" -I\"/usr/local/include\" "		// WebUI
-						" -I\"/usr/local/lib/aliflib\" "	// Alif lib
-						" \"" + PATH_FULL_CPP + "\" "
+			// LINUX_CMD = "g++ -Wall -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -pthread -DNDEBUG -fvisibility=hidden -c -o \"" + PATH_FULL_OBJ + "\" "
+			// 			" -I\"/usr/local/include\" "		// Standard
+			// 			" -I\"/usr/local/lib/aliflib\" "	// Alif lib
+			// 			" \"" + PATH_FULL_CPP + "\" "
+			// 			" 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log\" ";
+			
+			LINUX_CMD = "g++ -c -o \"" + PATH_FULL_OBJ + "\" \"" + PATH_FULL_CPP + "\" -I\"/usr/local/lib/aliflib\" "
+						+ Compile_ExtraCompile +
 						" 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log\" ";
-		
+
+			if(DEBUG)LogMessage("Compile command (Linux) : " + LINUX_CMD + " \n");
+			//std::cout << "\n\n--------------\nCompile: |" << LINUX_CMD << "|\n--------------\n";
+
 			// LINUX_CMD = "g++ -c -o \"" + PATH_FULL_OBJ + "\" -Wno-undef -Wno-unused-parameter "
 			// 				"-D__WXGTK__ -Wno-ctor-dtor-privacy -Woverloaded-virtual -D_FILE_OFFSET_BITS=64 "
 			// 				"-DwxDEBUG_LEVEL=0 -I\"/usr/local/include/aliflibwx\" -pthread -m64 -DG_DISABLE_CAST_CHECKS -O2 -m64 -std=c++11 " + Compile_ExtraCompile + " \"" +
@@ -8212,8 +8284,19 @@
 			// 				"-L\"/usr/local/lib/aliflibwx\" -lwx_gtk2u_alif_webview-3.1 -lwx_gtk2u_alif_propgrid-3.1 -lwx_gtk2u_alif_aui-3.1 -lwebkitgtk-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lpangoft2-1.0 -lpango-1.0 -lfontconfig -lfreetype -lsoup-2.4 -lgio-2.0 -lgobject-2.0 -ljavascriptcoregtk-1.0 -lglib-2.0 -lwx_gtk2u_alif_stc-3.1 -lwx_gtk2u_alif_core-3.1 -lwx_baseu_alif-3.1 -lwxscintilla_alif-3.1 -lwxtiff_alif-3.1 -lwxjpeg_alif-3.1 -lwxpng_alif-3.1  -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lfontconfig -lfreetype -lgthread-2.0 -pthread -lglib-2.0 -lX11 -lXxf86vm -lSM -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lwxzlib_alif-3.1 -lwxregexu_alif-3.1 -lwxexpat_alif-3.1 "
 			// 				"-pthread -m64 -static-libgcc -static-libstdc++ -ldl -lm -ldl -lm -O2 -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu\" " + Compile_ExtraLink;
 			
-			LINUX_CMD =	"g++ -Os -m64 -finput-charset=utf-8 -pthread -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\" "
-						"-L\"/usr/local/lib/aliflib\" -lwebui -lboost_filesystem";
+			// LINUX_CMD =	"g++ -Os -m64 -finput-charset=utf-8 -pthread -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\" "
+			// 			"-L\"/usr/local/lib/aliflib\" -lwebui -lboost_filesystem";
+			
+			LINUX_CMD =	"g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\" -L\"/usr/local/lib/aliflib\" "
+						+ Compile_ExtraLink + " "; // TODO: Add 2 > log
+			
+			if(DEBUG)LogMessage("Link command (Linux) : " + LINUX_CMD + " \n");
+
+			//std::cout << "\n\n--------------\nLink: |" << LINUX_CMD << "|\n--------------\n";
+			// g++   
+			// -Os -m64 -finput-charset=utf-8 -pthread -lboost_filesystem -lboost_thread   
+			// -Os -m64 -finput-charset=utf-8 -pthread -lboost_filesystem -lboost_thread   
+			// -L"/usr/local/lib/aliflib" -o "test" "/tmp/alifcompiler_1007.o"
 
 			if (system(LINUX_CMD.c_str()) != 0)
 			{
@@ -8223,7 +8306,7 @@
 				if(DEBUG)
 					cout << endl << "Debuging: " << LINUX_CMD.c_str() << endl;
 					
-				ALIF_ERROR("Please report this error to the Alif Community: https://github.com/alifcommunity/compiler/issues \nAlif Compiler " + VERSION + " - Linux\n\nFile : " + PATH_FULL_ALIF + "\nError: Linking Librarys error.");
+				ALIF_ERROR("Please report this error to the Alif Community: https://github.com/alifcommunity/compiler/issues \nAlif Compiler " + VERSION + " - Linux\n\nFile : " + PATH_FULL_ALIF + "\nError: Linking Librarys error.\nLink command: " + LINUX_CMD);
 				exit(EXIT_FAILURE);
 			}
 
@@ -8592,6 +8675,7 @@
 				("log", boost::program_options::value<std::string>(), "Set log file")
 				("input", 			boost::program_options::value<vector<std::string>>(), "Set input file (only one)")
 				("include-path,I",	boost::program_options::value<vector<std::string>>(), "Add include path")
+				("clib,L",	boost::program_options::value<vector<std::string>>(), "Add extra C/C++ libs")
 				;
 
 			boost::program_options::positional_options_description optional_desc;
@@ -8681,9 +8765,15 @@
 			// Include path
 			if (vm.count("include-path")){
 
-				// std::cout << "Include paths are: " << vm["include-path"].as< vector<string> >() << "\n";
 				for (auto const& i: vm["include-path"].as<vector<std::string>>())
   					argument.input.includes.push_back(i + settings.os.path_sep);
+			}
+			
+			// Extra lib (linker)
+			if (vm.count("clib")){
+
+				for (auto const& i: vm["clib"].as<vector<std::string>>())
+  					add_extra_arg_to_linker("-l" + i + " ");
 			}
 		}
 		catch(exception& e) {

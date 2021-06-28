@@ -34,7 +34,7 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
     
     if (IsInsideNamespace || IsInsideFunction)
 		ErrorCode("يجب استعمال الماكرو ' # ' في مكان عام", o_tokens);
-    
+
     // --[ Macro - Alif ] -----------------------------------------------------
 
     if (Token[2] == "ألف") {
@@ -52,11 +52,69 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
         }
         
         if(DEBUG)DEBUG_MESSAGE("[#ALIF]\n", o_tokens);
+
+        return;
+    }
+
+   // --[ Macro - Confidtions ] ----------------------------------------------
+
+    if (Token[2] == "إذا"){
+
+        if (Token[3] == "لينكس"){
+
+			// #إذا لينكس ...
+
+            #ifdef _WIN32
+                return;
+            #elif  __APPLE__
+                return;
+            #else
+                // Point to after : #إذا لينكس
+                str_arr_remove_elem(Token, 2, o_tokens->TOTAL[o_tokens->Line]); // إذا
+                str_arr_remove_elem(Token, 2, o_tokens->TOTAL[o_tokens->Line]); // لينكس
+            #endif
+        }
+        else if (Token[3] == "ويندوز"){
+
+            // #إذا ويندوز ...
+
+            #ifdef _WIN32
+                // Point to after : #إذا ويندوز
+                str_arr_remove_elem(Token, 2, o_tokens->TOTAL[o_tokens->Line]); // إذا
+                str_arr_remove_elem(Token, 2, o_tokens->TOTAL[o_tokens->Line]); // ويندوز
+            #elif  __APPLE__
+                return;
+            #else
+                return;
+            #endif
+        }
+        else if (Token[3] == "ماك"){
+
+            // #إذا ماك ...
+
+            #ifdef _WIN32
+                return;
+            #elif  __APPLE__
+                // Point to after : #إذا ماك
+                str_arr_remove_elem(Token, 2, o_tokens->TOTAL[o_tokens->Line]); // إذا
+                str_arr_remove_elem(Token, 2, o_tokens->TOTAL[o_tokens->Line]); // ماك
+            #else
+                return;
+            #endif
+        }
+        else {
+
+            ErrorCode("ماكرو شرطي غير معروف : ' " + Token[3] + " ' ", o_tokens);
+        }
+
+        // Check line
+        if (Token[2] == "#")
+		    ErrorCode("ليس هناك حاجة لإضافة # ثاني", o_tokens);
     }
 
     // --[ Macro - Library ] --------------------------------------------------
 
-    else if (Token[2] == "مكتبة") {
+    if (Token[2] == "مكتبة") {
 
         check_macro_alif(o_tokens);
 
@@ -173,19 +231,27 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
     // --[ Macro - Extra Compile / Link ] -------------------------------------
 
-    // else if (Token[2] == "أظف_ترجمة" || Token[2] == "أظف_ربط") {
+    else if (Token[2] == "أضف_ترجمة" || Token[2] == "أضف_تجميع") {
 
-    //     // #أظف_ترجمة "-O3 -z"
-    //     // #أظف_ربط "-l"        
+        // #أضف_ترجمة " -O3 -z "
+        // #أضف_تجميع " -lfoo "
 
-    //     if(!IsValidStringFormat(Token[3], o_tokens))
-    //         ErrorCode("خطأ في كتابة إسم الأمر: "+ Token[3], o_tokens);
-        
-    //     if (Token[2] == "أظف_ترجمة")
-    //         add_extra_arg_to_compiler(remove_quote(Token[3], o_tokens));
-    //     else
-    //         add_extra_arg_to_linker(remove_quote(Token[3], o_tokens));
-    // }
+        if(!o_tokens->TOKENS_PREDEFINED){
+
+            check_macro_alif(o_tokens);
+
+            if(!IsValidStringFormat(Token[3], o_tokens))
+                ErrorCode("خطأ في كتابة إسم الأمر: "+ Token[3], o_tokens);
+
+            if (Token[4] != "")
+                ErrorCode("أمر غير معروف : ' " + Token[4] + " ' ", o_tokens);
+            
+            if (Token[2] == "أضف_ترجمة")
+                add_extra_arg_to_compiler(remove_quote(Token[3], o_tokens));
+            else
+                add_extra_arg_to_linker(remove_quote(Token[3], o_tokens));
+        }
+    }
 
     // --[ Macro - Python ] ---------------------------------------------------
 
@@ -235,8 +301,13 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
             
             ErrorCode("ماكرو غير معروف : ' " + Token[2] + " '، هل تقصد ' ألف ' ؟ ", o_tokens);
         }
-        else
-            ErrorCode("ماكرو غير معروف : ' " + Token[2] + " ' ", o_tokens);
+        else {
+
+            if (Token[2] == "")
+		        ErrorCode("الماكرو غير محدد ' # '", o_tokens);
+            else
+                ErrorCode("ماكرو غير معروف : ' " + Token[2] + " ' ", o_tokens);
+        }
     }
 }
 

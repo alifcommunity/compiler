@@ -57,9 +57,9 @@ if (WIN32)
 	# add_definitions( -DBOOST_ALL_NO_LIB )
 else()
     # set(Boost_DEBUG 					OFF)
-    set(Boost_USE_STATIC_LIBS       	ON)
-    # set(Boost_USE_MULTITHREADED		ON)
-    # set(Boost_USE_STATIC_RUNTIME		ON)
+    set(Boost_USE_STATIC_LIBS       	OFF)
+    set(Boost_USE_MULTITHREADED			ON)
+    set(Boost_USE_STATIC_RUNTIME		OFF)
     # set(Boost_ARCHITECTURE			"-x64")
     # set(Boost_THREADAPI				"pthread")
     # set(Boost_DETAILED_FAILURE_MSG	ON)
@@ -69,7 +69,7 @@ endif()
 
 message("[*] Searching for Boost libs...")
 
-find_package(Boost ${Boost_Version_Needed} REQUIRED COMPONENTS date_time filesystem regex nowide program_options locale)
+find_package(Boost ${Boost_Version_Needed} REQUIRED COMPONENTS date_time filesystem regex nowide program_options locale thread)
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
@@ -137,7 +137,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		message("[*] Initializing '${Info_Title}' settings for GCC (Linux).")
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -w -O3 -std=gnu++17 -Wno-deprecated" )
-		target_link_libraries(${Info_App} ${Boost_LIBRARIES} boost_locale boost_program_options pthread)
+		target_link_libraries(${Info_App} ${Boost_LIBRARIES} pthread)
 		
 	endif()
 
@@ -194,3 +194,7 @@ if(UNIX)
 			RUNTIME DESTINATION bin)
 	install (DIRECTORY ${AlifProject_SOURCE_DIR}/aliflib DESTINATION lib)
 endif (UNIX)
+
+# --[ Copy Examples ] ------------------------------------------------------------
+
+file(COPY ${AlifProject_SOURCE_DIR}/examples DESTINATION ${CMAKE_BINARY_DIR}/)
