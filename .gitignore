@@ -4,6 +4,10 @@ build/
 */logs
 *.logs
 
+**/log
+*/log
+*.log
+
 **/exe
 */exe
 *.exe

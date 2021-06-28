@@ -231,7 +231,9 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
     // --[ Macro - Extra Compile / Link ] -------------------------------------
 
-    else if (Token[2] == "أضف_ترجمة" || Token[2] == "أضف_تجميع") {
+    else if (   Token[2] == "أضف_ترجمة" || Token[2] == "أضف_ترجمة_بداية" || 
+                Token[2] == "أضف_تجميع" || Token[2] == "أضف_تجميع_بداية"
+            ) {
 
         // #أضف_ترجمة " -O3 -z "
         // #أضف_تجميع " -lfoo "
@@ -248,8 +250,16 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
             
             if (Token[2] == "أضف_ترجمة")
                 add_extra_arg_to_compiler(remove_quote(Token[3], o_tokens));
-            else
+            else if (Token[2] == "أضف_ترجمة_بداية")
+                add_extra_arg_to_compiler_beginning(remove_quote(Token[3], o_tokens));
+
+            else if (Token[2] == "أضف_تجميع")
                 add_extra_arg_to_linker(remove_quote(Token[3], o_tokens));
+            else if (Token[2] == "أضف_تجميع_بداية")
+                add_extra_arg_to_linker_beginning(remove_quote(Token[3], o_tokens));
+
+            else
+               ErrorCode("علة: نوع أضف غير معروف ' " + Token[2] + " ' ", o_tokens); 
         }
     }
 

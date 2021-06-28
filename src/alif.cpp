@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.30 (Beta)"
+#define ALIF_VERSION "3.0.31 (Beta)"
 
 // Stack ********************************************************
 
@@ -491,6 +491,18 @@
 		Compile_ExtraLink.append(cmd);
 		Compile_ExtraLink.append(" ");
 		//std::cout << "\n\n--------------\nAdd link: |" << cmd << "|\n--------------\n";
+	}
+
+	void add_extra_arg_to_compiler_beginning (std::string cmd){
+
+		Compile_ExtraCompile.insert(0, (cmd + " "));
+		//std::cout << "\n\n--------------\nAdd compile beginning: |" << cmd << "|\n--------------\n";
+	}
+
+	void add_extra_arg_to_linker_beginning (std::string cmd){
+
+		Compile_ExtraLink.insert(0, (cmd + " "));
+		//std::cout << "\n\n--------------\nAdd link beginning: |" << cmd << "|\n--------------\n";
 	}
 
 	// -----------------------------------------------------------
@@ -7900,7 +7912,8 @@
 
 				boost::replace_all(LOG_LINE8_Buffer, "C:\\Alif\\bin/ld.exe:", "");
 
-				ALIF_ERROR("Please report this error to the Alif Community: https://github.com/alifcommunity/compiler/issues \n\nAlif Compiler " + VERSION + " - Windows\n\nFile : " + PATH_FULL_ALIF + "\nError (Linker): " + LOG_LINE8_Buffer);
+				ALIF_ERROR("Please report this error to the Alif Community: https://github.com/alifcommunity/compiler/issues \n\nAlif Compiler " + VERSION + " - Windows\n\nFile : " + PATH_FULL_ALIF + "\nError (Linker): " + LOG_LINE8_Buffer
+				+ "\nLinker command (Windows): \n" + CMD);
 				exit(EXIT_FAILURE);
 			}
 			
