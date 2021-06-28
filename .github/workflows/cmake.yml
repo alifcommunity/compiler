@@ -9,6 +9,7 @@ on:
 env:
   BUILD_TYPE: Release
   BOOST_VER: 1.76.0
+  BOOST_LIBS: filesystem program_options system locale date_time regex nowide thread
 
 jobs:
   GCC-Linux:
@@ -28,7 +29,7 @@ jobs:
         uses: egor-tensin/build-boost@v1
         with:
           version: ${{env.BOOST_VER}}
-          libraries: filesystem program_options system locale date_time regex nowide
+          libraries: ${{env.BOOST_LIBS}}
           platform: x64
           configuration: ${{env.BUILD_TYPE}}
           static: 1
@@ -64,7 +65,7 @@ jobs:
         uses: egor-tensin/build-boost@v1
         with:
           version: ${{env.BOOST_VER}}
-          libraries: filesystem program_options system locale date_time regex nowide
+          libraries: ${{env.BOOST_LIBS}}
           platform: x64
           configuration: ${{env.BUILD_TYPE}}
           toolset: mingw
