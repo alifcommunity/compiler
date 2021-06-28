@@ -36,7 +36,8 @@ nmake
 ```
 
 Linux - Install Boost +1.76
-```wget https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz
+```
+wget https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz
 tar -xzf boost_1_76_0.tar.gz
 cd boost_1_76_0
 ./bootstrap.sh
