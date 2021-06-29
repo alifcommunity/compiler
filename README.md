@@ -41,7 +41,7 @@ wget https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76
 tar -xzf boost_1_76_0.tar.gz
 cd boost_1_76_0
 ./bootstrap.sh
-sudo ./b2 install address-model=64 variant=release link=static runtime-link=shared warnings=off --with-filesystem --with-program_options --with-system --with-locale --with-date_time --with-regex --with-nowide ---with-thread 
+sudo ./b2 install address-model=64 variant=release link=static runtime-link=shared warnings=off --with-filesystem --with-program_options --with-system --with-locale --with-date_time --with-regex --with-nowide --with-thread 
 ```
 
 Linux - GCC.
