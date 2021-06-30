@@ -47,6 +47,7 @@ void parser_IfElse(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	// else ...
 	// end if
 
+	/*
 	// *** Generate Code ***
 	if (!IsInsideNamespace)
 	{
@@ -57,6 +58,26 @@ void parser_IfElse(std::string Token[2048], CLASS_TOKEN *o_tokens){
 	{
 		// Local Fun IF
 		cpp_AddScript(TheFunction, "\n } else { \n ");
+	}
+	// *** *** *** *** *** ***
+	*/
+
+	if (IsInsideClass)
+	{
+		// just for fixing this ...
+		// *** Generate Code ***
+		CPP_CLASS.append("\n } else { ");
+		// *** *** *** *** *** ***
+	}
+	else if (!IsInsideNamespace)
+	{
+		// Global Fun IF
+		CPP_GLOBAL_FUN.append("\n } else { ");
+	}
+	else
+	{
+		// Local Fun IF
+		cpp_AddScript(TheFunction, "\n } else { ");
 	}
 	// *** *** *** *** *** ***
 

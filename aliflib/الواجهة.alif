@@ -37,11 +37,16 @@ _س_
 
 صنف الواجهة
 
-			_س_
-			private: webui::window o_window;
-			private: std::string html;
-			private: unsigned short window_id;
-			_س_
+		عدد كروم = 1
+		عدد فايرفوكس = 2
+		عدد إدج = 3
+		عدد سافاري = 4
+
+		_س_
+		private: webui::window o_window;
+		private: std::string html;
+		private: unsigned short window_id;
+		_س_
 
             دالة بناء (نص  ن)
 					_س_
@@ -66,6 +71,36 @@ _س_
 				if(!o_window.show(&html, webui::browser::chrome))
 						o_window.show(&html);
 				_س_
+			نهاية دالة
+
+			دالة  إظهار_متصفح ( عدد المتصفح )
+				إذا المتصفح = 1
+  					_س_
+  						if(!o_window.show(&html, webui::browser::chrome))
+  						o_window.show(&html);
+  					_س_
+                أو إذا المتصفح = 2
+  					_س_
+  						if(!o_window.show(&html, webui::browser::firefox))
+  						o_window.show(&html);
+  					_س_ 
+                أو إذا المتصفح = 3
+  					_س_
+  						if(!o_window.show(&html, webui::browser::edge))
+  						o_window.show(&html);
+  					_س_ 
+                أو إذا المتصفح = 4
+  					_س_
+  						if(!o_window.show(&html, webui::browser::safari))
+  						o_window.show(&html);
+  					_س_ 
+				وإلا
+  					_س_
+  						if(!o_window.show(&html, webui::browser::chrome))
+  						o_window.show(&html);
+  					_س_    
+                نهاية إذا
+
 			نهاية دالة
 
 			دالة  إنتظار ()

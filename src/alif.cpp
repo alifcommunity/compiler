@@ -8270,7 +8270,7 @@
 				if(!DEBUG)
 					boost::replace_all(LOG_LINE8_Buffer, PATH_FULL_CPP + ":", "");
 
-				ALIF_ERROR("Please report this error to the Alif Community: https://github.com/alifcommunity/compiler/issues \n\nAlif Compiler " + VERSION + " - Linux\n\nFile : " + PATH_FULL_ALIF + "\nError: " + LOG_LINE8_Buffer);
+				ALIF_ERROR("Please report this error to the Alif Community: https://github.com/alifcommunity/compiler/issues \n\nAlif Compiler " + VERSION + " - Linux\n\nFile : " + PATH_FULL_ALIF + "\nError: " + LOG_LINE8_Buffer + "\nCompile command: " + LINUX_CMD);
 				exit(EXIT_FAILURE);
 			}
 
