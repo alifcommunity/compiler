@@ -1,0 +1,180 @@
+
+-- ------------------------
+-- مكتبة الملفات
+-- ------------------------
+
+#ألف
+
+#إذا ماك أضف_ترجمة_بداية " "
+#إذا ماك أضف_تجميع_بداية " "
+
+#إذا ويندوز أضف_ترجمة_بداية "  "
+#إذا ويندوز أضف_تجميع_بداية " -lComdlg32 "
+
+#إذا لينكس أضف_ترجمة_بداية "  "
+#إذا لينكس أضف_تجميع_بداية "  "
+
+_س_
+	#ifdef _WIN32
+		#include "commdlg.h"
+		// Windows -------------------------------------------
+		std::wstring string_to_wstring(const std::string& s){
+		int len;
+		int slength = (int)s.length() + 1;
+		len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0); 
+		wchar_t* buf = new wchar_t[len];
+		MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+		std::wstring r(buf);
+		delete[] buf;
+		return r;
+		}
+	#elif __APPLE__ ----------------------------------------
+		// macOS
+		// ...
+	#else
+		// Linux ---------------------------------------------
+		// ...
+	#endif
+	
+	bool is_file_exists(std::string f) {
+
+		boost::nowide::ifstream infile(f);
+		return infile.good();
+	}
+	
+	
+_س_
+
+صنف الملفات
+
+  دالة بناء ()
+
+  نهاية دالة
+  
+  دالة نص فتح_ملف (نص العنوان)
+	نص المسار = ""
+    _س_
+		#ifdef _WIN32
+		// Windows
+		wchar_t szFile[MAX_PATH] = { 0 };
+		OPENFILENAMEW ofn;
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lpstrFile = szFile;
+		ofn.nMaxFile = sizeof(szFile);
+		ofn.lStructSize = sizeof(ofn);
+		ofn.lpstrFileTitle = NULL;
+			//std::wstring w_type = string_to_wstring( أنواع );
+			//LPCWSTR lp_type = w_type.c_str();
+			//ofn.lpstrFilter = lp_type;
+			//ofn.nFilterIndex = 1;
+				//std::wstring w_title = string_to_wstring(@العنوان@);
+				//LPCWSTR lp_title = w_title.c_str();
+				//ofn.lpstrTitle = lp_title;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = NULL;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+		//ofn.hwndOwner = hWnd;
+		if (GetOpenFileNameW(&ofn) == TRUE){
+
+			std::string buf = alifcore_wchar_to_str(szFile);
+
+			if(buf != "")
+				@المسار@ = buf;
+
+			/*
+				WCHAR szPath[MAX_PATH+1] = {0};
+				DWORD retval = GetFullPathNameW(ofn.lpstrFile, MAX_PATH, szPath, NULL);
+				if ((retval != 0) && (retval < MAX_PATH)){
+				std::wstring wpath(szPath, retval);
+				std::string path(wpath.begin(), wpath.end());
+				//std::cout << path;
+				@المسار@ = path;
+				}
+			*/
+		}
+    #elif __APPLE__
+      // macOS
+      // ...
+    #else
+      // Linux
+      // ...
+    #endif
+    _س_
+    إرجاع المسار
+  نهاية دالة
+
+  دالة نص نوع_ملف (نص المسار)
+    نص نوع
+    _س_
+	boost::filesystem::path p(@المسار@);
+    @نوع@ = p.extension().string();
+    _س_
+    إرجاع نوع
+  نهاية دالة
+
+  دالة نص إسم_ملف (نص المسار)
+    نص إسم
+    _س_
+	boost::filesystem::path p(@المسار@);
+    @إسم@ = p.stem().string();
+    _س_
+    إرجاع إسم
+  نهاية دالة
+  
+  دالة نص مسار_المجلد (نص المسار)
+    نص إسم
+    _س_
+	boost::filesystem::path p(@المسار@);
+    @إسم@ = p.parent_path().string() + alifcore_inf.path_sep;
+    _س_
+    إرجاع إسم
+  نهاية دالة
+  
+  دالة منطق حفظ_ملف (نص المسار، نص محتوى)
+    منطق هل_ثم_الحفظ = خطأ
+    _س_
+	boost::nowide::ofstream file(@المسار@);
+	if(file){
+		file << @محتوى@;
+		file.close();
+		@هل_ثم_الحفظ@ = true;
+	}
+    _س_
+    إرجاع هل_ثم_الحفظ
+  نهاية دالة
+
+  دالة نص محتوى_ملف (نص المسار)
+    نص محتوى
+    _س_
+	
+	if (!is_file_exists(@المسار@))
+		return "";
+	
+	boost::nowide::ifstream file(@المسار@);
+	
+	// Method 1
+	//std::size_t sz = static_cast<std::size_t>(boost::filesystem::file_size(@المسار@));
+	//@محتوى@.resize(sz, '\0');
+	//file.read(&@محتوى@[0], sz); // This add null bytes at end
+	
+	// Method 2
+	std::string line;
+	while (getline(file, line)){
+		@محتوى@.append(line);
+		@محتوى@.append("\n");
+	}
+	
+	file.close();
+    _س_
+    إرجاع محتوى
+  نهاية دالة
+
+  دالة منطق هل_موجود (نص المسار)
+    منطق موجود
+    _س_
+    @موجود@ = is_file_exists(@المسار@);
+    _س_
+    إرجاع موجود
+  نهاية دالة
+
+نهاية صنف

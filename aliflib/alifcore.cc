@@ -4,7 +4,7 @@
  conain all functions and tools needed 
  by the app in the runtimes.
  File: [Alif folder]/alifcore/alifcore.cc
- Version: Alif CC Core 1.0.0
+ Version: Alif Core 1.0.2
 */
 
 #ifndef UNICODE
@@ -15,15 +15,58 @@
     #define _UNICODE
 #endif
 
+#define _HAS_STD_BYTE 0 // Fixing 'byte': ambiguous symbol
+
 #ifdef _WIN32
-    #include <windows.h>
+	#include <winsock2.h>
+	#include <windows.h>
+	#include <tchar.h>
+#elif  __APPLE__
+	// ...
+#else
+	// ...
 #endif
 
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <map>
+// Standard
+#include <fstream>      // O/I files
+#include <iostream>     // O/I
+#include <cstdio>       // Remove files
+#include <vector>       // UTF8, Vectors
+#include <stdlib.h>     // mblen, mbtowc, wchar_t(C)
+#include <string>       // strings
+#include <sstream>      // stringstream
+#include <map>          // vectors
+#include <ctime>        // Initializ time, for rand()
+#include <algorithm>	// Standard replace()
+#include <ctype.h>		//
+#include <iterator>		//
+#include <locale>		// 
+#include <codecvt>		// conversion from wide 'wchar_t' to 'string' bytes
+#include <chrono>		// Wait..
+#include <thread>		// Treading
+#include <streambuf>	// 
+
+// Boost
+#include <boost/thread/thread.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/program_options.hpp>
+#include <boost/locale.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/nowide/args.hpp>
+#include <boost/nowide/fstream.hpp>
+#include <boost/nowide/iostream.hpp>
+
+// UTF-8
+#include "utf8.h"
+
 using namespace std;
+
+// -- Alif v2 -------------------------------------------------------------
 
 const static string ALIFCORE_NEW_LINE = "\n";
 
@@ -68,23 +111,95 @@ string alifcore_BoolToString(bool Value) {
 	else return "false";
 }
 
-// Bind functions
-/*
-std::array<void(*)(), 256> key_actions;
-unsigned int key_actions_c = 0;
+// -- Alif v3 -------------------------------------------------------------
 
-void alifcore_bind_func_shutdown(void(*function_ref)()) {
-	
-	key_actions[key_actions_c] = function_ref;
-	key_actions_c++;
+struct _alifcore_inf {
+
+	#ifdef _WIN32
+		std::string exe_ext = ".exe";
+		std::string path_sep = "\\";
+	#elif  __APPLE__
+		std::string exe_ext = ".app";
+		std::string path_sep = "/";
+	#else
+		std::string exe_ext = "";
+		std::string path_sep = "/";
+	#endif
+
+} alifcore_inf;
+
+unsigned char * alifcore_malloc(size_t size){
+
+	//return NULL;
+	if(size > 0)
+		return (unsigned char*) malloc(size);
+	else
+		return NULL;
 }
 
-void alifcore_call_all_shutdown() {
-	
-	if(key_actions_c < 1)
-		return;
-	
-	for (int i = 0; i < key_actions_c; i++)
-		key_actions[i];
+void * alifcore_memset(void *s, int c, size_t n){
+
+	//return s;
+	if(s != NULL)
+		return memset(s, c, n);
+	else
+		return NULL;
 }
-*/
+
+void alifcore_free(void *ptr){
+
+	if(ptr != NULL)
+		free(ptr);
+}
+
+std::string& alifcore_ltrim(std::string &s){
+
+    auto it = std::find_if(s.begin(), s.end(), [](char c) {
+
+		return !std::isspace<char>(c, std::locale::classic());
+	});
+
+    s.erase(s.begin(), it);
+
+    return s;
+}
+
+std::string& alifcore_rtrim(std::string &s){
+	
+    auto it = std::find_if(s.rbegin(), s.rend(),[](char c) {
+
+		return !std::isspace<char>(c, std::locale::classic());
+	});
+
+    s.erase(it.base(), s.end());
+
+    return s;
+}
+
+std::string& alifcore_trim(std::string &s){
+
+    return alifcore_ltrim(alifcore_rtrim(s));
+}
+
+void alifcore_initialization(){
+	
+	#ifdef _WIN32
+		// Create and install global locale
+		std::locale::global(boost::locale::generator().generate(""));			
+	#endif
+
+	// Make boost.filesystem use it
+	boost::filesystem::path::imbue(std::locale());
+}
+
+std::string alifcore_wchar_to_str(wchar_t wstr){
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.to_bytes(wstr);
+}
+
+std::string alifcore_wchar_to_str(wchar_t wstr[]){
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.to_bytes(wstr);
+}

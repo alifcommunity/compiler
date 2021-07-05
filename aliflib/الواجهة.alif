@@ -36,86 +36,166 @@ void __alif_webui_events(webui::event e){
 _س_
 
 صنف الواجهة
+  
+  عدد كروم = 1
+  عدد فايرفوكس = 2
+  عدد إدج = 3
+  عدد سافاري = 4
+  
+  _س_
+  private: webui::window o_window;
+  private: std::string html;
+  private: unsigned short window_id;
+  _س_
+  
+  دالة بناء (نص  ن)
+    إذا ن = ""
+    _س_
+    html = "";
+    _س_
+    وإلا
+    _س_
+    html = @ن@;
+    _س_
+    نهاية إذا
+    _س_
+    window_id = o_window.get_window_id();
+    o_window.bind_all(__alif_webui_events);
+    _س_
+  نهاية دالة
+  
+  دالة  ربط (نص  ن، مؤشر_دالة  م)
+    _س_
+    std::string buf;
+    buf.append(std::to_string(window_id));
+    buf.append("_");
+    buf.append(@ن@);
+    func_ref[buf] = @م@;
+    _س_
+  نهاية دالة
+  
+  دالة  إظهار ()
+    _س_
+    if(!o_window.show(&html, webui::browser::chrome))
+    o_window.show(&html);
+    _س_
+  نهاية دالة
+  
+  دالة  إظهار_متصفح ( عدد المتصفح )
+    إذا المتصفح = 1
+    _س_
+    if(!o_window.show(&html, webui::browser::chrome))
+    o_window.show(&html);
+    _س_
+    أو إذا المتصفح = 2
+    _س_
+    if(!o_window.show(&html, webui::browser::firefox))
+    o_window.show(&html);
+    _س_ 
+    أو إذا المتصفح = 3
+    _س_
+    if(!o_window.show(&html, webui::browser::edge))
+    o_window.show(&html);
+    _س_ 
+    أو إذا المتصفح = 4
+    _س_
+    if(!o_window.show(&html, webui::browser::safari))
+    o_window.show(&html);
+    _س_ 
+    وإلا
+    _س_
+    if(!o_window.show(&html, webui::browser::chrome))
+    o_window.show(&html);
+    _س_    
+    نهاية إذا
+  نهاية دالة
+  
+  دالة  إظهار_متصفح_مع_مسار ( عدد المتصفح، نص  مسار)
+    إذا المتصفح = 1
+    _س_
+    o_window.open_window(@مسار@, webui::browser::chrome);
+    _س_
+    أو إذا المتصفح = 2
+    _س_
+    o_window.open_window(@مسار@, webui::browser::firefox);
+    _س_ 
+    أو إذا المتصفح = 3
+    _س_
+    o_window.open_window(@مسار@, webui::browser::edge);
+    _س_ 
+    أو إذا المتصفح = 4
+    _س_
+    o_window.open_window(@مسار@, webui::browser::safari);
+    _س_ 
+    وإلا
+    _س_
+    o_window.open_window(@مسار@, webui::browser::chrome);
+    _س_    
+    نهاية إذا
+  نهاية دالة
+  
+  دالة نص إخدم_مجلد (نص مجلد)
+    نص عنوان_الخادم 
+    _س_
+    o_window.serve_folder(@مجلد@);
+    webui::set_timeout_sec(0);
+    o_window.allow_multi_serving(true);
+    @عنوان_الخادم@ = o_window.new_server();
+    _س_
+    إرجاع عنوان_الخادم
+  نهاية دالة
+  
+  دالة إنتظار()
+    _س_
+    std::thread ui(webui::loop);
+    ui.join();
+    _س_
+  نهاية دالة
+  
+  دالة نص المسار_الحالي ()
+    نص المسار
+    _س_
+    @المسار@ = webui::get_current_path();
+    _س_
+    إرجاع المسار
+  نهاية دالة
+  
+  دالة نص جافاسكريبت (نص  ج)
+    نص  النتيجة
+    _س_
+    @النتيجة@ = o_window.run_js(@ج@);
+    _س_
+    إرجاع النتيجة
+  نهاية دالة
+  
+  دالة إغلاق ()
+    _س_
+    o_window.close();
+    _س_
+  نهاية دالة
+  
+  دالة إغلاق_شامل ()
+    _س_
+    webui::exit();
+    _س_
+  نهاية دالة
+  
+  دالة تغيير_نص_أداة (نص الأداة، نص النص)
+    _س_
+    o_window.set_value(@الأداة@, @النص@);
+    _س_
+  نهاية دالة
 
-		عدد كروم = 1
-		عدد فايرفوكس = 2
-		عدد إدج = 3
-		عدد سافاري = 4
+  دالة نص قرأة_نص_أداة (نص الأداة)
+    نص القيمة
+    _س_
+    @القيمة@ = o_window.get_value(@الأداة@);
+    _س_
+    إرجاع القيمة
+  نهاية دالة
 
-		_س_
-		private: webui::window o_window;
-		private: std::string html;
-		private: unsigned short window_id;
-		_س_
-
-            دالة بناء (نص  ن)
-					_س_
-					html = @ن@;
-					window_id = o_window.get_window_id();
-					o_window.bind_all(__alif_webui_events);
-					_س_
-            نهاية دالة	
-
-			دالة  ربط (نص  ن، مؤشر_دالة  م)
-				_س_
-				std::string buf;
-				buf.append(std::to_string(window_id));
-				buf.append("_");
-				buf.append(@ن@);
-				func_ref[buf] = @م@;
-				_س_
-			نهاية دالة
-
-			دالة  إظهار ()
-				_س_
-				if(!o_window.show(&html, webui::browser::chrome))
-						o_window.show(&html);
-				_س_
-			نهاية دالة
-
-			دالة  إظهار_متصفح ( عدد المتصفح )
-				إذا المتصفح = 1
-  					_س_
-  						if(!o_window.show(&html, webui::browser::chrome))
-  						o_window.show(&html);
-  					_س_
-                أو إذا المتصفح = 2
-  					_س_
-  						if(!o_window.show(&html, webui::browser::firefox))
-  						o_window.show(&html);
-  					_س_ 
-                أو إذا المتصفح = 3
-  					_س_
-  						if(!o_window.show(&html, webui::browser::edge))
-  						o_window.show(&html);
-  					_س_ 
-                أو إذا المتصفح = 4
-  					_س_
-  						if(!o_window.show(&html, webui::browser::safari))
-  						o_window.show(&html);
-  					_س_ 
-				وإلا
-  					_س_
-  						if(!o_window.show(&html, webui::browser::chrome))
-  						o_window.show(&html);
-  					_س_    
-                نهاية إذا
-
-			نهاية دالة
-
-			دالة  إنتظار ()
-				_س_
-				std::thread ui(webui::loop);
-				ui.join();
-				_س_
-			نهاية دالة
-
-			دالة نص جافاسكريبت (نص  ج)
-				نص  النتيجة
-				_س_
-				@النتيجة@ = o_window.run_js(@ج@);
-				_س_
-				إرجاع النتيجة
-			نهاية دالة
+  دالة رسالة (نص النص)
+    جافاسكريبت ( "alert('" + النص + "');" )
+  نهاية دالة
 
 نهاية صنف

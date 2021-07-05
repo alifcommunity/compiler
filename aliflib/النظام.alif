@@ -1,0 +1,48 @@
+-- ------------------------
+-- مكتبة النظام
+-- ------------------------
+
+#ألف
+
+#إذا ماك أضف_ترجمة_بداية " "
+#إذا ماك أضف_تجميع_بداية " "
+
+#إذا ويندوز أضف_ترجمة_بداية "  "
+#إذا ويندوز أضف_تجميع_بداية "  "
+
+#إذا لينكس أضف_ترجمة_بداية "  "
+#إذا لينكس أضف_تجميع_بداية "  "
+
+'----------------------------
+
+_س_
+// Workaround for a boost/mingw bug.
+// This must occur before the inclusion of the boost/process.hpp header.
+// Taken from https://github.com/boostorg/process/issues/96
+#ifndef __kernel_entry
+    #define __kernel_entry
+#endif
+#include <boost/process.hpp>
+//#include <boost/process/windows.hpp> // windows::hide
+_س_
+
+'----------------------------
+
+صنف النظام
+
+	دالة أمر (نص الأمر)
+		_س_
+		boost::process::child c(@الأمر@);
+		c.wait();
+		_س_
+	نهاية دالة
+	
+	دالة نص نوع_ملف_تطبيق ()
+		نص م
+		_س_
+		@م@ = alifcore_inf.exe_ext;
+		_س_
+		إرجاع م
+	نهاية دالة
+
+نهاية صنف
