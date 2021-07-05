@@ -21,7 +21,7 @@
 	<http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.31 (Beta)"
+#define ALIF_VERSION "3.0.32 (Beta)"
 
 // Stack ********************************************************
 
@@ -103,7 +103,7 @@
 				std::string exe_ext = ".exe";
 				std::string path_sep = "\\";
 			#elif  __APPLE__
-				std::string exe_ext = "app";
+				std::string exe_ext = ".app";
 				std::string path_sep = "/";
 			#else
 				std::string exe_ext = "";
@@ -162,11 +162,12 @@
 	// نهاية كلما مجال دالة عدد نص كائن إذا و أو سطر إرجاع صنف أداة نقر زر نص
 	// ملصق إظهار إخفاء تدمير عنوان نص تجميد عرض محتوى ارتفاع أفصول أرتوب 
 
-	static const std::string ALIF_RESERVED[] = {	"ألف", "أضف", "مكتبة", "واجهة", "_س_", "مجال", "إرجاع", "نهاية", 
-											"صنف", "خاص", "عدد", "نص", "كائن", "دالة", "هدم", "بناء",
-											"كلما", "إذا", "أو", "و", "وإلا", "سطر", "أداة", "نقر", "زر", "ملصق", 
-											"صحيح", "خطأ", "كسر", "متغير", "ثابت", "منطق", "طرفية", "رئيسية"
-											};
+	static const std::string ALIF_RESERVED[] = {
+
+		"ألف", "أضف", "مكتبة", "_س_", "مجال", "إرجاع", "نهاية", 
+		"صنف", "خاص", "عدد", "نص", "كائن", "دالة", "هدم", "بناء",
+		"كلما", "إذا", "أو", "و", "وإلا", "سطر" ,"صحيح", "خطأ", "كسر", "متغير", "ثابت", "منطق", "رئيسية"
+	};
 
 	static const int ALIF_RESERVED_TOTAL = 33;
 
@@ -405,11 +406,11 @@
 
 	bool DEBUG_PRINT_ON_SCREEN = false;
 	bool THIS_IS_ALIF_C_FILE = false;
-	bool SHOW_FILE_AND_LINE = true;
 
 	// Error
 
 	bool ERROR_PRINT_ON_SCREEN = false;
+	bool ERROR_AS_JSON = false;
 
 	// Log
 	std::string LOG_MESSAGE_FULL = "";
@@ -571,12 +572,10 @@
 	{
 		cout << endl << ERROR_DESCRIPTION << endl << endl;
 		
-		ofstream file;
+		boost::nowide::ofstream file;
 		
 		file.open (PATH_FULL_LOG, ios::app);
-		
 			file << ERROR_DESCRIPTION;
-			
 		file.close();
 		
 		exit(EXIT_FAILURE);
@@ -604,43 +603,50 @@
 
 	void PATH_FULL_LOG_SAVE()
 	{
-		ofstream file;
+		boost::nowide::ofstream file;
 
 		file.open (PATH_FULL_LOG);
 			file << LOG_MESSAGE_FULL;
 		file.close();
 	}
 
-	void ErrorCode(std::string ERROR_DESCRIPTION, CLASS_TOKEN *o_tokens) 
+	void ErrorCode(std::string error_message, CLASS_TOKEN *o_tokens) 
 	{
 
 		if(DEBUG)DEBUG_MESSAGE("\n ----------- DEBUGING ERROR ------------- \n", o_tokens);
-		
 		if(DEBUG)DEBUG_MESSAGE("Namespace : " + TheNamespace + " \n", o_tokens);
 		if(DEBUG)DEBUG_MESSAGE("Class : " + TheClass + " \n", o_tokens);
 		if(DEBUG)DEBUG_MESSAGE("Fun : " + TheFunction + " \n\n", o_tokens);
 		
+		std::string error_file = o_tokens->PATH_FULL_SOURCE;
+		std::string error_line = o_tokens->Line > 0 ? boost::lexical_cast<std::string>(o_tokens->Line) : "0";
+
 		std::string ERR_MSG;
-		
-		if (SHOW_FILE_AND_LINE)
-		{
-			ERR_MSG = " الملف		: " + o_tokens->PATH_FULL_SOURCE + "\n";
-			
-			if (o_tokens->Line > 0)
-				ERR_MSG.append(" السطر		: " + (boost::lexical_cast<std::string>(o_tokens->Line)) + "\n");
+
+		if(ERROR_AS_JSON){
+
+			// JSON Format
+			boost::replace_all(error_message, "\"", "\\\"");
+			ERR_MSG = "{\"file\":\"" + error_file + "\",\"line\":\"" + error_line + "\",\"msg\":\"" + error_message + "\"}";
+		}
+		else {
+
+			ERR_MSG = " الملف		: " + error_file+ "\n";
+			ERR_MSG.append(" السطر		: " + error_line + "\n");
+			ERR_MSG.append("\n الخطأ		: " + error_message);
 		}
 		
-		ERR_MSG.append("\n الخطأ		: " + ERROR_DESCRIPTION);
-		
 		if (ERROR_PRINT_ON_SCREEN)
-			cout << "---| DEBUG_MESSAGE |--------------" << endl << ERR_MSG << endl << "------------------------" << endl;
+			cout << "---| Alif Debug |--------------" << endl << ERR_MSG << endl << "------------------------" << endl;
 		
 		LOG_MESSAGE_FULL.append(ERR_MSG);
 		
 		PATH_FULL_LOG_SAVE();
 		
+		// Alif Studio v2
 		// Exit code must be 'success', to let IDE read from DEBUG_MESSAGE file
 		// if exit_failur, so IDE read data from process output
+
 		exit(EXIT_FAILURE);
 	}
 
@@ -666,7 +672,7 @@
 		// IDE must redirect output to a log file.
 		// no more log file like Alif v2 series.
 
-		// std::ofstream file;
+		// boost::nowide::ofstream file;
 		// file.open (PATH_FULL_LOG, ios::app);
 		// 	file << des;
 		// file.close();
@@ -1569,7 +1575,6 @@
 			// STRING
 
 			IsValidVar_Type = "نص";
-
 			return true;
 		}
 		else if (IsValidDigit(Var, true, o_tokens)){
@@ -1577,7 +1582,6 @@
 			// DIGIT
 
 			IsValidVar_Type = "عدد";
-
 			return true;
 		}
 		else if ((substr_utf8(Var, 0, 1) == "_" &&
@@ -1586,7 +1590,6 @@
 			// Global متغير _
 
 			IsValidVar_Type = G_VAR_TYPE[substr_utf8(Var, 1, CharCount_utf8(Var, o_tokens))];
-
 			return true;
 		}
 		else if (L_VAR_IS_SET[std::make_pair(TheNamespace + TheFunction, Var)]){
@@ -1594,7 +1597,6 @@
 			// Local Var
 
 			IsValidVar_Type = L_VAR_TYPE[std::make_pair(TheNamespace + TheFunction, Var)];
-
 			return true;
 		}
 		else if (L_VAR_IS_SET[std::make_pair(TheClass + TheFunction, Var)]){
@@ -1602,7 +1604,6 @@
 			// Class Local Var
 
 			IsValidVar_Type = L_VAR_TYPE[std::make_pair(TheClass + TheFunction, Var)];
-
 			return true;
 		}
 		else if (G_VAR_IS_SET[(Var)]){
@@ -1610,7 +1611,6 @@
 			// Global Var
 
 			IsValidVar_Type = G_VAR_TYPE[Var];
-
 			return true;
 		}
 		else if (CLASS_G_VAR_IS_SET[std::make_pair(TheClass, Var)] && IsInsideClass){
@@ -1618,7 +1618,6 @@
 			// Class Global Var
 
 			IsValidVar_Type = CLASS_G_VAR_TYPE[std::make_pair(TheClass, Var)];
-
 			return true;
 		}
 		else if (G_FUN_IS_SET[(Var)]){
@@ -1626,13 +1625,11 @@
 			// Global Function
 
 			IsValidVar_Type = G_FUN_TYPE[Var];
-
 			return true;
 		}
 		else if (L_FUN_IS_SET[std::make_pair(TheNamespace, Var)]){
 			
 			// Local Function
-
 			IsValidVar_Type = L_FUN_TYPE[std::make_pair(TheNamespace, Var)];
 
 			return true;
@@ -1642,16 +1639,19 @@
 			// Class Local Function
 
 			IsValidVar_Type = L_FUN_TYPE[std::make_pair(TheClass, Var)];
-
 			return true;
 		}
+		// else if (OBJ_IS_SET[std::make_pair("", Var)]){
+		//
+		// 	// Global OBJ
+		//
+		// 	IsValidVar_Type = "OBJ";
+		// 	return true;
+		// }
 
 		// else if (CONTROL_WIN_IS_SET[Var]){
-			
 		// 	// namespace: (By UI)
-
 		// 	IsValidVar_Type = "عادم";
-
 		// 	return true;
 		// }
 
@@ -1660,16 +1660,12 @@
 			// namespace: (By Code)
 
 			IsValidVar_Type = "عادم";
-
 			return true;
 		}
 
 		// else if (CONTROL_IS_SET[std::make_pair(TheNamespace, Var)]){
-			
 		// 	// Control:
-
 		// 	IsValidVar_Type = "عادم";
-
 		// 	return true;
 		// }
 
@@ -2402,9 +2398,6 @@
 					ErrorCode("نهايه شفرة غير موجود داخل البناء ' _س_ '", o_tokens);
 			}
 
-
-
-
 			// ----------------------
 			// OPERATION
 			// ----------------------
@@ -2487,6 +2480,179 @@
 				// *** Generate Code ***
 				CPP_CODE.append(" ) ");
 				// *** *** *** *** *** ***
+			}
+
+			// ----------------------
+			// Local VARIABLE INT
+			// ----------------------
+
+			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "عدد")
+			{
+				if (p > 0)
+					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
+						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
+
+				if (OBJECTIF_TYPE == "عدد")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[LOCAL-INT (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else if (OBJECTIF_TYPE == "نص")
+				{
+					if (ACCEPT_INT_TO_STRING)
+					{
+						if(DEBUG)
+							DEBUG_MESSAGE("[LOCAL-INT (" + SYNTAX[p] + ").ToString] ", o_tokens); // DEBUG
+
+						// *** Generate Code ***
+						CPP_CODE.append(" alifcore_IntToString(" + ID[SYNTAX[p]] + ") ");
+						// *** *** *** *** *** ***
+					}
+					else
+					{
+						ErrorCode("لا يمكن تحويل عدد إلى نص : ' " + SYNTAX[p] + " ' ", o_tokens);
+					}
+				}
+				else if (OBJECTIF_TYPE == "C++")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[C++ Local INT (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else
+				{
+					ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+			}
+
+			// -----------------------------------
+			// Local VARIABLE STRING
+			// -----------------------------------
+
+			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "نص")
+			{
+				if (p > 0)
+					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
+						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
+
+				if (OBJECTIF_TYPE == "عدد")
+				{
+					//if(DEBUG)DEBUG_MESSAGE("[LOCAL-STRING (" + SYNTAX[p] + ").ToInt] ", o_tokens); // DEBUG
+					ErrorCode("لا يمكن تحويل نص إلى عدد ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+				else if (OBJECTIF_TYPE == "نص")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[LOCAL-STRING (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else if (OBJECTIF_TYPE == "C++")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[C++ Local STRING (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else
+				{
+					ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+			}
+
+			// -----------------------------------
+			// Local VARIABLE Bool
+			// -----------------------------------
+
+			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "منطق")
+			{
+				//if (p != 1)
+				//{
+					//ErrorCode("أمر غير معروف ' " + SYNTAX[p] + " ' ", o_tokens);
+				//}
+				
+				if (SYNTAX[p + 1] != "")
+				{
+					// bool A = B + wrong
+					ErrorCode("أمر غير معروف ' " + SYNTAX[p + 1] + " '، على العموم لا يمكن أجراء أية عملية على متغير منطقي ", o_tokens);
+				}
+				else if (OBJECTIF_TYPE == "C++")
+				{
+					if(DEBUG)DEBUG_MESSAGE("[C++ Local Bool (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+
+					continue;
+				}
+				else if (OBJECTIF_TYPE != "منطق")
+				{
+					ErrorCode("لا يمكن تحويل منطق إلى " + OBJECTIF_TYPE + " ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+				//else
+				//{
+					//ErrorCode("علة : استثناء في متغير منطقي ' " + SYNTAX[p] + " ' ", o_tokens);
+				//}
+
+				if(DEBUG)DEBUG_MESSAGE("[LOCAL-BOOL ' " + SYNTAX[p] + " '] ", o_tokens); // DEBUG
+
+				// *** Generate Code ***
+				CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+				// *** *** *** *** *** ***
+			}			
+
+			// -----------------------------------
+			// Local Func Void Pointer
+			// -----------------------------------
+
+			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "مؤشر_دالة")
+			{
+				if (p > 0)
+					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
+						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
+
+				if (OBJECTIF_TYPE == "عدد")
+				{
+					ErrorCode("لا يمكن تحويل مؤشر_دالة إلى عدد ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+				else if (OBJECTIF_TYPE == "نص")
+				{
+					ErrorCode("لا يمكن تحويل مؤشر_دالة إلى نص ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
+				else if (OBJECTIF_TYPE == "مؤشر_دالة")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[LOCAL-POINTER-FUNC (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else if (OBJECTIF_TYPE == "C++")
+				{
+					if(DEBUG)
+						DEBUG_MESSAGE("[C++ Local POINTER-FUNC (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
+
+					// *** Generate Code ***
+					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
+					// *** *** *** *** *** ***
+				}
+				else
+				{
+					ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
+				}
 			}
 
 			// ----------------------
@@ -2590,7 +2756,7 @@
 				}
 				else if (G_VAR_TYPE[(G_VAR_WITHOUT_)] == "منطق")
 				{
-					if (OBJECTIF_TYPE != "منطق")
+					if (OBJECTIF_TYPE != "منطق" && OBJECTIF_TYPE != "C++")
 					{
 						ErrorCode("لا يمكن تحويل منطق إلى " + OBJECTIF_TYPE + " ' " + G_VAR_WITHOUT_ + " ' ", o_tokens);
 					}
@@ -2605,179 +2771,6 @@
 				{
 					ErrorCode("علة : نوع المتغير العام غير معروف ' " + G_VAR_TYPE[(G_VAR_WITHOUT_)] + " ' ل ' " + G_VAR_WITHOUT_ + " ' ",o_tokens);
 				}
-			}
-
-			// ----------------------
-			// Local VARIABLE INT
-			// ----------------------
-
-			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "عدد")
-			{
-				if (p > 0)
-					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
-						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
-
-				if (OBJECTIF_TYPE == "عدد")
-				{
-					if(DEBUG)
-						DEBUG_MESSAGE("[LOCAL-INT (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
-
-					// *** Generate Code ***
-					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
-					// *** *** *** *** *** ***
-				}
-				else if (OBJECTIF_TYPE == "نص")
-				{
-					if (ACCEPT_INT_TO_STRING)
-					{
-						if(DEBUG)
-							DEBUG_MESSAGE("[LOCAL-INT (" + SYNTAX[p] + ").ToString] ", o_tokens); // DEBUG
-
-						// *** Generate Code ***
-						CPP_CODE.append(" alifcore_IntToString(" + ID[SYNTAX[p]] + ") ");
-						// *** *** *** *** *** ***
-					}
-					else
-					{
-						ErrorCode("لا يمكن تحويل عدد إلى نص : ' " + SYNTAX[p] + " ' ", o_tokens);
-					}
-				}
-				else if (OBJECTIF_TYPE == "C++")
-				{
-					if(DEBUG)
-						DEBUG_MESSAGE("[C++ Local INT (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
-
-					// *** Generate Code ***
-					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
-					// *** *** *** *** *** ***
-				}
-				else
-				{
-					ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
-				}
-			}
-
-			// -----------------------------------
-			// Local VARIABLE STRING
-			// -----------------------------------
-
-			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "نص")
-			{
-				if (p > 0)
-					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
-						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
-
-				if (OBJECTIF_TYPE == "عدد")
-				{
-					//if(DEBUG)DEBUG_MESSAGE("[LOCAL-STRING (" + SYNTAX[p] + ").ToInt] ", o_tokens); // DEBUG
-					ErrorCode("لا يمكن تحويل نص إلى عدد ' " + SYNTAX[p] + " ' ", o_tokens);
-				}
-				else if (OBJECTIF_TYPE == "نص")
-				{
-					if(DEBUG)
-						DEBUG_MESSAGE("[LOCAL-STRING (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
-
-					// *** Generate Code ***
-					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
-					// *** *** *** *** *** ***
-				}
-				else if (OBJECTIF_TYPE == "C++")
-				{
-					if(DEBUG)
-						DEBUG_MESSAGE("[C++ Local STRING (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
-
-					// *** Generate Code ***
-					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
-					// *** *** *** *** *** ***
-				}
-				else
-				{
-					ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
-				}
-			}
-
-			// -----------------------------------
-			// Local VARIABLE STRING
-			// -----------------------------------
-
-			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "مؤشر_دالة")
-			{
-				if (p > 0)
-					if (!CAN_ADD_VAR_HERE(SYNTAX[p - 1]))
-						ErrorCode("لا يمكن إضافة متغير هنا ' " + SYNTAX[p - 1] + " " + SYNTAX[p] + " ' ", o_tokens);
-
-				if (OBJECTIF_TYPE == "عدد")
-				{
-					ErrorCode("لا يمكن تحويل مؤشر_دالة إلى عدد ' " + SYNTAX[p] + " ' ", o_tokens);
-				}
-				else if (OBJECTIF_TYPE == "نص")
-				{
-					ErrorCode("لا يمكن تحويل مؤشر_دالة إلى نص ' " + SYNTAX[p] + " ' ", o_tokens);
-				}
-				else if (OBJECTIF_TYPE == "مؤشر_دالة")
-				{
-					if(DEBUG)
-						DEBUG_MESSAGE("[LOCAL-POINTER-FUNC (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
-
-					// *** Generate Code ***
-					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
-					// *** *** *** *** *** ***
-				}
-				else if (OBJECTIF_TYPE == "C++")
-				{
-					if(DEBUG)
-						DEBUG_MESSAGE("[C++ Local POINTER-FUNC (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
-
-					// *** Generate Code ***
-					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
-					// *** *** *** *** *** ***
-				}
-				else
-				{
-					ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " ' ل ' " + SYNTAX[p] + " ' ", o_tokens);
-				}
-			}
-
-			// -----------------------------------
-			// Local VARIABLE Bool
-			// -----------------------------------
-
-			else if (L_VAR_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS + TmpFunction, SYNTAX[p])] == "منطق")
-			{
-				//if (p != 1)
-				//{
-					//ErrorCode("أمر غير معروف ' " + SYNTAX[p] + " ' ", o_tokens);
-				//}
-				
-				if (SYNTAX[p + 1] != "")
-				{
-					// bool A = B + wrong
-					ErrorCode("أمر غير معروف ' " + SYNTAX[p + 1] + " '، على العموم لا يمكن أجراء أية عملية على متغير منطقي ", o_tokens);
-				}
-				else if (OBJECTIF_TYPE == "C++")
-				{
-					if(DEBUG)DEBUG_MESSAGE("[C++ Local Bool (" + SYNTAX[p] + ")] ", o_tokens); // DEBUG
-
-					// *** Generate Code ***
-					CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
-					// *** *** *** *** *** ***
-
-					continue;
-				}
-				else if (OBJECTIF_TYPE != "منطق")
-				{
-					ErrorCode("لا يمكن تحويل منطق إلى " + OBJECTIF_TYPE + " ' " + SYNTAX[p] + " ' ", o_tokens);
-				}
-				//else
-				//{
-					//ErrorCode("علة : استثناء في متغير منطقي ' " + SYNTAX[p] + " ' ", o_tokens);
-				//}
-
-				if(DEBUG)DEBUG_MESSAGE("[LOCAL-BOOL ' " + SYNTAX[p] + " '] ", o_tokens); // DEBUG
-
-				// *** Generate Code ***
-				CPP_CODE.append(" " + ID[SYNTAX[p]] + " ");
-				// *** *** *** *** *** ***
 			}
 
 			// -----------------------------------
@@ -6223,11 +6216,23 @@
 			)" + code + R"(
 
 			// --[ Entry point ] ------------------------------
-			int main(){
+			void _alif_main(){
 
-			)" + code_entry_point + R"(
+				alifcore_initialization();
 
-			return 0;}
+				)" + code_entry_point + R"(
+				
+			}
+
+			#ifdef _WIN32
+				int wmain(int argc, wchar_t* argv[]) { _alif_main(); return 0;}
+				int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow) { _alif_main(); return 0;}
+			#elif  __APPLE__
+				int main(int argc, char** argv) { _alif_main(); return 0;}
+			#else
+				int main(int argc, char** argv) { _alif_main(); return 0;}
+			#endif
+			
 			// ------------------------------------------------
 			// Generated by Alif Compiler v)" + VERSION + R"(
 			// www.aliflang.org
@@ -7469,8 +7474,14 @@
 				{
 					goto NEXT_LINE;
 				}
-				else if (Char == "\"" && substr_utf8(LINE8, (CHAR_NUMBER - 1), 1) != "\\")
+				else if (	(Char == "\"" && substr_utf8(LINE8, (CHAR_NUMBER - 1), 1) != "\\") ||	// [salam"]
+							(Char == "\"" && substr_utf8(LINE8, (CHAR_NUMBER - 2), 2) == "\\\\")	// [salam\\"]
+						)
 				{
+					// [salam"]		-> Yes
+					// [salam\"]	-> No
+					// [salam\\"]	-> Yes
+
 					/*
 					if (INSIDE_STRING_CPP)
 					{
@@ -7767,7 +7778,7 @@
 
 			// Need file Bach to set Path=...
 			// for GCC Envirenment.
-			ofstream FILE_BATCH;
+			boost::nowide::ofstream FILE_BATCH;
 			std::string FILE_BATCH_PATH;
 
 			// Compile: WebUI - TDM (GCC) 9.2 C++17 64Bit - Windows
@@ -8422,9 +8433,16 @@
 
 		// Check log
 		if(argument.log.filename == "")
-			err("Log file is empty.");
+			err("Log file name is empty.");
 		
 		argument.log.fullpath = argument.log.path + argument.log.filename + argument.log.extension;
+
+		// Empty file
+		boost::nowide::ofstream ofile(argument.log.fullpath);
+		if(ofile){
+			ofile << "";
+			ofile.close();
+		}
 	}
 
 // Main *********************************************************
@@ -8578,7 +8596,7 @@
 
 				// Get GENERATED C++ CODE
 
-				ofstream FILE_CPP;
+				boost::nowide::ofstream FILE_CPP;
 				FILE_CPP.open (PATH_FULL_CPP); // .c_str());
 
 				if (!FILE_CPP.is_open()){
@@ -8596,7 +8614,7 @@
 				boost::replace_all(PATH_FULL_ICO, "\\", "\\\\");
 
 			// GENERATE Windows Resource CODE
-			ofstream FILE_RESOURCE;
+			boost::nowide::ofstream FILE_RESOURCE;
 			FILE_RESOURCE.open (PATH_FULL_RC); // .c_str());
 			if (!FILE_RESOURCE.is_open()){
 
@@ -8618,7 +8636,7 @@
 
 				// GENERATE C++ CODE
 				
-				ofstream FILE_CPP;
+				boost::nowide::ofstream FILE_CPP;
 				FILE_CPP.open (PATH_FULL_CPP); // .c_str());
 				if (!FILE_CPP.is_open()){
 
@@ -8638,7 +8656,7 @@
 
 				// GENERATE C++ CODE
 				
-				ofstream FILE_CPP;
+				boost::nowide::ofstream FILE_CPP;
 				FILE_CPP.open (PATH_FULL_CPP); // .c_str());
 				if (!FILE_CPP.is_open()){
 
@@ -8686,6 +8704,7 @@
 				("syntax-only", "Check only the Alif code syntax (no compile)")
 				("o", boost::program_options::value<std::string>(), "Set output file")
 				("log", boost::program_options::value<std::string>(), "Set log file")
+				("log-json", boost::program_options::value<std::string>(), "Set log file as JSON format")
 				("input", 			boost::program_options::value<vector<std::string>>(), "Set input file (only one)")
 				("include-path,I",	boost::program_options::value<vector<std::string>>(), "Add include path")
 				("clib,L",	boost::program_options::value<vector<std::string>>(), "Add extra C/C++ libs")
@@ -8753,10 +8772,18 @@
 			// Log
 			if (vm.count("log")) {
 
+				ERROR_AS_JSON = false;
 				set_log_file(vm["log"].as<std::string>());
 			}
 
 			// Log
+			if (vm.count("log-json")) {
+
+				ERROR_AS_JSON = true;
+				set_log_file(vm["log-json"].as<std::string>());
+			}
+
+			// debug
 			if (vm.count("debug")) {
 
 				DEBUG = true;

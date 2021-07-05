@@ -106,8 +106,8 @@ void parser_FunctionCall(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
 	// --- Check -------------------------------------------------
 
-	if (IsDataType(FunType))
-		ErrorCode("الدالة المحلية ' " + FunName + "()' من نوع " + FunType + ", لذلك أنت بحاجة إلى متغير للحصول على قيمة الرجوع", o_tokens);
+	//if (IsDataType(FunType))
+	//	ErrorCode("الدالة المحلية ' " + FunName + "()' من نوع " + FunType + ", لذلك أنت بحاجة إلى متغير للحصول على قيمة الرجوع", o_tokens);
 	
 	// --- ARGV -------------------------------------------------
 

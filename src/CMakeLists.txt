@@ -48,7 +48,7 @@ if (WIN32)
 	set(Boost_USE_STATIC_LIBS			ON)
 	set(Boost_USE_MULTITHREADED			ON)
 	set(Boost_USE_STATIC_RUNTIME		ON)
-	set(Boost_COMPILER					"-mgw8")
+	# set(Boost_COMPILER				"-mgw8")
 
 	# set(Boost_DETAILED_FAILURE_MSG	OFF)
 	# set(Boost_DEBUG					OFF)	

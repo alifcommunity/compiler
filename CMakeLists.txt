@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13.0)
 
 # --[ Alif version ] ---------------------------------------------------------------
 
-project(AlifProject VERSION 3.0.31 DESCRIPTION "Alif Programming Language - Compiler.")
+project(AlifProject VERSION 3.0.32 DESCRIPTION "Alif Programming Language - Compiler.")
 message("-- [ Alif version ${CMAKE_PROJECT_VERSION} ]")
 
 # --[ Uninstall ] ------------------------------------------------------------------
@@ -30,7 +30,7 @@ endif()
 
 # --[ Boost ] ----------------------------------------------------------------------
 
-set(Boost_Version_Needed "1.70.0")
+set(Boost_Version_Needed "1.76.0")
 
 if (WIN32)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

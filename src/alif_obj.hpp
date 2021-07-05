@@ -216,7 +216,7 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens){
 		}
 		else
 		{
-			if(DEBUG)DEBUG_MESSAGE("[LOCAL-OBJ1 ' " + Token[1] + " ' : ' " + Token[3] + " '] = ", o_tokens); // DEBUG
+			if(DEBUG)DEBUG_MESSAGE("[LOCAL-OBJ ' " + Token[1] + " ' : ' " + Token[3] + " '] = ", o_tokens); // DEBUG
 
 			// *** Generate Code ***
 			// Obj:Mem = ...
@@ -282,8 +282,8 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens){
 		if (CLASS_FUN_PRIVATE[std::make_pair(TK_CLASS, Token[3])])
 			ErrorCode("لا يمكن استدعاء الدالة ' " + Token[3] + " ' المنتمية للصنف ' " + TK_CLASS + " ' لأنها من نوع ' خاص ' ", o_tokens);
 		
-		if (CLASS_FUN_TYPE[std::make_pair(TK_CLASS, Token[3])] != "عادم")
-			ErrorCode("الدالة ' " + Token[3] + " ' المنتمية للصنف ' " + TK_CLASS + " ' ليست من نوع 'عادم'، لذى لابد من استعمال متغير ليلتقط قيمة الإرجاع ", o_tokens);
+		// if (CLASS_FUN_TYPE[std::make_pair(TK_CLASS, Token[3])] != "عادم")
+		// 	ErrorCode("الدالة ' " + Token[3] + " ' المنتمية للصنف ' " + TK_CLASS + " ' ليست من نوع 'عادم'، لذى لابد من استعمال متغير ليلتقط قيمة الإرجاع ", o_tokens);
 		
 		if (Token[4] != "(")
 			ErrorCode("يجب وضع '(' بعد ' " + Token[1] + " : " + Token[3] + " ' ", o_tokens);
