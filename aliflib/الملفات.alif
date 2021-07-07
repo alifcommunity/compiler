@@ -11,8 +11,8 @@
 #إذا ويندوز أضف_ترجمة_بداية "  "
 #إذا ويندوز أضف_تجميع_بداية " -lComdlg32 "
 
-#إذا لينكس أضف_ترجمة_بداية "  "
-#إذا لينكس أضف_تجميع_بداية "  "
+#إذا لينكس أضف_ترجمة_بداية " `pkg-config --cflags gtk+-3.0` "
+#إذا لينكس أضف_تجميع_بداية " `pkg-config --libs gtk+-3.0` "
 
 _س_
 	#ifdef _WIN32
@@ -28,12 +28,28 @@ _س_
 		delete[] buf;
 		return r;
 		}
-	#elif __APPLE__ ----------------------------------------
-		// macOS
+	#elif __APPLE__
+		// macOS ---------------------------------------------
 		// ...
 	#else
 		// Linux ---------------------------------------------
-		// ...
+		#include <gtk/gtk.h>
+		std::string alif_gtk_openfile_buf;
+		static void alif_gtk_openfile (GtkApplication* app,gpointer user_data){
+		    GtkWidget *dialog;
+		    GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
+		    gint res;
+		    dialog = gtk_file_chooser_dialog_new ("Open File",GTK_WINDOW(NULL),action,("_Cancel"),GTK_RESPONSE_CANCEL,("_Open"),GTK_RESPONSE_ACCEPT,NULL);
+		    res = gtk_dialog_run (GTK_DIALOG (dialog));
+		    if (res == GTK_RESPONSE_ACCEPT){
+			char *filename;
+			GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
+			filename = gtk_file_chooser_get_filename (chooser);
+			alif_gtk_openfile_buf = filename;
+			g_free (filename);
+		    }
+		    gtk_widget_destroy (dialog);
+		}
 	#endif
 	
 	bool is_file_exists(std::string f) {
@@ -97,7 +113,13 @@ _س_
       // ...
     #else
       // Linux
-      // ...
+      GtkApplication *alif_app;
+      alif_app = gtk_application_new ("org.gtk.alif", G_APPLICATION_FLAGS_NONE);
+      g_signal_connect (alif_app, "activate", G_CALLBACK (alif_gtk_openfile), NULL);
+      g_application_run (G_APPLICATION (alif_app), 0, NULL);
+      g_object_unref (alif_app);
+      //std::cout << alif_gtk_openfile_buf << std::endl;
+      @المسار@ = alif_gtk_openfile_buf;
     #endif
     _س_
     إرجاع المسار
