@@ -34,6 +34,11 @@ Windows - Microsoft build tools 2019.
 cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release 
 nmake
 ```
+  
+Linux - Install GCC & GTK3
+```
+sudo apt install build-essential libgtk-3-dev
+```
 
 Linux - Install Boost +1.76
 ```
