@@ -1,27 +1,19 @@
 build/
 
-**/logs
-*/logs
-*.logs
+.ccls-cache
 
-**/log
-*/log
+logs/
+*.logs
 *.log
 
-**/exe
-*/exe
+exe/
 *.exe
 
-**/obj
-*/obj
+obj/
 *.obj
 
-**/o
-*/o
+o/
 *.o
 
-**/.vscode
-*/.vscode
-*..vscode
+*.vscode/
 
-*.json
