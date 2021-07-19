@@ -64,6 +64,8 @@
 // UTF-8
 #include "utf8.h"
 
+using namespace std;
+
 // -- Alif v2 -------------------------------------------------------------
 
 const static std::string ALIFCORE_NEW_LINE = "\n";
@@ -76,7 +78,7 @@ int ALIFCORE_ID_GENERATOR() { return Generated_ID++; }
 std::string alifcore_IntToString(double INT_VAL) {
 
   std::stringstream STRING_STREAM_BUFFER;
-  STRING_STREAM_BUFFER << INT_VAL;
+  STRING_STREAM_BUFFER << std::setprecision(40) << INT_VAL;
   std::string STRING_BUFFER = STRING_STREAM_BUFFER.str();
   return STRING_BUFFER;
 }
