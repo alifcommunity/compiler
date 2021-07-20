@@ -18,9 +18,9 @@
 #define _HAS_STD_BYTE 0 // Fixing 'byte': ambiguous symbol
 
 #ifdef _WIN32
-#include <winsock2.h>
-#include <windows.h>
 #include <tchar.h>
+#include <windows.h>
+#include <winsock2.h>
 #elif __APPLE__
 // ...
 #else
@@ -197,4 +197,3 @@ std::string alifcore_wchar_to_str(wchar_t wstr[]) {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   return converter.to_bytes(wstr);
 }
-
