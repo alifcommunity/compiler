@@ -1,0 +1,25 @@
+#!/bin/sh
+RED="\e[31m"
+GREEN="\e[32m"
+NC="\e[0m"
+
+all_files=$(git diff --cached --diff-filter=d --name-only | grep -E '.(cpp|cc|hpp|c|h)$')
+
+if [ "${all_files}" ]; then
+  # @see: https://stackoverflow.com/questions/24628076/convert-multiline-string-to-array
+  SAVE_IFS=$IFS                  # Save current IFS
+  IFS=$'\n'                     # Change IFS to new line
+  clang-format -i $all_files
+  formatter_exit_code=$?
+  IFS=$SAVE_IFS                  # Restore IFS
+fi
+
+git add -f $all_files
+
+if [ $formatter_exit_code -ne 0 ]; then
+  echo -e "${RED}❌ error:${NC} ccls-format failed with code ${formatter_exit_code}, ( ͡ಥ ͜ʖ ͡ಥ)"
+  exit 1
+else
+  echo -e "${GREEN}✔ formatter succeeded:${NC} Files are formatted [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]"
+  exit 0
+fi
