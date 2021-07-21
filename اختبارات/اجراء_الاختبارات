@@ -88,8 +88,8 @@ def test_unit(tt, full_path):
     if expect_file:
         with open(expect_file, "r") as f:
             expected_behaviour = json.loads(f.read())
-            exec_inputs = expected_behaviour.get('execution').get('stdin')
-            comp_inputs = expected_behaviour.get('compilation').get('stdin')
+            exec_inputs = expected_behaviour.get('تنفيذ').get('دخل')
+            comp_inputs = expected_behaviour.get('تجميع').get('دخل')
 
     compile_stdout, compile_stderr, compile_exitcode = \
         run(f"alif '{code_file}' --o '{exec_file}' --log-json '{log_file}'", inputs=comp_inputs)
@@ -103,32 +103,32 @@ def test_unit(tt, full_path):
             logs = json.loads(f.read())
 
     real_behaviour = {
-        "execution": {
-            "exitcode": exitcode,
-            "stdin": exec_inputs,
-            "stdout": stdout,
-            "stderr": stderr
+        "تنفيذ": {
+            "رمز_الخروج": exitcode,
+            "دخل": exec_inputs,
+            "خرج": stdout,
+            "خطأ": stderr
         } if not compile_exitcode else None, # if no error occured
-        "compilation": {
-            "exitcode": compile_exitcode,
-            "stdin": comp_inputs,
-            "stdout": compile_stdout,
-            "stderr": compile_stderr,
-            "logs": logs
+        "تجميع": {
+            "رمز_الخروج": compile_exitcode,
+            "دخل": comp_inputs,
+            "خرج": compile_stdout,
+            "خطأ": compile_stderr,
+            "سجل": logs
         }
     }
 
     if not expect_file:
         expect_file = path.join(full_path, f"{name}_توقع.json")
         with open(expect_file, "w") as f:
-            f.write(json.dumps(real_behaviour, indent=2))
+            f.write(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
         print("    📝: ", expect_file)
         return
 
     equal, msg = is_equal(real_behaviour, expected_behaviour, code_file)
     print(msg)
     if not equal:
-        print(json.dumps(real_behaviour, indent=2))
+        print(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
 
 
 def test_all(tests, syntax_only=False):
