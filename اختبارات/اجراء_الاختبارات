@@ -47,7 +47,7 @@ def run(cmd, return_prcss=False, inputs=None):
     return out.decode(), err.decode(), process.returncode
 
 
-def get_tests(directory='أكواد', clean=False):
+def get_tests(directory='أكواد', clean=False, fill=False):
     tests = []
     tree = walk(directory)  # top-down tree
     for (full_path, dirs, files) in tree:
@@ -59,6 +59,7 @@ def get_tests(directory='أكواد', clean=False):
             if not clean:
                 expect_file = path.join(full_path, f"{name}_توقع.json")
                 expect_file = expect_file if path.exists(expect_file) else None
+            if fill and expect_file: continue
             code_file = path.join(full_path, f)
             t = {
                 "full_path": full_path,
@@ -148,12 +149,14 @@ if __name__ == "__main__":
     args_parser.add_argument(
         "--مساعدة", "-م", help="احصل على رسالة المساعدم هذه", action="store_true")
     args_parser.add_argument(
+        "--تكميل", "-ك", help="بانتاج ملفات التوقع الغير موجودة", action="store_true")
+    args_parser.add_argument(
         "--القواعد-فقط", "-ق", help="اختبار القواعد فقط بدون الخَرج", action="store_true")
     args_parser.add_argument(
-        "--توقع", help="إعادة انتاج كل التوقعات من الكود وإهمال القديم. هذه الأمر لابد أن تكون واعيا بتبعاته", action="store_true")
+        "--تجديد", "-ج", help="إعادة انتاج كل التوقعات من الكود وإهمال القديم. هذه الأمر لابد أن تكون واعيا بتبعاته", action="store_true")
     args = args_parser.parse_args()
 
-    tests = get_tests(clean=args.توقع)
+    tests = get_tests(clean=args.تجديد, fill=args.تكميل)
 
     if (args.مساعدة):
         help_msg = args_parser.format_help()
