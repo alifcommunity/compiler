@@ -27,9 +27,7 @@ mkdir build
 cd build
 ```
 
-
-
-<div>
+</div>
 
 ### Windows
 
@@ -81,7 +79,7 @@ cd boost_1_76_0
 sudo ./b2 install address-model=64 variant=release link=static runtime-link=shared warnings=off --with-filesystem --with-program_options --with-system --with-locale --with-date_time --with-regex --with-nowide --with-thread 
 ```
 
-<div>
+</div>
 
 بناء مترجم ألف باستخدام GCC.
 
@@ -117,7 +115,8 @@ git clone https://github.com/alifcommunity/compiler.git alif-compiler
 ./إعداد-للتطوير
 ```
 
-<div dir=ltr>
+</div>
+  
 [ ! ] تنبيه
 
 مشروع ألف نسخة 3 هو قيد التطوير ولا يصلح حاليا للاستخدام
