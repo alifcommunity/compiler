@@ -1,8 +1,9 @@
 {
   "execution": {
     "exitcode": 0,
-    "stdout": "\u0633\u0637\u0631\n",
-    "stderr": ""
+    "stdin": ["123\n"],
+    "stdout": ["123\n"],
+    "stderr": [""]
   },
   "compilation": {
     "exitcode": 0,

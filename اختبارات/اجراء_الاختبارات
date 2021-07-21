@@ -4,39 +4,47 @@ import re
 import json
 import argparse
 import subprocess
-from colors import *
 from os import sys, path, walk
 
-
-SUCCESS = 1
-FAILURE = 0
-
-
 def is_equal(dict1, dict2, msg):
-    equal = True
+    def is_dicts_equal(d1, d2):
+        e = True
+        for p in d1:
+            p1 = d1.get(p)
+            p2 = d2.get(p)
+            if type(p1) == dict:
+                if not is_dicts_equal(p1, p2):
+                    e = False
+                    break
+            elif p1 != p2: 
+                e = False
+                break
+        return e
 
-    for p in dict1:
-        if dict1.get(p) != dict2.get(p):
-            equal = False
-            break
+    equal = is_dicts_equal(dict1, dict2)
 
     if (equal):
-        msg = color("    ✅️:", fg="green") + msg
+        msg = "    ✅️: " + msg
     else:
-        msg = color("    ❌️:", fg="red") + msg
+        msg = "    ❌️: " + msg
 
     return equal, msg
 
 
-def run(cmd, return_prcss=False):
+def run(cmd, return_prcss=False, inputs=None):
     process = subprocess.Popen(cmd, shell=True,
-                               stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if return_prcss:
         return process
+    if inputs:
+        stdouts = []; stderrs = []
+        for i in inputs:
+            out, err = process.communicate(i.encode())
+            stdouts.append(out.decode());
+            stderrs.append(err.decode());
+        return stdouts, stderrs, process.returncode
     out, err = process.communicate()
-    out = "".join([chr(i) for i in out])
-    err = "".join([chr(i) for i in err])
-    return out, err, process.returncode
+    return out.decode(), err.decode(), process.returncode
 
 
 def get_tests(directory='أكواد', clean=False):
@@ -75,10 +83,19 @@ def test_unit(tt, full_path):
     exec_file = path.join(full_path, f"{name}_تنفيذي")
     log_file = path.join(full_path, f"{name}_سجل")
 
+    exec_inputs=None
+    comp_inputs=None
+    if expect_file:
+        with open(expect_file, "r") as f:
+            expected_behaviour = json.loads(f.read())
+            exec_inputs = expected_behaviour.get('execution').get('stdin')
+            comp_inputs = expected_behaviour.get('compilation').get('stdin')
+
     compile_stdout, compile_stderr, compile_exitcode = \
-        run(f"alif '{code_file}' --o '{exec_file}' --log-json '{log_file}'")
-    stdout, stderr, exitcode = \
-        run(f"./'{exec_file}'")
+        run(f"alif '{code_file}' --o '{exec_file}' --log-json '{log_file}'", inputs=comp_inputs)
+    if not compile_exitcode:
+        stdout, stderr, exitcode = \
+            run(f"./'{exec_file}'", inputs=exec_inputs)
 
     logs = None
     if compile_exitcode:
@@ -88,11 +105,13 @@ def test_unit(tt, full_path):
     real_behaviour = {
         "execution": {
             "exitcode": exitcode,
+            "stdin": exec_inputs,
             "stdout": stdout,
             "stderr": stderr
-        },
+        } if not compile_exitcode else None, # if no error occured
         "compilation": {
             "exitcode": compile_exitcode,
+            "stdin": comp_inputs,
             "stdout": compile_stdout,
             "stderr": compile_stderr,
             "logs": logs
@@ -103,14 +122,13 @@ def test_unit(tt, full_path):
         expect_file = path.join(full_path, f"{name}_توقع.json")
         with open(expect_file, "w") as f:
             f.write(json.dumps(real_behaviour, indent=2))
-        print(color("    📝:", fg="green"), expect_file)
+        print("    📝: ", expect_file)
         return
 
-    with open(expect_file, "r") as f:
-        expected_behaviour = json.loads(f.read())
-
-    _, msg = is_equal(real_behaviour, expected_behaviour, code_file)
+    equal, msg = is_equal(real_behaviour, expected_behaviour, code_file)
     print(msg)
+    if not equal:
+        print(json.dumps(real_behaviour, indent=2))
 
 
 def test_all(tests, syntax_only=False):
@@ -120,7 +138,6 @@ def test_all(tests, syntax_only=False):
 
 
 if __name__ == "__main__":
-    print(run("alif")[1])
     if run("alif")[1]:
         sys.stderr.write(
             "مترجم ألف غير مثبت لديك، قم بالبناء أولا أو نزله مبنيا جاهزا\n")
