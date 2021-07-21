@@ -147,11 +147,11 @@ if __name__ == "__main__":
     args_parser = argparse.ArgumentParser(
         description='إجراء اختبارات لمترجم ألف.', add_help=False)
     args_parser.add_argument(
-        "--مساعدة", "-م", help="احصل على رسالة المساعدم هذه", action="store_true")
+        "--مساعدة", "-م", help="احصل على رسالة المساعدة هذه", action="store_true")
     args_parser.add_argument(
         "--تكميل", "-ك", help="بانتاج ملفات التوقع الغير موجودة", action="store_true")
     args_parser.add_argument(
-        "--القواعد-فقط", "-ق", help="اختبار القواعد فقط بدون الخَرج", action="store_true")
+        "--القواعد-فقط", "-ق", help="اختبار القواعد فقط بدون الخَرج أو الترجمة الكاملة", action="store_true")
     args_parser.add_argument(
         "--تجديد", "-ج", help="إعادة انتاج كل التوقعات من الكود وإهمال القديم. هذه الأمر لابد أن تكون واعيا بتبعاته", action="store_true")
     args = args_parser.parse_args()
