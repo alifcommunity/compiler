@@ -1,10 +1,15 @@
+venv/
 build/
+/اختبارات/أكواد/**/*_تنفيذي
+/اختبارات/أكواد/**/*_سجل
 
-.ccls-cache
+.ccls-cache/
+__pycache__/
 
 logs/
 *.logs
 *.log
+*.سجل
 
 exe/
 *.exe
@@ -16,4 +21,4 @@ o/
 *.o
 
 *.vscode/
-
+.vim/
