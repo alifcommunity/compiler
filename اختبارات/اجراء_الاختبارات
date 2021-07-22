@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+
+import re
+import json
+import argparse
+import subprocess
+from os import sys, path, walk
+
+def is_equal(dict1, dict2, msg):
+    def is_dicts_equal(d1, d2):
+        e = True
+        for p in d1:
+            p1 = d1.get(p)
+            p2 = d2.get(p)
+            if type(p1) == dict:
+                if not is_dicts_equal(p1, p2):
+                    e = False
+                    break
+            elif p1 != p2: 
+                e = False
+                break
+        return e
+
+    equal = is_dicts_equal(dict1, dict2)
+
+    if (equal):
+        msg = "    ✅️: " + msg
+    else:
+        msg = "    ❌️: " + msg
+
+    return equal, msg
+
+
+def run(cmd, return_prcss=False, inputs=None):
+    process = subprocess.Popen(cmd, shell=True,
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if return_prcss:
+        return process
+    if inputs:
+        stdouts = []; stderrs = []
+        for i in inputs:
+            out, err = process.communicate(i.encode())
+            stdouts.append(out.decode());
+            stderrs.append(err.decode());
+        return stdouts, stderrs, process.returncode
+    out, err = process.communicate()
+    return out.decode(), err.decode(), process.returncode
+
+
+def get_tests(directory='أكواد', clean=False, fill=False):
+    tests = []
+    tree = walk(directory)  # top-down tree
+    for (full_path, dirs, files) in tree:
+        alif_files = filter(lambda f: re.compile(
+            r'.(ألف|alif)$').findall(f), files)
+        for f in alif_files:
+            name = re.compile(r'(.*)\.(?:ألف|alif)$').findall(f)[0]
+            expect_file = None
+            if not clean:
+                expect_file = path.join(full_path, f"{name}_توقع.json")
+                expect_file = expect_file if path.exists(expect_file) else None
+            if fill and expect_file: continue
+            code_file = path.join(full_path, f)
+            t = {
+                "full_path": full_path,
+                "tests": [{
+                    "name": name, "code_file": code_file,
+                    "expect_file": expect_file}]
+            }
+            tests.append(t)
+
+        if dirs:
+            for d in dirs:
+                sub_tests = get_tests(d)
+                tests.extend(sub_tests)
+
+    return tests
+
+
+def test_unit(tt, full_path):
+    name = tt.get('name')
+    code_file = tt.get("code_file")
+    expect_file = tt.get("expect_file")
+    exec_file = path.join(full_path, f"{name}_تنفيذي")
+    log_file = path.join(full_path, f"{name}_سجل")
+
+    exec_inputs=None
+    comp_inputs=None
+    if expect_file:
+        with open(expect_file, "r") as f:
+            expected_behaviour = json.loads(f.read())
+            exec_inputs = expected_behaviour.get('تنفيذ').get('دخل')
+            comp_inputs = expected_behaviour.get('تجميع').get('دخل')
+
+    compile_stdout, compile_stderr, compile_exitcode = \
+        run(f"alif '{code_file}' --o '{exec_file}' --log-json '{log_file}'", inputs=comp_inputs)
+    if not compile_exitcode:
+        stdout, stderr, exitcode = \
+            run(f"./'{exec_file}'", inputs=exec_inputs)
+
+    logs = None
+    if compile_exitcode:
+        with open(log_file, "r") as f:
+            logs = json.loads(f.read())
+
+    real_behaviour = {
+        "تنفيذ": {
+            "رمز_الخروج": exitcode,
+            "دخل": exec_inputs,
+            "خرج": stdout,
+            "خطأ": stderr
+        } if not compile_exitcode else None, # if no error occured
+        "تجميع": {
+            "رمز_الخروج": compile_exitcode,
+            "دخل": comp_inputs,
+            "خرج": compile_stdout,
+            "خطأ": compile_stderr,
+            "سجل": logs
+        }
+    }
+
+    if not expect_file:
+        expect_file = path.join(full_path, f"{name}_توقع.json")
+        with open(expect_file, "w") as f:
+            f.write(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
+        print("    📝: ", expect_file)
+        return
+
+    equal, msg = is_equal(real_behaviour, expected_behaviour, code_file)
+    print(msg)
+    if not equal:
+        print(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
+
+
+def test_all(tests, syntax_only=False):
+    for t in tests:
+        for tt in t.get("tests"):
+            test_unit(tt, t.get("full_path"))
+
+
+if __name__ == "__main__":
+    if run("alif")[1]:
+        sys.stderr.write(
+            "مترجم ألف غير مثبت لديك، قم بالبناء أولا أو نزله مبنيا جاهزا\n")
+        exit(1)
+
+    args_parser = argparse.ArgumentParser(
+        description='إجراء اختبارات لمترجم ألف.', add_help=False)
+    args_parser.add_argument(
+        "--مساعدة", "-م", help="احصل على رسالة المساعدة هذه", action="store_true")
+    args_parser.add_argument(
+        "--تكميل", "-ك", help="بانتاج ملفات التوقع الغير موجودة", action="store_true")
+    args_parser.add_argument(
+        "--القواعد-فقط", "-ق", help="اختبار القواعد فقط بدون الخَرج أو الترجمة الكاملة", action="store_true")
+    args_parser.add_argument(
+        "--تجديد", "-ج", help="إعادة انتاج كل التوقعات من الكود وإهمال القديم. هذه الأمر لابد أن تكون واعيا بتبعاته", action="store_true")
+    args = args_parser.parse_args()
+
+    tests = get_tests(clean=args.تجديد, fill=args.تكميل)
+
+    if (args.مساعدة):
+        help_msg = args_parser.format_help()
+        help_msg = "الاستخدام" + \
+            help_msg[5:].replace("optional arguments", "أَسْناد غير إلزامية")
+        print(help_msg)
+        exit(0)
+
+    test_all(tests, syntax_only=args.القواعد_فقط)
