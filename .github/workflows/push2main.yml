@@ -1,4 +1,4 @@
-name: Build
+name: Build and Syntax Tests
 
 on:
   push:
@@ -46,7 +46,13 @@ jobs:
 
       - name: Build
         working-directory: ${{github.workspace}}/build
-        run: cmake --build .
+        run: |
+          cmake --build .
+          make
+          make install
+      
+      - name: Tests
+        run: make tests-syntax
 
   MinGW-Windows:
     runs-on: windows-latest
@@ -90,3 +96,4 @@ jobs:
         shell: cmd
         run: |
              mingw32-make
+
