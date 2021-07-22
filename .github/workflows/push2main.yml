@@ -49,7 +49,7 @@ jobs:
         run: |
           cmake --build .
           make
-          make install
+          sudo make install
       
       - name: Tests
         run: make tests-syntax
