@@ -26,18 +26,17 @@ def create_venv():
     os.chdir(__dirname__)
 
     if not os.path.exists("./متطلبات"):
-        os.sys.stderr.write("لا يوجد ملف المتطلبات\n")
+        print("لا يوجد ملف المتطلبات\n", file=os.sys.stderr)
         exit(1)
 
-    ec = os.system("python -m venv venv") # TODO(platforms)
+    ec = os.system("python -m venv venv")  # TODO(platforms)
     if not ec:
-        ec = activate_and_do("pip install -r متطلبات")
+        ec = activate_and_do("python -m pip install -r ./متطلبات")
         if ec:
-            os.sys.stderr.write(
-                "حدث خطأ عند محاولة تنصيب الحزو من ملف ./متطلبات\n")
+            print("حدث خطأ عند محاولة تنصيب الحزم من ملف ./متطلبات\n", file=os.sys.stderr)
             exit(ec)
     else:
-        os.sys.stderr.write("حدث خطأ عند محاولة إنشاء بيئة افتراضية لبايثون\n")
+        print("حدث خطأ عند محاولة إنشاء بيئة افتراضية لبايثون\n", file=os.sys.stderr)
         exit(ec)
 
 
@@ -45,7 +44,7 @@ def build_alif():
     print_section_title("🚀 جاري بناء مترجم ألف ...")
     # TODO(platforms): check privileges
     if os.environ.get("USER") != "root":
-        os.sys.stderr.write("يجب تشغيل هذا الأمر بصلاحيات المستخدم الجذر، استخدم `sudo`\n")
+        print("يجب تشغيل هذا الأمر بصلاحيات المستخدم الجذر، استخدم `sudo`\n", file=os.sys.stderr)
         exit(1)
     build_dir = os.path.join(__dirname__, "../build")
     if not os.path.exists(build_dir):

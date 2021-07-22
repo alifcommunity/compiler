@@ -161,8 +161,7 @@ def test_all(tests, syntax_only=False):
 
 if __name__ == "__main__":
     if run("alif")[1]:
-        sys.stderr.write(
-            "مترجم ألف غير مثبت لديك، قم بالبناء أولا أو نزله مبنيا جاهزا\n")
+        print("مترجم ألف غير مثبت لديك، قم بالبناء أولا أو نزله مبنيا جاهزا\n", file=sys.stderr)
         exit(1)
 
     args_parser = argparse.ArgumentParser(
