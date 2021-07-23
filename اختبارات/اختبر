@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+import subprocess
 import os
+from os import sys, path
+from إجراء_الاختبارات import test_all
 
 
-__dirname__ = os.path.abspath(os.path.dirname(__file__))
+__dirname__ = path.abspath(path.dirname(__file__))
 
 
 def print_section_title(title):
@@ -18,51 +21,56 @@ def print_section_title(title):
 def activate_and_do(*cmds):
     # TODO(platforms): use platform specific activation and "&&"
     activate = "source ./venv/bin/activate"
-    return os.system(f"{activate} && {' && '.join(cmds)}")
+    rc = subprocess.run(f"{activate} && {' && '.join(cmds)}", shell=True).returncode
+    return rc
 
 
 def create_venv():
     print_section_title("📦 إنشاء بيئة افتراضية لتشغيل أكواد بايثون ...")
     os.chdir(__dirname__)
 
-    if not os.path.exists("./متطلبات"):
-        print("لا يوجد ملف المتطلبات\n", file=os.sys.stderr)
+    if not path.exists("./متطلبات"):
+        print("لا يوجد ملف المتطلبات\n", file=sys.stderr)
         exit(1)
 
-    ec = os.system("python -m venv venv")  # TODO(platforms)
-    if not ec:
-        ec = activate_and_do("python -m pip install -r ./متطلبات")
-        if ec:
-            print("حدث خطأ عند محاولة تنصيب الحزم من ملف ./متطلبات\n", file=os.sys.stderr)
-            exit(ec)
+    rc = subprocess.run("python -m venv venv", shell=True).returncode  # TODO(platforms)
+    if not rc:
+        rc = activate_and_do("python -m pip install -r ./متطلبات")
+        if rc:
+            print("حدث خطأ عند محاولة تنصيب الحزم من ملف ./متطلبات\n",
+                  file=sys.stderr)
+            exit(rc)
     else:
-        print("حدث خطأ عند محاولة إنشاء بيئة افتراضية لبايثون\n", file=os.sys.stderr)
-        exit(ec)
+        print("حدث خطأ عند محاولة إنشاء بيئة افتراضية لبايثون\n", file=sys.stderr)
+        exit(rc)
 
 
 def build_alif():
     print_section_title("🚀 جاري بناء مترجم ألف ...")
     # TODO(platforms): check privileges
     if os.environ.get("USER") != "root":
-        print("يجب تشغيل هذا الأمر بصلاحيات المستخدم الجذر، استخدم `sudo`\n", file=os.sys.stderr)
+        print("يجب تشغيل هذا الأمر بصلاحيات المستخدم الجذر، استخدم `sudo`\n",
+              file=sys.stderr)
         exit(1)
-    build_dir = os.path.join(__dirname__, "../build")
-    if not os.path.exists(build_dir):
-        os.system(f'mkdir -p "{build_dir}"')
+    build_dir = path.join(__dirname__, "../build")
+    if not path.exists(build_dir):
+        subprocess.run(f'mkdir -p "{build_dir}"', shell=True)
     os.chdir(build_dir)
     # TODO(platforms): different build commands in different platforms platforms
-    os.system("cmake .. && make && sudo make install")
+    rc = subprocess.run("cmake .. && make && sudo make install", shell=True).returncode
+    if rc:
+        print("لم يتم البناء بنجاح ]':", file=sys.stderr)
+        exit(rc)
 
 
 if __name__ == "__main__":
     os.chdir(__dirname__)
-    if not os.path.exists("./venv"):
+    if not path.exists("./venv"):
         create_venv()
-    args = os.sys.argv[1:]
-    if os.sys.argv[1:].count("--ابن-ألف") > 0:
+    try:
+        i = sys.argv.index("--ابن-ألف")
+        del sys.argv[i:i+1]
         build_alif()
-        args = filter(lambda a: a != "--ابن-ألف", args)
-    args = map(lambda a: f"'{a}'", args)
+    except: pass
     print_section_title("🔍 إجراء الاختبارات ...")
-    os.chdir(__dirname__)
-    activate_and_do(f"python ./اجراء_الاختبارات {' '.join(args)}")
+    test_all()

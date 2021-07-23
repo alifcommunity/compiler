@@ -72,7 +72,7 @@ def get_tests(directory='أكواد', clean=False, fill=False):
     return tests
 
 
-def test_unit(tt, full_path, syntax_only):
+def test_unit(tt, full_path, syntax_only=False):
     SYNTAX_ONLY = "<قواعد فقط>"
     name = tt.get('name')
     code_file = tt.get("code_file")
@@ -126,40 +126,57 @@ def test_unit(tt, full_path, syntax_only):
         }
     }
 
+    # compare expected and real behaviours and return the state
+    # of the test:
+    #   - if the expect_file doesn't exists, generate it and return
+    #   - if a syntax-only test was done before (compilation state only known),
+    #       and now a complete test is running, test the compilation only and
+    #       change the execution state if only the test pass
+    #   - otherwise compare both behaviours' exec and compi behaviours
+
+    def print_failure_details(indent="        "):
+        real_behaviour_lines = json.dumps(real_behaviour,
+                                        indent=2, ensure_ascii=False).split("\n")
+        expected_behaviour_lines = json.dumps(expected_behaviour,
+                                        indent=2, ensure_ascii=False).split("\n")
+        sep = indent * 2 + "-" * 25
+        print(f"{indent*2}** ما حدث فعلا **")
+        print(sep)
+        print(indent + f"\n{indent}".join(real_behaviour_lines))
+        print(f"{indent*2}** ما كان مُتوقعا **")
+        print(sep)
+        print(indent + f"\n{indent}".join(expected_behaviour_lines))
+
     if not expect_file:
         expect_file = path.join(full_path, f"{name}_توقع.json")
         with open(expect_file, "w") as f:
             f.write(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
         print("    📝: ", expect_file)
-        return
-
-    if not syntax_only and expected_behaviour.get("تنفيذ") == SYNTAX_ONLY:
+    elif not syntax_only and expected_behaviour.get("تنفيذ") == SYNTAX_ONLY:
         equal = is_equal(real_behaviour.get("ترجمة"),
                          expected_behaviour.get("ترجمة"))
         if equal:
             with open(expect_file, "w") as f:
                 f.write(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
             print("    ✅️📝: " + code_file)
+            return True
         else:
             print("    ❌️: " + code_file)
-            print(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
-        return
-
-    equal = is_equal(real_behaviour, expected_behaviour)
-    if equal:
-        print("    ✅️: " + code_file)
+            print_failure_details()
+            return False
     else:
-        print("    ❌️: " + code_file)
-        print(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
+        equal = is_equal(real_behaviour, expected_behaviour)
+        if equal:
+            print("    ✅️: " + code_file)
+            return True
+        else:
+            real_behaviour_str = json.dumps(real_behaviour, )
+            print("    ❌️: " + code_file)
+            print_failure_details()
+            return False
 
 
-def test_all(tests, syntax_only=False):
-    for t in tests:
-        for tt in t.get("tests"):
-            test_unit(tt, t.get("full_path"), syntax_only)
-
-
-if __name__ == "__main__":
+def test_all():
     if run("alif")[1]:
         print("مترجم ألف غير مثبت لديك، قم بالبناء أولا أو نزله مبنيا جاهزا\n", file=sys.stderr)
         exit(1)
@@ -176,9 +193,9 @@ if __name__ == "__main__":
         "--تجديد", "-ج", help="إعادة انتاج كل التوقعات من الكود وإهمال القديم. هذه الأمر لابد أن تكون واعيا بتبعاته", action="store_true")
     args_parser.add_argument(
         "--مسار", "-س", help="تحديد مسار لجمع الاختبارات منه ومن المسارات الفرعية بداخلة", default="أكواد")
-    args = args_parser.parse_args()
 
-    tests = get_tests(args.مسار, clean=args.تجديد, fill=args.تكميل)
+    args = args_parser.parse_args()
+    syntax_only = args.القواعد_فقط
 
     if (args.مساعدة):
         help_msg = args_parser.format_help()
@@ -187,4 +204,21 @@ if __name__ == "__main__":
         print(help_msg)
         exit(0)
 
-    test_all(tests, syntax_only=args.القواعد_فقط)
+    tests = get_tests(args.مسار, clean=args.تجديد, fill=args.تكميل)
+    some_failed = False
+
+    for t in tests:
+        full_path = t.get("full_path")
+        for tt in t.get("tests"):
+            passed = test_unit(tt, full_path, syntax_only)
+            some_failed = some_failed or not passed
+
+    if some_failed:
+        print()
+        print("-" * 10)
+        print("** قدر الله وما شاء فعل، بعض الاختبارات لم تنجح **")
+        exit(1)
+
+
+if __name__ == "__main__":
+    test_all()
