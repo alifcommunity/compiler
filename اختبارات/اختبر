@@ -28,14 +28,15 @@ def activate_and_do(*cmds):
 def create_venv():
     print_section_title("📦 إنشاء بيئة افتراضية لتشغيل أكواد بايثون ...")
     os.chdir(__dirname__)
+    requirements = path.join(__dirname__, "./متطلبات")
 
-    if not path.exists("./متطلبات"):
+    if not path.exists(requirements):
         print("لا يوجد ملف المتطلبات\n", file=sys.stderr)
         exit(1)
 
     rc = subprocess.run("python -m venv venv", shell=True).returncode  # TODO(platforms)
     if not rc:
-        rc = activate_and_do("python -m pip install -r ./متطلبات")
+        rc = activate_and_do(f"python -m pip install -r {requirements}")
         if rc:
             print("حدث خطأ عند محاولة تنصيب الحزم من ملف ./متطلبات\n",
                   file=sys.stderr)
