@@ -32,7 +32,6 @@ jobs:
           libraries: ${{env.BOOST_LIBS}}
           platform: x64
           configuration: ${{env.BUILD_TYPE}}
-          static: 1
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{github.workspace}}/build
