@@ -1,10 +1,16 @@
-name: Build and Syntax Tests
+name: Build and Tests
 
 on:
   push:
+    paths-ignore:
+      - 'README.md'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+  release:
+    types: [released]
 
 env:
   BUILD_TYPE: Release
@@ -50,8 +56,19 @@ jobs:
           make
           sudo make install
       
-      - name: Tests
+      - name: Tests Syntax
+        env:
+          BOOST_ROOT: ${{steps.boost.outputs.root}}
+          BOOST_LIBRARYDIR: ${{steps.boost.outputs.librarydir}}
+        if: ${{ github.event_name != 'release' }}
         run: make tests-syntax
+
+      - name: Tests
+        env:
+          BOOST_ROOT: ${{steps.boost.outputs.root}}
+          BOOST_LIBRARYDIR: ${{steps.boost.outputs.librarydir}}
+        if: ${{ github.event_name == 'release' }}
+        run: make tests
 
   MinGW-Windows:
     runs-on: windows-latest
