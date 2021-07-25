@@ -107,6 +107,7 @@ make && sudo make install
 2. على الأقل أنت بحاجة لـ "جيت" الإصدار 2.9.0 لاستعمال الخطافات، [المصدر](https://stackoverflow.com/questions/39332407/git-hooks-applying-git-config-core-hookspath)
 3. قمت بتنصيب clang-format، تأتي ضمن مترجم ال clang
 4. مفسر لغة بايثون، حيث يٌتطلب وجود `python`، `pip`، `venv` لإجراء الاختبارات
+5. <sub>(خياريا وليس إلزاما)،</sub> لتنسيق ملفات `yaml, json, ...`، يجب توافر أداة prettier التي يمكن تنصيبها من npm والتي تأتي مع ال NodeJs
 
 ### استنساخ الكود وإعداده
 

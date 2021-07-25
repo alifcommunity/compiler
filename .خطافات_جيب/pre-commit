@@ -3,28 +3,47 @@ RED="\e[31m"
 GREEN="\e[32m"
 NC="\e[0m"
 
-all_files=()
+all_c_like_files=()
+all_prettier_files=()
 
-while read -r file; do
-  file="$(printf "${file}")"     # convert unicode numbers into carachters
-  file="$(eval "echo ${file}")"  # remove quotation if exists
-  echo "${file}" |
+while read -r file_path; do
+  file_path="$(printf "${file_path}")"     # convert unicode numbers into carachters
+  file_path="$(eval "echo ${file_path}")"  # remove quotation if exists
+  echo "${file_path}" |
     grep -E '.(c|cc|cpp|hpp|h)$' >& /dev/null &&
-    all_files+=(${file})
+    all_c_like_files+=(${file_path})
+  echo "${file_path}" |
+    grep -E '.(yml|yaml|json|js|css|html|md|mdx)$' >& /dev/null &&
+    all_prettier_files+=(${file_path})
 done < <(git diff --cached --diff-filter=d --name-only)
 # echo "${all_files[@]}"; exit 0
 
-if (( ${#all_files} )); then
-  clang-format -i "${all_files[@]}"
-  formatter_exit_code=$?
+if (( ${#all_c_like_files} )); then
+  clang-format -i "${all_c_like_files[@]}"
+  clang_format_exit_code=$?
 fi
 
-git add -f "${all_files[@]}"
+if (( ${#all_prettier_files} )); then
+  prettier -v >& /dev/null && \
+  prettier -w "${all_prettier_files[@]}" && \
+  prettier_exit_code=$?
+fi
 
-if [ $formatter_exit_code -ne 0 ]; then
-  echo -e "${RED}❌ error:${NC} ccls-format failed with code ${formatter_exit_code}, ( ͡ಥ ͜ʖ ͡ಥ)"
+git add -f "${all_c_like_files[@]}"
+git add -f "${all_prettier_files[@]}"
+
+if (( $clang_format_exit_code )); then
+  echo -e "${RED}❌ error:${NC} ccls-format failed with code ${clang_format_exit_code}, ( ͡ಥ ͜ʖ ͡ಥ)"
   exit 1
 else
-  echo -e "${GREEN}✔ formatter succeeded:${NC} Files are formatted [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]"
+  echo -e "${GREEN}✔ clang-format succeeded:${NC} Files are formatted [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]"
+  exit 0
+fi
+
+if (( $prettier_exit_code )); then
+  echo -e "${RED}❌ error:${NC} prettier failed with code ${prettier_exit_code}, ( ͡ಥ ͜ʖ ͡ಥ)"
+  exit 1
+else
+  echo -e "${GREEN}✔ prettier succeeded:${NC} Files are formatted [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]"
   exit 0
 fi
