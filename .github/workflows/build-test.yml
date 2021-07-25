@@ -56,7 +56,11 @@ jobs:
           configuration: ${{env.BUILD_TYPE}}
 
       - name: Create Build Environment
-        run: cmake -E make_directory ${{github.workspace}}/build
+        run: |
+          sudo cp -r ${{steps.boost.outputs.root}}/boost /usr/include/boost
+          sudo cp -r ${{steps.boost.outputs.librarydir}}/* /usr/lib/
+          sudo ldconfig
+          cmake -E make_directory ${{github.workspace}}/build
 
       - name: Configure CMake
         env:
@@ -72,21 +76,11 @@ jobs:
           sudo make install
 
       - name: Tests Syntax
-        env:
-          BOOST_ROOT: ${{steps.boost.outputs.root}}
-          BOOST_LIBRARYDIR: ${{steps.boost.outputs.librarydir}}
-        run: |
-          export LD_LIBRARY_PATH=${{env.BOOST_LIBRARYDIR}}:$LD_LIBRARY_PATH
-          make tests-syntax
+        run: make tests-syntax
 
       - name: Tests
-        env:
-          BOOST_ROOT: ${{steps.boost.outputs.root}}
-          BOOST_LIBRARYDIR: ${{steps.boost.outputs.librarydir}}
         if: ${{ github.event_name == 'release' || github.event.inputs.allTests == 'نعم' }}
-        run: |
-          export LD_LIBRARY_PATH=${{env.BOOST_LIBRARYDIR}}:$LD_LIBRARY_PATH
-          make tests
+        run: make tests
 
   MinGW-Windows:
     runs-on: windows-latest
