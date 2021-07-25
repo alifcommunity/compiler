@@ -1,29 +1,140 @@
 #!/usr/bin/env python
 
+import os
 import re
-import json
+import json  # TODO: use yaml instead
 import subprocess
-from os import sys, path, walk
-
+import traceback
+from os import path, sys
 
 __dirname__ = path.abspath(path.dirname(__file__))
 
 
+def print_help():
+    help_msg = """
+الاستخدام: اجراء_الاختبارات [--مساعدة] [--تكميل] [--القواعد-فقط] [--تجديد]
+                    [--مسار مسار]
+
+إجراء اختبارات لمترجم ألف.
+
+أَسْناد غير إلزامية:
+    --مساعدة, -م          احصل على رسالة المساعدة هذه
+    --تكميل, -ك           بانتاج ملفات التوقع الغير موجودة من خلال ما يحدث فعلا
+                            عند ترجمة وتنفيذ الكود
+    --القواعد-فقط, -ق     اختبار القواعد فقط بدون الخَرج أو الترجمة الكاملة
+    --تجديد, -ج           إعادة انتاج كل التوقعات من الكود وإهمال القديم. هذه
+                            الأمر لابد أن تكون واعيا بتبعاته
+    --مسار مسار, -س مسار  تحديد مسار لجمع الاختبارات منه ومن المسارات الفرعية
+                            بداخلة
+    """
+
+    print(help_msg)
+
+
+def print_title(*lines, level=1, indent=None,
+                top_line=True, bottom_line=True,
+                file=sys.stdout, align="center",
+                min_width=35, max_width=0):
+    """
+    print something like this, with customizations like `indent` and `level`:
+    ---------------------------
+                        هذا سطر
+    ---------------------------
+    """
+    try:
+        term_w = os.get_terminal_size().columns
+    except:
+        term_w = 100000000
+    # min width is 35 and max width is term_w, otherwise the width will be the max length of `lines`
+    width = min(term_w, max(min_width, *map(lambda l: len(l), lines)))
+    # total printed line width has to be less than the terminal width
+    if indent:
+        width = width if len(indent) + width < term_w else term_w - len(indent)
+    else:
+        width = width if width < term_w else term_w
+    levels = ["=", "-", "."]
+    if type(level) == int:
+        level = levels[level-1]
+    if indent == None:
+        if term_w < 200:
+            a = term_w - width
+            # `>> 1` means divide by 2 and truncate, numbers here are experimental, nothing make sense
+            indent = ((a >> 1) - 5) * ' ' if a > 10 else ''
+        else:
+            indent = " " * 15
+    if not len(indent) < term_w - 10:
+        raise Exception("Indentation must be smaller than term width by more than 10 chars")
+
+    def print_these_lines():
+        nonlocal max_width
+        max_width = max_width or term_w - len(indent)
+        for l in lines:
+            # if the length of a line is greater than term_w,
+            # split it into smaller lines
+            if len(l) > max_width:
+                ll = []
+                while l:
+                    ll.append(l[0:max_width])
+                    l = l[max_width:]
+                l = ll
+            l = [l] if type(l) != list else l
+            for ll in l:
+                indent_to_center_text = \
+                    (width - len(ll) >> 1) * " " if align == "center" else \
+                    (width - len(ll)) * " " if align == "end" else ""
+                print(indent + indent_to_center_text + ll, file=file)
+
+    if top_line:
+        print(indent + level * width, file=file)
+    print_these_lines()
+    if bottom_line:
+        print(indent + level * width, file=file)
+
+
+def print_indented(text, indent="", file=sys.stdout):
+    """
+    put intial indent to the text and print the indented text
+    """
+    lines = str(text).split("\n")
+    try:
+        term_w = os.get_terminal_size().columns
+    except:
+        term_w = 100000000
+    max_width = term_w - len(indent)
+    for l in lines:
+        # if the length of a line is greater than term_w,
+        # split it into smaller lines
+        if len(l) > max_width:
+            ll = []
+            while l:
+                ll.append(l[0:max_width])
+                l = l[max_width:]
+            l = ll
+        l = [l] if type(l) != list else l
+        for ll in l:
+            print(indent + ll, file=file)
+
+
+def print_err(*msgs):
+    """
+    print to the STDERR
+    """
+    print(*msgs, file=sys.stderr)
+
+
 def is_equal(obj1, obj2):
-    e = True
     if type(obj1) == list and type(obj2) == list:
         for i in range(len(obj1)):
             if not is_equal(obj1[i], obj2[i]):
-                e = False
-                break
+                return False
+        return True
     elif type(obj1) == dict and type(obj2) == dict:
         for p in obj1:
             if not is_equal(obj1.get(p), obj2.get(p)):
-                e = False
-                break
-    else:
-        e = obj1 == obj2
-    return e
+                return False
+        return True
+
+    return obj1 == obj2
 
 
 def run(cmd, return_prcss=False, inputs=None):
@@ -45,8 +156,9 @@ def run(cmd, return_prcss=False, inputs=None):
 
 def get_tests(directory='أكواد', clean=False, fill=False):
     tests = []
-    tree = walk(directory)  # top-down tree
+    tree = os.walk(directory)  # top-down tree
     for (full_path, dirs, files) in tree:
+        full_path = path.abspath(full_path)
         alif_files = filter(lambda f: re.compile(
             r'.(ألف|alif)$').findall(f), files)
         for f in alif_files:
@@ -80,107 +192,157 @@ def test_unit(tt, full_path, syntax_only=False):
     code_file = tt.get("code_file")
     expect_file = tt.get("expect_file")
     exec_file = path.join(full_path, f"{name}_تنفيذي")
-    exec_file = path.abspath(exec_file)
     log_file = path.join(full_path, f"{name}_سجل")
+    code_file_rel_path = path.relpath(code_file, start=__dirname__)
+    expect_file_rel_path = path.relpath(expect_file, start=__dirname__)
+    exec_file_rel_path = path.relpath(exec_file, start=__dirname__)
+    log_file_rel_path = path.relpath(log_file, start=__dirname__)
 
-    execs_stds = None
-    execs_inputs = None
-    compi_inputs = None
-    if expect_file:
-        with open(expect_file, "r") as f:
-            expected_behaviour = json.loads(f.read())
-            compi_inputs = expected_behaviour.get('تجميع').get('دخل')
-            expected_exec = expected_behaviour.get('تنفيذ')
-            if expected_exec and expected_exec != SYNTAX_ONLY:
-                execs_inputs = map(lambda r: r.get('دخل'), expected_exec)
-            if syntax_only:
-                expected_behaviour["تنفيذ"] = SYNTAX_ONLY
+    def print_full_test_details_due_to_err(indent=" "*8):
+        print_title(f"تفاصيل الخطأ", indent=indent, level=3)
+        exception_str = "".join(traceback.format_exception(*sys.exc_info()))
+        print_indented(exception_str, indent=indent)
+        # is exec fle generated
+        print_title(f"تفاصيل مترجم ألف", indent=indent, level=3)
+        alif_details, alif_errors, rc = run("alif")
+        if rc:
+            print_indented(alif_errors, indent=indent)
+        else:
+            print_indented(alif_details, indent=indent)
+        # is exec fle generated
+        print_title(
+            f"هل انتج الملف التنفيذي ({exec_file_rel_path}):", indent=indent, level=3)
+        print_indented(path.exists(exec_file), indent=indent)
+        # print tt
+        print_title("هذه هي تفاصلي الاختبار:", indent=indent, level=3)
+        tt_str = json.dumps(tt, indent=2, ensure_ascii=False)
+        print_indented(tt_str, indent=indent)
+        # print content of `log_file`
+        print_title(f"ملف السجل ({log_file_rel_path}):",
+                    indent=indent, level=3)
+        if path.exists(log_file):
+            with open(log_file, "r") as f:
+                content = f.read()
+                print_indented(content, indent=indent)
+        else:
+            print_indented("<غير موجود>", indent=indent)
+        # print content of `expect_file`
+        print_title(
+            f"ملف التوقع ({expect_file_rel_path}):", indent=indent, level=3)
+        if expect_file and path.exists(expect_file):
+            with open(expect_file, "r") as f:
+                content = f.read()
+                print_indented(content, indent=indent)
+        else:
+            print_indented("<غير موجود>", indent=indent)
 
-    syntax_only = '--syntax-only' if syntax_only else ''
-    compile_stdout, compile_stderr, compile_exitcode = \
-        run(f"alif '{code_file}' {syntax_only} --o '{exec_file}' --log-json '{log_file}'",
-            inputs=compi_inputs)
-    if not compile_exitcode and not syntax_only:
-        execs_stds = \
-            map(lambda i: (i, *run(f"'{exec_file}'", inputs=i)), execs_inputs) \
-            if execs_inputs else [(None, *run(f"'{exec_file}'"))]
+    def do_test():
+        nonlocal expect_file
+        execs_stds = None
+        execs_inputs = None
+        compi_inputs = None
+        if expect_file:
+            with open(expect_file, "r") as f:
+                expected_behaviour = json.loads(f.read())
+                compi_inputs = expected_behaviour.get('تجميع').get('دخل')
+                expected_exec = expected_behaviour.get('تنفيذ')
+                if expected_exec and expected_exec != SYNTAX_ONLY:
+                    execs_inputs = map(lambda r: r.get('دخل'), expected_exec)
+                if syntax_only:
+                    expected_behaviour["تنفيذ"] = SYNTAX_ONLY
 
-    logs = None
-    if compile_exitcode:
-        with open(log_file, "r") as f:
-            logs = json.loads(f.read())
+        syntax_only_arg = '--syntax-only' if syntax_only else ''
+        compile_stdout, compile_stderr, compile_exitcode = \
+            run(f"alif '{code_file}' {syntax_only_arg} --o '{exec_file}' --log-json '{log_file}'",
+                inputs=compi_inputs)
+        if not compile_exitcode and not syntax_only:
+            execs_stds = \
+                map(lambda i: (i, *run(f"'{exec_file}'", inputs=i)), execs_inputs) \
+                if execs_inputs else [(None, *run(f"'{exec_file}'"))]
 
-    real_behaviour = {
-        "تنفيذ": [*map(lambda stds: {
-            "رمز_الخروج": stds[3],
-            "دخل": stds[0],
-            "خرج": stds[1],
-            "خطأ": stds[2]
-        }, execs_stds)]
-        if execs_stds else SYNTAX_ONLY
-        if syntax_only else None,  # if no error occured
-        "تجميع": {
-            "رمز_الخروج": compile_exitcode,
-            "دخل": compi_inputs,
-            "خرج": compile_stdout,
-            "خطأ": compile_stderr,
-            "سجل": logs
+        logs = None
+        if compile_exitcode:
+            with open(log_file, "r") as f:
+                logs = json.loads(f.read())
+
+        real_behaviour = {
+            "تنفيذ": [*map(lambda stds: {
+                "رمز_الخروج": stds[3],
+                "دخل": stds[0],
+                "خرج": stds[1],
+                "خطأ": stds[2]
+            }, execs_stds)]
+            if execs_stds else SYNTAX_ONLY
+            if syntax_only else None,  # if no error occured
+            "تجميع": {
+                "رمز_الخروج": compile_exitcode,
+                "دخل": compi_inputs,
+                "خرج": compile_stdout,
+                "خطأ": compile_stderr,
+                "سجل": logs
+            }
         }
-    }
 
-    # compare expected and real behaviours and return the state
-    # of the test:
-    #   - if the expect_file doesn't exists, generate it and return
-    #   - if a syntax-only test was done before (compilation state only known),
-    #       and now a complete test is running, test the compilation only and
-    #       change the execution state if only the test pass
-    #   - otherwise compare both behaviours' exec and compi behaviours
+        # compare expected and real behaviours and return the state
+        # of the test:
+        #   - if the expect_file doesn't exists, generate it and return
+        #   - if a syntax-only test was done before (compilation state only known),
+        #       and now a complete test is running, test the compilation only and
+        #       change the execution state if only the test pass
+        #   - otherwise compare both behaviours' exec and compi behaviours
 
-    def print_failure_details(indent="        "):
-        real_behaviour_lines = json.dumps(real_behaviour,
-                                        indent=2, ensure_ascii=False).split("\n")
-        expected_behaviour_lines = json.dumps(expected_behaviour,
-                                        indent=2, ensure_ascii=False).split("\n")
-        sep = indent * 2 + "-" * 25
-        print(f"{indent*2}** ما حدث فعلا **")
-        print(sep)
-        print(indent + f"\n{indent}".join(real_behaviour_lines))
-        print(f"{indent*2}** ما كان مُتوقعا **")
-        print(sep)
-        print(indent + f"\n{indent}".join(expected_behaviour_lines))
+        def print_failure_details(indent=" "*8):
+            real_behaviour_str = json.dumps(real_behaviour,
+                                            indent=2, ensure_ascii=False)
+            expected_behaviour_str = json.dumps(expected_behaviour,
+                                                indent=2, ensure_ascii=False)
+            print_title("ما حدث فعلا", indent=indent, level=3)
+            # put `indent` as intial indentation
+            print_indented(real_behaviour_str, indent=indent)
+            print_title("ما كان مُتوقعا", indent=indent, level=3)
+            print_indented(expected_behaviour_str, indent=indent)
 
-    if not expect_file:
-        expect_file = path.join(full_path, f"{name}_توقع.json")
-        with open(expect_file, "w") as f:
-            f.write(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
-        print("    📝: ", expect_file)
-    elif not syntax_only and expected_behaviour.get("تنفيذ") == SYNTAX_ONLY:
-        equal = is_equal(real_behaviour.get("ترجمة"),
-                         expected_behaviour.get("ترجمة"))
-        if equal:
+        if not expect_file:
+            expect_file = path.join(full_path, f"{name}_توقع.json")
             with open(expect_file, "w") as f:
                 f.write(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
-            print("    ✅️📝: " + code_file)
-            return True
+            print("    📝: ", code_file_rel_path)
+        elif not syntax_only and expected_behaviour.get("تنفيذ") == SYNTAX_ONLY:
+            equal = is_equal(real_behaviour.get("ترجمة"),
+                             expected_behaviour.get("ترجمة"))
+            if equal:
+                with open(expect_file, "w") as f:
+                    f.write(json.dumps(real_behaviour,
+                            indent=2, ensure_ascii=False))
+                print("    ✅️📝: " + code_file_rel_path)
+                return True
+            else:
+                print("    ❌️: " + code_file_rel_path)
+                print_failure_details()
+                return False
         else:
-            print("    ❌️: " + code_file)
-            print_failure_details()
-            return False
-    else:
-        equal = is_equal(real_behaviour, expected_behaviour)
-        if equal:
-            print("    ✅️: " + code_file)
-            return True
-        else:
-            real_behaviour_str = json.dumps(real_behaviour, )
-            print("    ❌️: " + code_file)
-            print_failure_details()
-            return False
+            equal = is_equal(real_behaviour, expected_behaviour)
+            if equal:
+                print("    ✅️: " + code_file_rel_path)
+                return True
+            else:
+                real_behaviour_str = json.dumps(real_behaviour, )
+                print("    ❌️: " + code_file_rel_path)
+                print_failure_details()
+                return False
+
+    try:
+        return do_test()
+    except:
+        print("    ❌️: " + code_file_rel_path)
+        print_title("حدث خطأ غير متوقع", level=2)
+        print_full_test_details_due_to_err()
+        return False
 
 
 def test_all(tests, syntax_only=False):
-    if run("alif")[1]:
-        print("مترجم ألف غير مثبت لديك، قم بالبناء أولا أو نزله مبنيا جاهزا\n", file=sys.stderr)
+    if run("alif")[2]:
+        print_err("مترجم ألف غير مثبت لديك، قم بالبناء أولا أو نزله مبنيا جاهزا")
         exit(1)
 
     some_failed = False
@@ -193,32 +355,15 @@ def test_all(tests, syntax_only=False):
 
     if some_failed:
         print()
-        print("-" * 10)
-        print("** قدر الله وما شاء فعل، بعض الاختبارات لم تنجح **")
+        print_title("قدر الله وما شاء فعل، بعض الاختبارات لم تنجح")
         exit(1)
+    else:
+        print()
+        print_title("الحمد لله، تمت الاختبارات بنجاح 😁",
+                    "سبحانك اللهم وبحمدك، نشهد أن لا إله إلا أنت، نستغفرك ونتوب إليه")
 
 
 if __name__ == "__main__":
-    def print_help():
-        help_msg = """
-        الاستخدام: اجراء_الاختبارات [--مساعدة] [--تكميل] [--القواعد-فقط] [--تجديد]
-                            [--مسار مسار]
-
-        إجراء اختبارات لمترجم ألف.
-
-        أَسْناد غير إلزامية:
-        --مساعدة, -م          احصل على رسالة المساعدة هذه
-        --تكميل, -ك           بانتاج ملفات التوقع الغير موجودة من خلال ما يحدث فعلا
-                                عند ترجمة وتنفيذ الكود
-        --القواعد-فقط, -ق     اختبار القواعد فقط بدون الخَرج أو الترجمة الكاملة
-        --تجديد, -ج           إعادة انتاج كل التوقعات من الكود وإهمال القديم. هذه
-                                الأمر لابد أن تكون واعيا بتبعاته
-        --مسار مسار, -س مسار  تحديد مسار لجمع الاختبارات منه ومن المسارات الفرعية
-                                بداخلة
-        """
-
-        print(help_msg)
-
     is_help = sys.argv.count("--مساعدة") > 0
     is_help = is_help or sys.argv.count("-م") > 0
 
@@ -244,7 +389,7 @@ if __name__ == "__main__":
             tests_path = path.join(__dirname__, "أكواد")
 
     if not path.exists(tests_path):
-        print(f"المسار {tests_path} غير موجود", file=sys.stderr)
+        print_err(f"المسار {tests_path} غير موجود")
         exit(1)
 
     tests = get_tests(tests_path, clean=is_clean, fill=is_fill)

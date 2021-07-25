@@ -1,10 +1,32 @@
-name: Build and Syntax Tests
+name: Build and Tests
 
 on:
   push:
+    branches: # all branches
+      - "**"
+    tags-ignore: # ignore pushing tags
+      - "**"
+    paths-ignore:
+      - "README.md"
+
   pull_request:
     branches:
       - main
+    tags-ignore: # ignore pushing tags
+      - "**"
+    paths-ignore:
+      - "README.md"
+
+  release:
+    types: 
+      - published
+
+  workflow_dispatch:
+    inputs:
+      allTests:
+        description: "اختبارات كاملة ترجمةً وتنفيذًا؟ (نعم/لا)"
+        required: true
+        default: "نعم"
 
 env:
   BUILD_TYPE: Release
@@ -21,8 +43,8 @@ jobs:
       - name: Cache Boost
         uses: actions/cache@v2
         with:
-          path: '${{ runner.workspace }}/boost_*.tar.gz'
-          key: 'boost-${{env.BOOST_VER}}'
+          path: "${{ runner.workspace }}/boost_*.tar.gz"
+          key: "boost-${{env.BOOST_VER}}"
 
       - name: Build Boost
         id: boost
@@ -32,10 +54,13 @@ jobs:
           libraries: ${{env.BOOST_LIBS}}
           platform: x64
           configuration: ${{env.BUILD_TYPE}}
-          static: 1
 
       - name: Create Build Environment
-        run: cmake -E make_directory ${{github.workspace}}/build
+        run: |
+          sudo cp -r ${{steps.boost.outputs.root}}/boost /usr/include/boost
+          sudo cp -r ${{steps.boost.outputs.librarydir}}/* /usr/lib/
+          sudo ldconfig
+          cmake -E make_directory ${{github.workspace}}/build
 
       - name: Configure CMake
         env:
@@ -47,24 +72,27 @@ jobs:
       - name: Build
         working-directory: ${{github.workspace}}/build
         run: |
-          cmake --build .
           make
           sudo make install
-      
-      - name: Tests
+
+      - name: Tests Syntax
         run: make tests-syntax
+
+      - name: Tests
+        if: ${{ github.event_name == 'release' || github.event.inputs.allTests == 'نعم' }}
+        run: make tests
 
   MinGW-Windows:
     runs-on: windows-latest
-    
+
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Cache Boost
         uses: actions/cache@v2
         with:
-          path: '${{ runner.workspace }}/boost_*.tar.gz'
-          key: 'boost-${{env.BOOST_VER}}'
+          path: "${{ runner.workspace }}/boost_*.tar.gz"
+          key: "boost-${{env.BOOST_VER}}"
 
       - name: Build Boost
         id: boost
@@ -89,11 +117,10 @@ jobs:
         working-directory: ${{github.workspace}}/build
         shell: cmd
         run: |
-             cmake ${{github.workspace}} -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+          cmake ${{github.workspace}} -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
         working-directory: ${{github.workspace}}/build
         shell: cmd
         run: |
-             mingw32-make
-
+          mingw32-make
