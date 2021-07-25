@@ -19,31 +19,38 @@ done < <(git diff --cached --diff-filter=d --name-only)
 # echo "${all_files[@]}"; exit 0
 
 if (( ${#all_c_like_files} )); then
-  clang-format -i "${all_c_like_files[@]}"
   clang_format_exit_code=$?
 fi
 
+print_success() { echo -e "${GREEN}✔ $1 succeeded:${NC} Files are formatted [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]"; }
+print_failure() { echo -e "${RED}❌ $1 failed:${NC} failed with code $2, ( ͡ಥ ͜ʖ ͡ಥ)"; }
+
+if (( ${#all_c_like_files} )); then
+  clang-format -i "${all_c_like_files[@]}"
+  clang_format_exit_code=$?
+  if (( $clang_format_exit_code )); then
+    print_failure "clang-format" $clang_format_exit_code
+    exit_code=1
+  else
+    print_success "clang-format"
+  fi
+fi
+
 if (( ${#all_prettier_files} )); then
-  prettier -v >& /dev/null && \
-  prettier -w "${all_prettier_files[@]}" && \
-  prettier_exit_code=$?
+  prettier -v >& /dev/null
+  if [ $? = 0 ]; then
+    prettier -w "${all_prettier_files[@]}"
+    prettier_exit_code=$?
+    if (( $prettier_exit_code )); then
+      print_failure "prettier" $prettier_exit_code
+      exit_code=1
+    else
+      print_success "prettier"
+    fi
+  fi
 fi
 
 git add -f "${all_c_like_files[@]}"
 git add -f "${all_prettier_files[@]}"
 
-if (( $clang_format_exit_code )); then
-  echo -e "${RED}❌ error:${NC} ccls-format failed with code ${clang_format_exit_code}, ( ͡ಥ ͜ʖ ͡ಥ)"
-  exit 1
-else
-  echo -e "${GREEN}✔ clang-format succeeded:${NC} Files are formatted [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]"
-  exit 0
-fi
-
-if (( $prettier_exit_code )); then
-  echo -e "${RED}❌ error:${NC} prettier failed with code ${prettier_exit_code}, ( ͡ಥ ͜ʖ ͡ಥ)"
-  exit 1
-else
-  echo -e "${GREEN}✔ prettier succeeded:${NC} Files are formatted [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]"
-  exit 0
-fi
+exit $exit_code
