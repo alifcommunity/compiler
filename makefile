@@ -6,6 +6,9 @@ build:
 prepare:
 	python ./إعداد_للتطوير.py
 
+prepare-tests:
+	python ./إعداد_للتطوير.py اختبارات
+
 tests:
 	./اختبارات/اختبر
 

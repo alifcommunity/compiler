@@ -40,13 +40,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache Boost
+      - name: تخبئة بوست
         uses: actions/cache@v2
         with:
           path: "${{ runner.workspace }}/boost_*.tar.gz"
           key: "boost-${{env.BOOST_VER}}"
 
-      - name: Build Boost
+      - name: بناء بوست
         id: boost
         uses: egor-tensin/build-boost@v1
         with:
@@ -55,34 +55,33 @@ jobs:
           platform: x64
           configuration: ${{env.BUILD_TYPE}}
 
-      - name: Create Build Environment
+      - name: صنع بيئة للبناء
         run: |
           sudo cp -r ${{steps.boost.outputs.root}}/boost /usr/include/boost
           sudo cp -r ${{steps.boost.outputs.librarydir}}/* /usr/lib/
           sudo ldconfig
           cmake -E make_directory ${{github.workspace}}/build
 
-      - name: Configure CMake
+      - name: إعداد CMake
         env:
           BOOST_ROOT: ${{steps.boost.outputs.root}}
           BOOST_LIBRARYDIR: ${{steps.boost.outputs.librarydir}}
         working-directory: ${{github.workspace}}/build
         run: cmake $GITHUB_WORKSPACE
 
-      - name: Build
+      - name: بناء المترجم
         working-directory: ${{github.workspace}}/build
         run: |
           make
           sudo make install
 
-      - name: Install pip packages
-        run: |
-          pip install pyyaml
+      - name: تجهيز للاختبارات
+        run: make prepare-tests
 
-      - name: Tests Syntax
+      - name: اختبارات القواعد
         run: make tests-syntax
 
-      - name: Tests
+      - name: اختبارات كاملة
         if: ${{ github.event_name == 'release' || github.event.inputs.allTests == 'نعم' }}
         run: make tests
 

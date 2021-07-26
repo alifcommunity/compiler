@@ -5,6 +5,7 @@ import re
 import json
 import yaml
 import traceback
+from colors import color
 from os import path, sys
 from مساعدات import run, is_equal, \
                     print_err, print_title, print_indented
@@ -62,10 +63,10 @@ def get_tests(tests_path, clean=False, fill=False):
 
 
 def test_unit(tt, full_path, syntax_only=False):
-    WRITE_SYMBOL         = "    \x1b[33m✎:\x1b[0m "    # yellow
-    SUCCESS_WRITE_SYMBOL = "    \x1b[36m✔✎:\x1b[0m "  # cyan
-    SUCCESS_SYMBOL       = "    \x1b[32m✔:\x1b[0m "   # green
-    FAILURE_SYMBOL       = "    \x1b[31m✘:\x1b[0m "   # red
+    WRITE_SYMBOL         = color("    🗎: "     , fg="yellow")
+    SUCCESS_WRITE_SYMBOL = color("    ✔ & 🗎: " , fg="cyan")
+    SUCCESS_SYMBOL       = color("    ✔: "     , fg="green")
+    FAILURE_SYMBOL       = color("    ✘: "     , fg="red")
     SYNTAX_ONLY          = "<قواعد فقط>"
 
     name                 = tt.get('name')

@@ -22,27 +22,34 @@ def config_git_hooks():
         print("-" * 35)
         print(cmd)
         exit(1)
+    print("تم بنجاح")
 
 
-def install_pip_packages():
-    print_tit("تنصيب حزم بيب")
-    cmd = "pip install pyyaml"
-    exit_code = os.system(cmd)
-    if exit_code:
-        print_err("حدث مشكلة أثناء تنصيب حزمة بيب، يرجى تنصيبها يدويها وإعداد المشروع للتطوير مجددا")
-        print("-" * 35)
-        print(cmd)
-        exit(1)
+def prepare_tests():
+    print_tit("تجهيز للاختبارات")
 
-
-def ensure_requiremets():
     try:
         import yaml
+        import colors
     except ImportError:
-        install_pip_packages()
+        cmd = "pip install pyyaml ansicolors"
+        exit_code = os.system(cmd)
+        if exit_code:
+            print_err("حدث مشكلة أثناء تنصيب حزمة بيب، يرجى تنصيبها يدويها وإعداد المشروع للتطوير مجددا")
+            print("-" * 35)
+            print(cmd)
+            exit(1)
+
+    print("تم بنجاح")
 
 
 if __name__ == "__main__":
-    ensure_requiremets()
+    what_to_prepare = sys.argv[1]
+
+    if what_to_prepare == "اختبارات":
+        prepare_tests()
+        exit(0)
+
+    prepare_tests()
     config_git_hooks()
 
