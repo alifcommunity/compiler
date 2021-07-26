@@ -1,4 +1,4 @@
-name: Build and Tests
+name: بناء واختبارات
 
 on:
   push:
@@ -18,7 +18,7 @@ on:
       - "README.md"
 
   release:
-    types: 
+    types:
       - published
 
   workflow_dispatch:
@@ -74,6 +74,10 @@ jobs:
         run: |
           make
           sudo make install
+
+      - name: Install pip packages
+        run: |
+          pip install pyyaml
 
       - name: Tests Syntax
         run: make tests-syntax

@@ -2,10 +2,16 @@
 
 import os
 import re
-import json  # TODO: use yaml instead
-import subprocess
+import json
+import yaml
 import traceback
+import subprocess
 from os import path, sys
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+
 
 __dirname__ = path.abspath(path.dirname(__file__))
 
@@ -154,34 +160,46 @@ def run(cmd, return_prcss=False, inputs=None):
     return out.decode(), err.decode(), process.returncode
 
 
-def get_tests(directory='أكواد', clean=False, fill=False):
+def get_tests(tests_path, clean=False, fill=False):
     tests = []
-    tree = os.walk(directory)  # top-down tree
-    for (full_path, dirs, files) in tree:
-        full_path = path.abspath(full_path)
-        alif_files = filter(lambda f: re.compile(
-            r'.(ألف|alif)$').findall(f), files)
-        for f in alif_files:
-            name = re.compile(r'(.*)\.(?:ألف|alif)$').findall(f)[0]
-            expect_file = None
-            if not clean:
-                expect_file = path.join(full_path, f"{name}_توقع.json")
-                expect_file = expect_file if path.exists(expect_file) else None
-            if fill and expect_file:
-                continue
-            code_file = path.join(full_path, f)
-            t = {
-                "full_path": full_path,
-                "tests": [{
-                    "name": name, "code_file": code_file,
-                    "expect_file": expect_file}]
-            }
-            tests.append(t)
 
-        if dirs:
-            for d in dirs:
-                sub_tests = get_tests(d)
-                tests.extend(sub_tests)
+    def get_one_test(file_name, full_path):
+        name = re.compile(r'(.*)\.(?:ألف|alif)$').findall(file_name)
+        if not name: return
+        name = name[0]
+        expect_file = None
+        if not clean:
+            expect_file = path.join(full_path, f"{name}_توقع.yml")
+            expect_file = expect_file if path.exists(expect_file) else None
+        if fill and expect_file:
+            return
+        code_file = path.join(full_path, file_name)
+        return {
+            "full_path": full_path,
+            "tests": [{
+                "name": name, "code_file": code_file,
+                "expect_file": expect_file}]
+        }
+
+    if path.isdir(tests_path):
+        tree = os.walk(tests_path)  # top-down tree
+        for (full_path, dirs, files) in tree:
+            full_path = path.abspath(full_path)
+            alif_files = filter(lambda f: re.compile(
+                r'.(ألف|alif)$').findall(f), files)
+            for fname in alif_files:
+                t = get_one_test(fname, full_path)
+                t and tests.append(t)
+
+            if dirs:
+                for d in dirs:
+                    sub_tests = get_tests(d)
+                    tests.extend(sub_tests)
+    else:
+        fname = path.basename(tests_path)
+        full_path = path.abspath(path.dirname(tests_path))
+        t = get_one_test(fname, full_path)
+        t and tests.append(t)
 
     return tests
 
@@ -200,10 +218,17 @@ def test_unit(tt, full_path, syntax_only=False):
     log_file             = path.join(full_path, f"{name}_سجل")
     code_file_rel_path   = path.relpath(code_file, start=__dirname__)
 
+    def dump_to_yaml(obj):
+        return yaml.dump(obj, indent=4, Dumper=Dumper, default_flow_style=False, allow_unicode=True)
+
+    def load_yaml(y):
+        return yaml.load(y, Loader=Loader)
+
     def print_full_test_details_due_to_err(indent=" "*8):
         print_title(f"تفاصيل الخطأ", indent=indent, level=3)
         exception_str = "".join(traceback.format_exception(*sys.exc_info()))
         print_indented(exception_str, indent=indent)
+
         # is exec fle generated
         print_title(f"تفاصيل مترجم ألف", indent=indent, level=3)
         alif_details, alif_errors, rc = run("alif")
@@ -211,15 +236,18 @@ def test_unit(tt, full_path, syntax_only=False):
             print_indented(alif_errors, indent=indent)
         else:
             print_indented(alif_details, indent=indent)
+
         # is exec fle generated
         exec_file_rel_path = path.relpath(exec_file, start=__dirname__)
         print_title(
             f"هل انتج الملف التنفيذي ({exec_file_rel_path}):", indent=indent, level=3)
         print_indented(path.exists(exec_file), indent=indent)
+
         # print tt
         print_title("هذه هي تفاصلي الاختبار:", indent=indent, level=3)
-        tt_str = json.dumps(tt, indent=2, ensure_ascii=False)
+        tt_str = dump_to_yaml(tt)
         print_indented(tt_str, indent=indent)
+
         # print content of `log_file`
         log_file_rel_path = path.relpath(log_file, start=__dirname__)
         print_title(f"ملف السجل ({log_file_rel_path}):",
@@ -230,6 +258,7 @@ def test_unit(tt, full_path, syntax_only=False):
                 print_indented(content, indent=indent)
         else:
             print_indented("<غير موجود>", indent=indent)
+
         # print content of `expect_file`
         if expect_file:
             expect_file_rel_path = path.relpath(expect_file, start=__dirname__)
@@ -253,7 +282,7 @@ def test_unit(tt, full_path, syntax_only=False):
         compi_inputs = None
         if expect_file:
             with open(expect_file, "r") as f:
-                expected_behaviour = json.loads(f.read())
+                expected_behaviour = load_yaml(f.read())
                 compi_inputs = expected_behaviour.get('تجميع').get('دخل')
                 expected_exec = expected_behaviour.get('تنفيذ')
                 if expected_exec and expected_exec != SYNTAX_ONLY:
@@ -302,10 +331,8 @@ def test_unit(tt, full_path, syntax_only=False):
         #   - otherwise compare both behaviours' exec and compi behaviours
 
         def print_failure_details(indent=" "*8):
-            real_behaviour_str = json.dumps(real_behaviour,
-                                            indent=2, ensure_ascii=False)
-            expected_behaviour_str = json.dumps(expected_behaviour,
-                                                indent=2, ensure_ascii=False)
+            real_behaviour_str = dump_to_yaml(real_behaviour)
+            expected_behaviour_str = dump_to_yaml(expected_behaviour)
             print_title("ما حدث فعلا", indent=indent, level=3)
             # put `indent` as intial indentation
             print_indented(real_behaviour_str, indent=indent)
@@ -313,9 +340,9 @@ def test_unit(tt, full_path, syntax_only=False):
             print_indented(expected_behaviour_str, indent=indent)
 
         if not expect_file:
-            expect_file = path.join(full_path, f"{name}_توقع.json")
+            expect_file = path.join(full_path, f"{name}_توقع.yml")
             with open(expect_file, "w") as f:
-                f.write(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
+                f.write(dump_to_yaml(real_behaviour))
             print(WRITE_SYMBOL, code_file_rel_path)
             return True
         elif not syntax_only and expected_behaviour.get("تنفيذ") == SYNTAX_ONLY:
@@ -323,8 +350,7 @@ def test_unit(tt, full_path, syntax_only=False):
                              expected_behaviour.get("ترجمة"))
             if equal:
                 with open(expect_file, "w") as f:
-                    f.write(json.dumps(real_behaviour,
-                            indent=2, ensure_ascii=False))
+                    f.write(dump_to_yaml(real_behaviour))
                 print(SUCCESS_WRITE_SYMBOL + code_file_rel_path)
                 return True
             else:
@@ -343,6 +369,8 @@ def test_unit(tt, full_path, syntax_only=False):
 
     try:
         return do_test()
+    except (KeyboardInterrupt, SystemExit):
+        exit(1)
     except:
         print(FAILURE_SYMBOL + code_file_rel_path)
         print_title("حدث خطأ غير متوقع", level=2)
