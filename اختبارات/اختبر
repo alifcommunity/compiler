@@ -194,9 +194,6 @@ def test_unit(tt, full_path, syntax_only=False):
     exec_file = path.join(full_path, f"{name}_تنفيذي")
     log_file = path.join(full_path, f"{name}_سجل")
     code_file_rel_path = path.relpath(code_file, start=__dirname__)
-    expect_file_rel_path = path.relpath(expect_file, start=__dirname__)
-    exec_file_rel_path = path.relpath(exec_file, start=__dirname__)
-    log_file_rel_path = path.relpath(log_file, start=__dirname__)
 
     def print_full_test_details_due_to_err(indent=" "*8):
         print_title(f"تفاصيل الخطأ", indent=indent, level=3)
@@ -210,6 +207,7 @@ def test_unit(tt, full_path, syntax_only=False):
         else:
             print_indented(alif_details, indent=indent)
         # is exec fle generated
+        exec_file_rel_path = path.relpath(exec_file, start=__dirname__)
         print_title(
             f"هل انتج الملف التنفيذي ({exec_file_rel_path}):", indent=indent, level=3)
         print_indented(path.exists(exec_file), indent=indent)
@@ -218,6 +216,7 @@ def test_unit(tt, full_path, syntax_only=False):
         tt_str = json.dumps(tt, indent=2, ensure_ascii=False)
         print_indented(tt_str, indent=indent)
         # print content of `log_file`
+        log_file_rel_path = path.relpath(log_file, start=__dirname__)
         print_title(f"ملف السجل ({log_file_rel_path}):",
                     indent=indent, level=3)
         if path.exists(log_file):
@@ -227,6 +226,7 @@ def test_unit(tt, full_path, syntax_only=False):
         else:
             print_indented("<غير موجود>", indent=indent)
         # print content of `expect_file`
+        expect_file_rel_path = path.relpath(expect_file, start=__dirname__)
         print_title(
             f"ملف التوقع ({expect_file_rel_path}):", indent=indent, level=3)
         if expect_file and path.exists(expect_file):
