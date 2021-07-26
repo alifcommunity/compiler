@@ -187,13 +187,18 @@ def get_tests(directory='أكواد', clean=False, fill=False):
 
 
 def test_unit(tt, full_path, syntax_only=False):
-    SYNTAX_ONLY = "<قواعد فقط>"
-    name = tt.get('name')
-    code_file = tt.get("code_file")
-    expect_file = tt.get("expect_file")
-    exec_file = path.join(full_path, f"{name}_تنفيذي")
-    log_file = path.join(full_path, f"{name}_سجل")
-    code_file_rel_path = path.relpath(code_file, start=__dirname__)
+    WRITE_SYMBOL         = "    \x1b[33m✎:\x1b[0m "    # yellow
+    SUCCESS_WRITE_SYMBOL = "    \x1b[36m✔✎:\x1b[0m "  # cyan
+    SUCCESS_SYMBOL       = "    \x1b[32m✔:\x1b[0m "   # green
+    FAILURE_SYMBOL       = "    \x1b[31m✘:\x1b[0m "   # red
+    SYNTAX_ONLY          = "<قواعد فقط>"
+
+    name                 = tt.get('name')
+    code_file            = tt.get("code_file")
+    expect_file          = tt.get("expect_file")
+    exec_file            = path.join(full_path, f"{name}_تنفيذي")
+    log_file             = path.join(full_path, f"{name}_سجل")
+    code_file_rel_path   = path.relpath(code_file, start=__dirname__)
 
     def print_full_test_details_due_to_err(indent=" "*8):
         print_title(f"تفاصيل الخطأ", indent=indent, level=3)
@@ -226,14 +231,19 @@ def test_unit(tt, full_path, syntax_only=False):
         else:
             print_indented("<غير موجود>", indent=indent)
         # print content of `expect_file`
-        expect_file_rel_path = path.relpath(expect_file, start=__dirname__)
-        print_title(
-            f"ملف التوقع ({expect_file_rel_path}):", indent=indent, level=3)
-        if expect_file and path.exists(expect_file):
-            with open(expect_file, "r") as f:
-                content = f.read()
-                print_indented(content, indent=indent)
+        if expect_file:
+            expect_file_rel_path = path.relpath(expect_file, start=__dirname__)
+            print_title(
+                f"ملف التوقع ({expect_file_rel_path}):", indent=indent, level=3)
+            if expect_file and path.exists(expect_file):
+                with open(expect_file, "r") as f:
+                    content = f.read()
+                    print_indented(content, indent=indent)
+            else:
+                print_indented("<غير موجود>", indent=indent)
         else:
+            print_title(
+                f"ملف التوقع:", indent=indent, level=3)
             print_indented("<غير موجود>", indent=indent)
 
     def do_test():
@@ -253,7 +263,7 @@ def test_unit(tt, full_path, syntax_only=False):
 
         syntax_only_arg = '--syntax-only' if syntax_only else ''
         compile_stdout, compile_stderr, compile_exitcode = \
-            run(f"alif '{code_file}' {syntax_only_arg} --o '{exec_file}' --log-json '{log_file}'",
+            run(f'alif "{code_file}" {syntax_only_arg} --o "{exec_file}" --log-json "{log_file}"',
                 inputs=compi_inputs)
         if not compile_exitcode and not syntax_only:
             execs_stds = \
@@ -306,7 +316,8 @@ def test_unit(tt, full_path, syntax_only=False):
             expect_file = path.join(full_path, f"{name}_توقع.json")
             with open(expect_file, "w") as f:
                 f.write(json.dumps(real_behaviour, indent=2, ensure_ascii=False))
-            print("    📝: ", code_file_rel_path)
+            print(WRITE_SYMBOL, code_file_rel_path)
+            return True
         elif not syntax_only and expected_behaviour.get("تنفيذ") == SYNTAX_ONLY:
             equal = is_equal(real_behaviour.get("ترجمة"),
                              expected_behaviour.get("ترجمة"))
@@ -314,27 +325,26 @@ def test_unit(tt, full_path, syntax_only=False):
                 with open(expect_file, "w") as f:
                     f.write(json.dumps(real_behaviour,
                             indent=2, ensure_ascii=False))
-                print("    ✅️📝: " + code_file_rel_path)
+                print(SUCCESS_WRITE_SYMBOL + code_file_rel_path)
                 return True
             else:
-                print("    ❌️: " + code_file_rel_path)
+                print(FAILURE_SYMBOL + code_file_rel_path)
                 print_failure_details()
                 return False
         else:
             equal = is_equal(real_behaviour, expected_behaviour)
             if equal:
-                print("    ✅️: " + code_file_rel_path)
+                print(SUCCESS_SYMBOL + code_file_rel_path)
                 return True
             else:
-                real_behaviour_str = json.dumps(real_behaviour, )
-                print("    ❌️: " + code_file_rel_path)
+                print(FAILURE_SYMBOL + code_file_rel_path)
                 print_failure_details()
                 return False
 
     try:
         return do_test()
     except:
-        print("    ❌️: " + code_file_rel_path)
+        print(FAILURE_SYMBOL + code_file_rel_path)
         print_title("حدث خطأ غير متوقع", level=2)
         print_full_test_details_due_to_err()
         return False

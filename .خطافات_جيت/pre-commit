@@ -23,7 +23,7 @@ if (( ${#all_c_like_files} )); then
 fi
 
 print_success() { echo -e "${GREEN}✔ $1 succeeded:${NC} Files are formatted [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]"; }
-print_failure() { echo -e "${RED}❌ $1 failed:${NC} failed with code $2, ( ͡ಥ ͜ʖ ͡ಥ)"; }
+print_failure() { echo -e "${RED}✘ $1 failed:${NC} failed with code $2, ( ͡ಥ ͜ʖ ͡ಥ)"; }
 
 if (( ${#all_c_like_files} )); then
   clang-format -i "${all_c_like_files[@]}"
@@ -34,6 +34,7 @@ if (( ${#all_c_like_files} )); then
   else
     print_success "clang-format"
   fi
+  git add -f "${all_c_like_files[@]}"
 fi
 
 if (( ${#all_prettier_files} )); then
@@ -47,10 +48,9 @@ if (( ${#all_prettier_files} )); then
     else
       print_success "prettier"
     fi
+    git add -f "${all_prettier_files[@]}"
   fi
 fi
 
-git add -f "${all_c_like_files[@]}"
-git add -f "${all_prettier_files[@]}"
 
 exit $exit_code
