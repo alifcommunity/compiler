@@ -65,3 +65,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Alif Compiler Source Code
 add_subdirectory(${AlifProject_SOURCE_DIR}/src Alif)
+
+# --[ Copping Files ] ----------------------------------------------------------------
+
+if (WIN32)
+    if(EXISTS "C:/Alif3/")
+
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/aliflib/ DESTINATION C:/Alif3/aliflib/)
+
+    endif()
+endif()
