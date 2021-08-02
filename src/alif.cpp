@@ -37,6 +37,7 @@
 // OS Include ***************************************************
 
 	#ifdef _WIN32
+		#include <winsock2.h>
 		#include <windows.h>
 		#include <tchar.h>
 	#elif  __APPLE__
@@ -4999,11 +5000,12 @@
 		#include <direct.h> // getcwd (Get current working directory)
 		#define GetCurrentDir _getcwd
 
+		#include <winsock2.h>
 		#include <windows.h> // Get Working Path by Win32 API
 
 		//#include <w32api.h>
 		//#include <Winbase.h>
-		#include <windows.h> // Get Absolute Path by Win32 API
+		//#include <windows.h> // Get Absolute Path by Win32 API
 		#include <stdlib.h> // Get Temp envirenemt by Win32 API getenv()
 
 		std::string GET_WORKING_PATH_WIN32()

@@ -195,6 +195,12 @@ if(UNIX)
 	install (DIRECTORY ${AlifProject_SOURCE_DIR}/aliflib DESTINATION lib)
 endif (UNIX)
 
+if(WIN32)
+	message("[*] Initializing installation settings...")
+	install (TARGETS ${Info_App} DESTINATION C:/Alif3)
+	install (DIRECTORY ${AlifProject_SOURCE_DIR}/aliflib DESTINATION C:/Alif3)
+endif ()
+
 # --[ Copy Examples ] ------------------------------------------------------------
 
 file(COPY ${AlifProject_SOURCE_DIR}/examples DESTINATION ${CMAKE_BINARY_DIR}/)
