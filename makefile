@@ -1,7 +1,12 @@
 .PHONY: build prepare tests tests-*
 
+ifeq ($(OS),Windows_NT)
+build:
+	rd /s /q build && mkdir build && cd build && cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release && mingw32-make && mingw32-make install
+else
 build:
 	mkdir -p build && cd build && cmake .. && make && sudo make install
+endif
 
 prepare:
 	python ./إعداد_للتطوير.py
@@ -10,13 +15,13 @@ prepare-tests:
 	python ./إعداد_للتطوير.py اختبارات
 
 tests:
-	./اختبارات/اختبر
+	python ./اختبارات/اختبر
 
 tests-syntax:
-	./اختبارات/اختبر -ق
+	python ./اختبارات/اختبر -ق
 
 tests-fill:
-	./اختبارات/اختبر -ك
+	python ./اختبارات/اختبر -ك
 
 tests-renew:
-	./اختبارات/اختبر -ك
+	python ./اختبارات/اختبر -ك

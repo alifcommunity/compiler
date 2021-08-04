@@ -30,7 +30,20 @@ cd build
 
 </div>
 
-### Windows
+### البناء
+
+للبناء المشروع على أي نظام تشغيل باستخدام `make`
+
+<div dir=ltr>
+
+```bash
+make build
+```
+
+</div>
+
+
+#### Windows
 
 البناء باستخدام **_GCC (MinGW64)_**.
 
@@ -39,6 +52,7 @@ cd build
 ```bash
 cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
 mingw32-make
+mingw32-make install
 ```
 
 </div>
@@ -54,7 +68,7 @@ nmake
 
 </div>
 
-### Linux
+#### Linux
 
 تنصيب مترجم GCC & GTK3
 
