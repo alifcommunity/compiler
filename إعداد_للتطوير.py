@@ -44,7 +44,7 @@ def prepare_tests():
 
 
 if __name__ == "__main__":
-    what_to_prepare = sys.argv[1]
+    what_to_prepare = sys.argv[1] if len(sys.argv) > 1 else ''
 
     if what_to_prepare == "اختبارات":
         prepare_tests()
