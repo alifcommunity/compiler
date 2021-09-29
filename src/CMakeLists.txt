@@ -128,7 +128,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		# using MinGW/GCC Windows
 		message("[*] Initializing '${Info_Title}' settings for MinGW/GCC (Windows).")
 
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -fvisibility=hidden -w -O3 -std=gnu++17 -Wno-deprecated -municode")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -fvisibility=hidden -w -O3 -std=gnu++17 -march=armv8-a -Wno-deprecated -municode")
 		target_link_libraries(${Info_App} ${Boost_LIBRARIES} iconv pthread -static)
 
 	else()
@@ -136,7 +136,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		# using GCC Linux
 		message("[*] Initializing '${Info_Title}' settings for GCC (Linux).")
 
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -w -O3 -std=gnu++17 -Wno-deprecated" )
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -w -O3 -std=gnu++17 -march=armv8-a -Wno-deprecated" )
 		target_link_libraries(${Info_App} ${Boost_LIBRARIES} pthread)
 		
 	endif()
