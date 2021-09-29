@@ -8211,7 +8211,7 @@ void compile_linux64() {
   // "_compile.log\" ";
 
   LINUX_CMD = "g++ -c -o \"" + PATH_FULL_OBJ + "\" \"" + PATH_FULL_CPP +
-              "\" -I\"/usr/local/lib/aliflib\" " + Compile_ExtraCompile +
+              "\" -I\"/usr/local/lib/aliflib\" " + "-march=armv8-a" +
               " 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM +
               "_compile.log\" ";
 
@@ -8328,10 +8328,12 @@ void compile_linux64() {
   // 			"-L\"/usr/local/lib/aliflib\" -lwebui
   // -lboost_filesystem";
 
-  LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ +
-              "\" -L\"/usr/local/lib/aliflib\" " + Compile_ExtraLink +
-              " "; // TODO: Add 2 > log
+  //LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ +
+  //            "\" -L\"/usr/local/lib/aliflib\" " + Compile_ExtraLink +
+  //            " "; // TODO: Add 2 > log
 
+    LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\" -L\"usr/local/lib/aliflib\" " + "-march=armv8-a  -std=gun++17 -Os -finput-charset=utf-8 -pthread -lboost_system -lboost_thread ";
+	
   if (DEBUG)
     LogMessage("Link command (Linux) : " + LINUX_CMD + " \n");
 
