@@ -30,7 +30,7 @@ endif()
 
 # --[ Boost ] ----------------------------------------------------------------------
 
-set(Boost_Version_Needed "1.76.0")
+set(Boost_Version_Needed "1.74.0")
 
 if (WIN32)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
