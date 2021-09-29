@@ -1,4 +1,6 @@
 
+add_definitions( -DINSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} )
+
 # Info
 set(Info_Title "Alif Compiler")
 set(Info_Source "alif.cpp")
@@ -6,7 +8,6 @@ set(Info_App "alif")
 
 # Working directory for Debugin & Testing
 set(WD_Windows "C:\\Alif3")
-set(WD_Linux "/bin")
 
 # --[ Alif ] -------------------------------------------------------------------
 
@@ -106,7 +107,7 @@ else()
 	set_target_properties(${Info_App} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${WD_Windows})
 	set_target_properties(${Info_App} PROPERTIES CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WD_Windows})
 	set_target_properties(${Info_App} PROPERTIES EXECUTABLE_OUTPUT_PATH_DEBUG ${WD_Windows})
-	set_target_properties(${Info_App} PROPERTIES CMAKE_EXECUTABLE_OUTPUT_PATH ${WD_Windows})
+	set_target_properties(${Info_App} PROPERTIES CMAKE_EXECUTABLE_OUTPUT_PATH ${Windows})
 endif ()
 
 # --[ Compiler flags ] ----------------------------------------------------------
@@ -203,4 +204,4 @@ endif ()
 
 # --[ Copy Examples ] ------------------------------------------------------------
 
-file(COPY ${AlifProject_SOURCE_DIR}/examples DESTINATION ${CMAKE_BINARY_DIR}/)
+#file(COPY ${AlifProject_SOURCE_DIR}/examples DESTINATION ${CMAKE_BINARY_DIR}/)

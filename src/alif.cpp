@@ -22,6 +22,8 @@
 */
 
 #define ALIF_VERSION "3.0.33 (Beta)"
+#define XSTR(a) STR(a)
+#define STR(a) #a
 
 // Stack ********************************************************
 
@@ -4328,22 +4330,26 @@ std::string CheckForSyntax(
     // namespace:ctr:text
 
     // 			if (SYNTAX[p + 1] != ":")
-    // 				ErrorCode("يجب اضافه ' : ' بعد ' " + SYNTAX[p] + "
+    // 				ErrorCode("يجب اضافه ' : ' بعد ' " + SYNTAX[p] +
+    // "
     // '
     // ", o_tokens);
 
     // 			if (SYNTAX[p + 2] == "")
-    // 				ErrorCode("يجب اضافه عضو تابع ل ' " + SYNTAX[p] + " ' بعد
+    // 				ErrorCode("يجب اضافه عضو تابع ل ' " + SYNTAX[p] + " '
+    // بعد
     // ':'
     // ", o_tokens);
 
     // 			if (SYNTAX[p + 3] == "")
-    // 				ErrorCode("يجب اضافه ':' أو '()' بعد ' " + SYNTAX[p] + " "
+    // 				ErrorCode("يجب اضافه ':' أو '()' بعد ' " + SYNTAX[p] + "
+    // "
     // + SYNTAX[p
     // + 1] + " " + SYNTAX[p + 2] + " ' ", o_tokens);
 
     // 			if (SYNTAX[p + 3] != "(" && SYNTAX[p + 3] != ":")
-    // 				ErrorCode("أمر غير معروف ' " + SYNTAX[p + 3] + " ', يجب اضافه
+    // 				ErrorCode("أمر غير معروف ' " + SYNTAX[p + 3] + " ', يجب
+    // اضافه
     // ':' أو
     // '()' ", o_tokens);
 
@@ -4368,8 +4374,8 @@ std::string CheckForSyntax(
     // 					SYNTAX[p + 2] == "إخفاء" ||
     // 					SYNTAX[p + 2] == "تدمير")
     // 				{
-    // 					ErrorCode("لا يمكن إستعمال خاصية ' " + SYNTAX[p + 2] + "
-    // ' هنا، لأنها من نوع عادم" + OBJECTIF_TYPE, o_tokens);
+    // 					ErrorCode("لا يمكن إستعمال خاصية ' " + SYNTAX[p + 2] +
+    // " ' هنا، لأنها من نوع عادم" + OBJECTIF_TYPE, o_tokens);
     // 				}
 
     // 				// -----------------------
@@ -4381,10 +4387,10 @@ std::string CheckForSyntax(
     // + 2])])
     // 				{
     // 					if (SYNTAX[p + 3] != "(")
-    // 						ErrorCode("من اجل نداء الدالة ' " + SYNTAX[p + 2] + " '
-    // يجب اضافه
-    // '()' بعد ' " + SYNTAX[p] + " " + 										SYNTAX[p + 1] + " " +
-    // SYNTAX[p
+    // 						ErrorCode("من اجل نداء الدالة ' " + SYNTAX[p + 2] + "
+    // ' يجب اضافه
+    // '()' بعد ' " + SYNTAX[p] + " " + 										SYNTAX[p + 1] + " "
+    // + SYNTAX[p
     // + 2] + " ' ", o_tokens);
 
     // 					std::string FUN_TYPE;
@@ -4394,21 +4400,23 @@ std::string CheckForSyntax(
     // L_FUN_TYPE[std::make_pair(TMP_NAMESPACE_OR_CLASS, SYNTAX[p])];
 
     // 					if (FUN_TYPE == "عادم")
-    // 						ErrorCode("الدالة المحلية ' " + SYNTAX[p] + "()' من نوع
-    // عادم, لدى لا يمكن تحويلها إلى " + OBJECTIF_TYPE, o_tokens);
+    // 						ErrorCode("الدالة المحلية ' " + SYNTAX[p] + "()' من
+    // نوع عادم, لدى لا يمكن تحويلها إلى " + OBJECTIF_TYPE, o_tokens);
 
     // 					if (OBJECTIF_TYPE == "عدد")
     // 					{
     // 						if (FUN_TYPE == "عدد")
     // 						{
-    // 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + "
+    // 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] +
+    // "
     // ':LOCAL_INT_FUNC'"
     // + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
 
     // 							// *** Generate Code ***
     // 							// Buffer
     // 							CPP_END = " ";
-    // 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]] +
+    // 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]]
+    // +
     // "::FUNCTION_"
     // + ID[SYNTAX[p + 2]] + "( ");
     // 							// *** *** *** *** ***
@@ -4416,7 +4424,8 @@ std::string CheckForSyntax(
     // 						}
     // 						else
     // 						{
-    // 							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p + 2]
+    // 							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p +
+    // 2]
     // +
     // "()' من " + FUN_TYPE + " إلى عدد ", o_tokens);
     // 						}
@@ -4425,7 +4434,8 @@ std::string CheckForSyntax(
     // 					{
     // 						if (FUN_TYPE == "نص")
     // 						{
-    // 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p]
+    // 							if(DEBUG)DEBUG_MESSAGE("[NS'" +
+    // SYNTAX[p]
     // +
     // "
     // ':LOCAL_STRING_FUNC'" + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
@@ -4433,7 +4443,8 @@ std::string CheckForSyntax(
     // 							// *** Generate Code ***
     // 							// Buffer
     // 							CPP_END = " ";
-    // 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]] +
+    // 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]]
+    // +
     // "::FUNCTION_"
     // + ID[SYNTAX[p + 2]] + "( ");
     // 							// *** *** *** *** ***
@@ -4441,22 +4452,24 @@ std::string CheckForSyntax(
     // 						}
     // 						else if (FUN_TYPE == "عدد")
     // 						{
-    // 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + "
+    // 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] +
+    // "
     // ':LOCAL_INT_FUNC'"
     // + SYNTAX[p + 2] + " '().ToString( ", o_tokens); // DEBUG
 
     // 							// *** Generate Code ***
     // 							// Buffer
     // 							CPP_END = " ) ";
-    // 							CPP_CODE.append(" alifcore_IntToString(
-    // OBJ_CLASS_WINDOW_"
+    // 							CPP_CODE.append("
+    // alifcore_IntToString( OBJ_CLASS_WINDOW_"
     // + ID[SYNTAX[p]] + "::FUNCTION_" + ID[SYNTAX[p + 2]] + "( ");
     // 							// *** *** *** *** ***
     // ***
     // 						}
     // 						else
     // 						{
-    // 							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p + 2]
+    // 							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p +
+    // 2]
     // +
     // "()' من " + FUN_TYPE + " إلى نص ", o_tokens);
     // 						}
@@ -4465,7 +4478,8 @@ std::string CheckForSyntax(
     // 					{
     // 						if (FUN_TYPE == "منطق")
     // 						{
-    // 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] +
+    // 							if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p]
+    // +
     // "
     // ':LOCAL_BOOL_FUNC'"
     // + SYNTAX[p + 2] + " '( ", o_tokens); // DEBUG
@@ -4473,7 +4487,8 @@ std::string CheckForSyntax(
     // 							// *** Generate Code ***
     // 							// Buffer
     // 							CPP_END = " ";
-    // 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]] +
+    // 							CPP_CODE.append(" NS_" + ID[SYNTAX[p]]
+    // +
     // "::FUNCTION_"
     // + ID[SYNTAX[p + 2]] + "( ");
     // 							// *** *** *** *** ***
@@ -4481,14 +4496,15 @@ std::string CheckForSyntax(
     // 						}
     // 						else
     // 						{
-    // 							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p + 2]
+    // 							ErrorCode("لا يمكن تحويل الدالة المحلية ' " + SYNTAX[p +
+    // 2]
     // +
     // "()' من " + FUN_TYPE + " إلى منطق ", o_tokens);
     // 						}
     // 					}
     // 					else
-    // 						ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + "
-    // ' ل ' " + SYNTAX[p + 2] + " ' ", o_tokens);
+    // 						ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE +
+    // " ' ل ' " + SYNTAX[p + 2] + " ' ", o_tokens);
 
     // 					// abc = (p)namespace:local_func(a, b) +
     // x
@@ -4501,9 +4517,10 @@ std::string CheckForSyntax(
     // 					// Get Local Function Args
     // 					while (TMP_FUN_LONG <= SYNTAX_LONG)
     // 					{
-    // 						if (SYNTAX[TMP_FUN_LONG] == "(") // مفتوح inside الدالة args
-    // : fun(
-    // a + (b)) 							OPEN_PARENTIZE++; 						else if (SYNTAX[TMP_FUN_LONG]
+    // 						if (SYNTAX[TMP_FUN_LONG] == "(") // مفتوح inside الدالة
+    // args : fun(
+    // a + (b)) 							OPEN_PARENTIZE++; 						else if
+    // (SYNTAX[TMP_FUN_LONG]
     // ==
     // ")" && OPEN_PARENTIZE > 0) // Close inside الدالة args
     // OPEN_PARENTIZE--; 						else if
@@ -4513,36 +4530,42 @@ std::string CheckForSyntax(
     // 							if (TMP_FUN_LONG <
     // SYNTAX_LONG)
     // 							{
-    // 								// abc = fun( a +
-    // (b))
+    // 								// abc = fun( a
+    // + (b))
     // + 123
-    // 								// abc = x + (fun(var)) * (fun(var) / fun(var, fun(var),
-    // var)
+    // 								// abc = x + (fun(var)) * (fun(var) / fun(var,
+    // fun(var), var)
     // - var)
 
-    // 								if ((SYNTAX[TMP_FUN_LONG + 1]
+    // 								if ((SYNTAX[TMP_FUN_LONG +
+    // 1]
     // !=
     // "+")
-    // && 									(SYNTAX[TMP_FUN_LONG + 1] != "-")
+    // && 									(SYNTAX[TMP_FUN_LONG + 1] !=
+    // "-")
     // && (SYNTAX[TMP_FUN_LONG + 1] != "*")
-    // && 									(SYNTAX[TMP_FUN_LONG + 1] != "/")
+    // && 									(SYNTAX[TMP_FUN_LONG + 1] !=
+    // "/")
     // && (SYNTAX[TMP_FUN_LONG + 1] != "،")
-    // && 									(SYNTAX[TMP_FUN_LONG + 1] != ",")
+    // && 									(SYNTAX[TMP_FUN_LONG + 1] !=
+    // ",")
     // && (SYNTAX[TMP_FUN_LONG + 1] !=
     // ")"))
     // 								{
-    // 									ErrorCode("نص غير معروف بعد نداء ' " + SYNTAX[p + 2] + "()'
-    // : ' " + SYNTAX[TMP_FUN_LONG + 1] + " ' ", o_tokens);
+    // 									ErrorCode("نص غير معروف بعد نداء ' " + SYNTAX[p + 2] +
+    // "()' : ' " + SYNTAX[TMP_FUN_LONG + 1] + " ' ", o_tokens);
     // 								}
     // 							}
     // 							else if (TMP_FUN_LONG ==
     // SYNTAX_LONG)
     // 							{
     // 								// a = fun( a +
-    // (b)) 								if (SYNTAX[TMP_FUN_LONG] != ")" || SYNTAX[SYNTAX_LONG]
+    // (b)) 								if (SYNTAX[TMP_FUN_LONG] != ")" ||
+    // SYNTAX[SYNTAX_LONG]
     // !=
     // ")") //
-    // double check! 									ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p
+    // double check! 									ErrorCode("يجب إنهاء نداء الدالة ' " +
+    // SYNTAX[p
     // + 2] + "()' بالإشارة ')' ", o_tokens);
     // 							}
 
@@ -4554,7 +4577,8 @@ std::string CheckForSyntax(
 
     // 					if (SYNTAX[TMP_FUN_LONG] != ")") //
     // Double
-    // check! 						ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p + 2]
+    // check! 						ErrorCode("يجب إنهاء نداء الدالة ' " + SYNTAX[p +
+    // 2]
     // +
     // "()' بالإشارة ')' ", o_tokens);
 
@@ -4571,13 +4595,14 @@ std::string CheckForSyntax(
     // 						}
     // 					}
 
-    // 					// Check local fun Args : fun (a + c, 2 *
-    // (b
+    // 					// Check local fun Args : fun (a + c, 2
+    // * (b
     // - 1)) 					CPP_CODE.append(
     // CHECK_CALL_FUN_ARG( false,
     // SYNTAX[p], SYNTAX[p + 2],
-    // 0, 														TheNamespace, 														TheFunction,
-    // TempToken, 														(TempTokenCount
+    // 0, 														TheNamespace,
+    // TheFunction, TempToken,
+    // (TempTokenCount
     // - 1), o_tokens));
 
     // 					if(DEBUG)DEBUG_MESSAGE(")] \n\n",
@@ -4596,8 +4621,8 @@ std::string CheckForSyntax(
     // 				//
     // ---------------------------------------------------------------------------------
     // 				else
-    // 					ErrorCode("النافذة ' " + SYNTAX[p] + " ' لا تحتوي على
-    // دالة محليه بإسم ' " + SYNTAX[p + 2] + " ' ", o_tokens);
+    // 					ErrorCode("النافذة ' " + SYNTAX[p] + " ' لا تحتوي
+    // على دالة محليه بإسم ' " + SYNTAX[p + 2] + " ' ", o_tokens);
 
     // 				// Exception!
     // 				continue;
@@ -4633,8 +4658,8 @@ std::string CheckForSyntax(
     // 				{
     // 					// namespace:Title =
 
-    // 					if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':VALUE'" +
-    // SYNTAX[p
+    // 					if(DEBUG)DEBUG_MESSAGE("[NS'" + SYNTAX[p] + " ':VALUE'"
+    // + SYNTAX[p
     // + 2] + "(SetWindowTitle)' = ", o_tokens); // DEBUG
 
     // 					// *** Generate Code ***
@@ -4645,8 +4670,8 @@ std::string CheckForSyntax(
     // ((
     // ")); 					else
     // 						// namespace : Title =
-    // 						cpp_AddScript(TheFunction, CG_WIN_MEMBER(SYNTAX[p],
-    // "SetLabel
+    // 						cpp_AddScript(TheFunction,
+    // CG_WIN_MEMBER(SYNTAX[p], "SetLabel
     // ((
     // "));
     // 					// *** *** *** *** *** ***
@@ -4655,7 +4680,8 @@ std::string CheckForSyntax(
     // 				}
     // 				else
     // 				{
-    // 					ErrorCode("النافذة ' " + SYNTAX[p] + " ' لا تحتوي على خاصيه باسم
+    // 					ErrorCode("النافذة ' " + SYNTAX[p] + " ' لا تحتوي على خاصيه
+    // باسم
     // '
     // "
     // + SYNTAX[p + 2] + " ' ", o_tokens);
@@ -4664,7 +4690,8 @@ std::string CheckForSyntax(
     // 				// namespace : Option = ...
 
     // 				TempTokenCount = 0;
-    // 				for (int p = 3; p <= o_tokens->TOTAL[o_tokens->Line]; p++) // | =
+    // 				for (int p = 3; p <= o_tokens->TOTAL[o_tokens->Line]; p++) // |
+    // =
     // a
     // * b + 2 / (c) + 1 |
     // 				{
@@ -4676,10 +4703,9 @@ std::string CheckForSyntax(
     // 				}
 
     // 				CheckForSyntax(VALUE_TYPE,	// OBJECTIF_TYPE
-    // 								true, 		// Accept Using
-    // Reference to namespace:Controls
-    // true, 		// Accept Using Reference to namespace:Function
-    // true,
+    // 								true, 		// Accept
+    // Using Reference to namespace:Controls true, 		// Accept Using
+    // Reference to namespace:Function true,
     // // Accept Using Reference to Global Functions
     // true, 		// Accept Using Reference to Local Functions
     // true,
@@ -4687,11 +4713,10 @@ std::string CheckForSyntax(
     // true, 		// Accept Using Reference to Local VAR
     // false,
     // // Accept Convertion from String To Int
-    // 								true, 		// Accept Convertion from
-    // Int To
-    // String 								TempToken,				//
-    // SYNTAX[] std::string
-    // (TempTokenCount - 1),	// SYNTAX_LONG int
+    // 								true, 		// Accept Convertion
+    // from Int To
+    // String 								TempToken,
+    // // SYNTAX[] std::string (TempTokenCount - 1),	// SYNTAX_LONG int
     // TheNamespace,		// TMP_WINDOW_NAME
     // TheFunction,
     // // TMP_FUNCTION_NAME
@@ -4730,19 +4755,21 @@ std::string CheckForSyntax(
     // + SYNTAX[p + 2] + " ' ", o_tokens);
 
     // 				//if (SYNTAX[p + 5] == "")
-    // 					//ErrorCode("يجب اضافه '=' أو '()' بعد ' " + SYNTAX[p] + " :
+    // 					//ErrorCode("يجب اضافه '=' أو '()' بعد ' " + SYNTAX[p] + "
+    // :
     // "
     // + SYNTAX[p + 2] + " : " + SYNTAX[p + 4] + " ' ", o_tokens);
 
     // 				//if (SYNTAX[p + 5] != "=" && SYNTAX[p + 5] !=
     // "(")
-    // 					//ErrorCode("أمر غير معروف ' " + SYNTAX[p + 5] + "
+    // 					//ErrorCode("أمر غير معروف ' " + SYNTAX[p + 5] +
+    // "
     // '
     // ", o_tokens);
 
     // 				//if (SYNTAX[p + 6] == "")
-    // 					//ErrorCode("يجب اضافه قيمة بعد ' " + SYNTAX[p] + " : " +
-    // SYNTAX[p
+    // 					//ErrorCode("يجب اضافه قيمة بعد ' " + SYNTAX[p] + " : "
+    // + SYNTAX[p
     // + 2] + " : " + SYNTAX[p + 4] + " " + SYNTAX[p + 6] + " ' ", o_tokens);
 
     // 				CTR_WIN = SYNTAX[p];
@@ -4754,7 +4781,8 @@ std::string CheckForSyntax(
     // 			else
     // 			{
     // 				// Exception !
-    // 				ErrorCode("يجب اضافه ':' أو '()' بعد ' " + SYNTAX[p] + " "
+    // 				ErrorCode("يجب اضافه ':' أو '()' بعد ' " + SYNTAX[p] + "
+    // "
     // + SYNTAX[p
     // + 1] + " " + SYNTAX[p + 2] + " ' ", o_tokens);
     // 			}
@@ -4776,27 +4804,31 @@ std::string CheckForSyntax(
     // ", o_tokens);
 
     // 			if (SYNTAX[p + 1] != ":")
-    // 				ErrorCode("أمر غير معروف ' " + SYNTAX[p + 1] + " ', يجب اضافة
+    // 				ErrorCode("أمر غير معروف ' " + SYNTAX[p + 1] + " ', يجب
+    // اضافة
     // ':' بعد ' " + SYNTAX[p] + " ' ", o_tokens);
 
     // 			if (SYNTAX[p + 2] == "")
-    // 				ErrorCode("يجب اضافة خاصية بعد ' " + SYNTAX[p] + " :
+    // 				ErrorCode("يجب اضافة خاصية بعد ' " + SYNTAX[p] + "
+    // :
     // '
     // ", o_tokens);
 
     // 			//if (SYNTAX[p + 3] == "")
-    // 				//ErrorCode("يجب اضافة '=' أو '()' بعد ' " + SYNTAX[p] + " :
+    // 				//ErrorCode("يجب اضافة '=' أو '()' بعد ' " + SYNTAX[p] + "
+    // :
     // "
     // + SYNTAX[p + 2] + " ' ", o_tokens);
 
     // 			//if (SYNTAX[p + 3] != "=" && SYNTAX[p + 3] != "(")
-    // 				//ErrorCode("أمر غير معروف ' " + SYNTAX[p + 5] + "
+    // 				//ErrorCode("أمر غير معروف ' " + SYNTAX[p + 5] +
+    // "
     // '
     // ", o_tokens);
 
     // 			//if (SYNTAX[p + 4] == "")
-    // 				//ErrorCode("يجب اضافة قيمة بعد ' " + SYNTAX[p] + " : " +
-    // SYNTAX[p
+    // 				//ErrorCode("يجب اضافة قيمة بعد ' " + SYNTAX[p] + " : "
+    // + SYNTAX[p
     // + 2] + " " + SYNTAX[p + 3] + " ' ", o_tokens);
 
     // 			CTR_WIN = TheNamespace;
@@ -4830,13 +4862,15 @@ std::string CheckForSyntax(
 
     // 		if (OBJECTIF_TYPE == "عدد")
     // 		{
-    // 			if(DEBUG)DEBUG_MESSAGE("[NS'" + CTR_WIN + " ':CTR'" + CTR_CONTROL
+    // 			if(DEBUG)DEBUG_MESSAGE("[NS'" + CTR_WIN + " ':CTR'" +
+    // CTR_CONTROL
     // +
     // "
     // ':OPTION'" + CTR_OPTION + "(Text).ToInt()]' ", o_tokens); // DEBUG
 
     // 			// *** Generate Code ***
-    // 			CPP_CODE.append(" (alifcore_StringToInt(OBJ_CTR_" + ID[CTR_WIN]
+    // 			CPP_CODE.append(" (alifcore_StringToInt(OBJ_CTR_" +
+    // ID[CTR_WIN]
     // +
     // "_"
     // + Control_ID[CTR_CONTROL] + "->" + GetValueFix + "())) ");
@@ -4844,7 +4878,8 @@ std::string CheckForSyntax(
     // 		}
     // 		else if (OBJECTIF_TYPE == "نص")
     // 		{
-    // 			if(DEBUG)DEBUG_MESSAGE("[NS'" + CTR_WIN + " ':CTR'" + CTR_CONTROL
+    // 			if(DEBUG)DEBUG_MESSAGE("[NS'" + CTR_WIN + " ':CTR'" +
+    // CTR_CONTROL
     // +
     // "
     // ':OPTION'" + CTR_OPTION + "(Text)]' ", o_tokens); // DEBUG
@@ -4860,13 +4895,14 @@ std::string CheckForSyntax(
     // 		}
     // 		else
     // 		{
-    // 			ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + " '
-    // ل ' " + CTR_CONTROL + " ' ", o_tokens);
+    // 			ErrorCode("علة : نوع المستهدف غير معروف ' " + OBJECTIF_TYPE + "
+    // ' ل ' " + CTR_CONTROL + " ' ", o_tokens);
     // 		}
     // 	}
     // 	else
     // 	{
-    // 		ErrorCode("الأداة ' " + CTR_CONTROL + " ' لا تحتوي على خاصيه باسم '
+    // 		ErrorCode("الأداة ' " + CTR_CONTROL + " ' لا تحتوي على خاصيه باسم
+    // '
     // "
     // + CTR_OPTION + " ' ", o_tokens);
     // 	}
@@ -5430,7 +5466,7 @@ bool CHECK_SETUP() // std::string ARGV_0, std::string OUTPUT)
   // Get Absolute Path
   // -------------------
 
-  PATH_ABSOLUTE = "/usr/local/bin";
+  PATH_ABSOLUTE = XSTR(INSTALL_PREFIX) "/bin";
 
   // -------------------
   // Get Working Path
@@ -5500,7 +5536,7 @@ bool CHECK_SETUP() // std::string ARGV_0, std::string OUTPUT)
   // Get Absolute Path
   // -------------------
 
-  PATH_ABSOLUTE = "/usr/local/bin";
+  PATH_ABSOLUTE = XSTR(INSTALL_PREFIX) "/bin";
 
   // -------------------
   // Get Working Path
@@ -6404,7 +6440,8 @@ void ALIF_PARSER(CLASS_TOKEN *o_tokens) {
                       / * if(remove_quote(Token[3], o_tokens) == "البايثون"){
 
                               //if (Token[7] != "")
-                              //	ErrorCode("أمر غير معروف : ' " + Token[7]
+                              //	ErrorCode("أمر غير معروف : ' " +
+      Token[7]
       + " ' ", o_tokens);
 
                               // #مكتبة "البايثون" "/usr/include/python3.5"4
@@ -7134,13 +7171,13 @@ void AlifLexerParser(std::string file, std::string target, bool is_first_file,
         OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = file + ".alif";
       else
         OBJ_CLASS_TOKEN.PATH_FULL_SOURCE =
-            "/usr/local/lib/aliflib/" + file + ".alif";
+            XSTR(INSTALL_PREFIX) "/lib/aliflib/" + file + ".alif";
 #else
       if (is_path(file))
         OBJ_CLASS_TOKEN.PATH_FULL_SOURCE = file + ".alif";
       else
         OBJ_CLASS_TOKEN.PATH_FULL_SOURCE =
-            "/usr/local/lib/aliflib/" + file + ".alif";
+            XSTR(INSTALL_PREFIX) "/lib/aliflib/" + file + ".alif";
 #endif
     } else
       ErrorCode("علة: نوع ملف غير معروف : ' " + target + " ' ",
@@ -8053,8 +8090,8 @@ void COMPILE_MAC_64BIT() // std::string RAND, std::string PATH_FULL_ICO,
             "\" -D__WXOSX_COCOA__ -Wall -Wundef -Wunused-parameter "
             "-Wno-ctor-dtor-privacy -Woverloaded-virtual "
             "-Wno-deprecated-declarations -D_FILE_OFFSET_BITS=64 "
-            "-I/usr/local/lib/aliflib" // Alif lib path on macOS
-            "  -fno-common \"" +
+            "-I" XSTR(INSTALL_PREFIX) "/lib/aliflib" // Alif lib path on macOS
+                                      "  -fno-common \"" +
             PATH_FULL_CPP +
             "\" "
             "2> \"" +
@@ -8102,12 +8139,16 @@ void COMPILE_MAC_64BIT() // std::string RAND, std::string PATH_FULL_ICO,
             " -framework IOKit "
             "-framework Carbon -framework Cocoa -framework AudioToolbox "
             "-framework System -framework OpenGL "
-            " -L/usr/local/lib/aliflib -lwebui_linux_x86_64 -framework WebKit  "
-            "-framework IOKit -framework Carbon -framework Cocoa -framework "
-            "AudioToolbox -framework System -framework OpenGL -framework "
-            "Security -lpthread -liconv  -framework Security -lpthread -liconv "
-            " -lboost_filesystem -lboost_iostreams "
-            "2> \"" +
+            " -L" XSTR(INSTALL_PREFIX) "/lib/aliflib -lwebui_linux_x86_64 "
+                                       "-framework WebKit  "
+                                       "-framework IOKit -framework Carbon "
+                                       "-framework Cocoa -framework "
+                                       "AudioToolbox -framework System "
+                                       "-framework OpenGL -framework "
+                                       "Security -lpthread -liconv  -framework "
+                                       "Security -lpthread -liconv "
+                                       " -lboost_filesystem -lboost_iostreams "
+                                       "2> \"" +
             PATH_FULL_BIN_TMP + ".log\" ";
 
   if (system(MAC_CMD.c_str()) != 0) {
@@ -8258,9 +8299,9 @@ void compile_linux64() {
   // "_compile.log\" ";
 
   LINUX_CMD = "g++ -c -o \"" + PATH_FULL_OBJ + "\" \"" + PATH_FULL_CPP +
-              "\" -I\"/usr/local/lib/aliflib\" " + Compile_ExtraCompile +
-              " 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM +
-              "_compile.log\" ";
+              "\" -I \"" XSTR(INSTALL_PREFIX) "/lib/aliflib\" " +
+              Compile_ExtraCompile + " 2> \"" + PATH_TEMP + "/alifcompiler_" +
+              RANDOM + "_compile.log\" ";
 
   if (DEBUG)
     LogMessage("Compile command (Linux) : " + LINUX_CMD + " \n");
@@ -8366,9 +8407,9 @@ void compile_linux64() {
   // -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype
   // -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype
   // -lwxzlib_alif-3.1 -lwxregexu_alif-3.1 -lwxexpat_alif-3.1 "
-  // 				"-pthread -m64 -static-libgcc -static-libstdc++ -ldl
-  // -lm -ldl -lm -O2 -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu\" " +
-  // Compile_ExtraLink;
+  // 				"-pthread -m64 -static-libgcc -static-libstdc++
+  // -ldl -lm -ldl -lm -O2 -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu\"
+  // " + Compile_ExtraLink;
 
   // LINUX_CMD =	"g++ -Os -m64 -finput-charset=utf-8 -pthread -o \"" +
   // PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\" "
@@ -8376,8 +8417,8 @@ void compile_linux64() {
   // -lboost_filesystem";
 
   LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ +
-              "\" -L\"/usr/local/lib/aliflib\" " + Compile_ExtraLink +
-              " "; // TODO: Add 2 > log
+              "\" -L\"" XSTR(INSTALL_PREFIX) "/lib/aliflib\" " +
+              Compile_ExtraLink + " "; // TODO: Add 2 > log
 
   if (DEBUG)
     LogMessage("Link command (Linux) : " + LINUX_CMD + " \n");
@@ -8764,7 +8805,7 @@ void alif() {
 #ifdef _WIN32
   std::string core_path = PATH_ABSOLUTE + "\\aliflib\\alifcore.cc";
 #else
-  std::string core_path = "/usr/local/lib/aliflib/alifcore.cc";
+  std::string core_path = XSTR(INSTALL_PREFIX) "/lib/aliflib/alifcore.cc";
 #endif
   boost::nowide::ifstream alifcore_if(core_path);
   stringstream alifcore_ss;
