@@ -19,8 +19,8 @@
 
 #ifdef _WIN32
 #include <tchar.h>
-#include <winsock2.h>
 #include <windows.h>
+#include <winsock2.h>
 #elif __APPLE__
 // ...
 #else

@@ -1,4 +1,6 @@
 
+add_definitions( -DINSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} )
+
 # Info
 set(Info_Title "Alif Compiler")
 set(Info_Source "alif.cpp")
@@ -6,7 +8,6 @@ set(Info_App "alif")
 
 # Working directory for Debugin & Testing
 set(WD_Windows "C:\\Alif3")
-set(WD_Linux "/bin")
 
 # --[ Alif ] -------------------------------------------------------------------
 
@@ -192,15 +193,15 @@ if(UNIX)
 			ARCHIVE DESTINATION lib
 			LIBRARY DESTINATION lib
 			RUNTIME DESTINATION bin)
-	install (DIRECTORY ${AlifProject_SOURCE_DIR}/aliflib DESTINATION lib)
+	install (DIRECTORY aliflib DESTINATION lib)
 endif (UNIX)
 
 if(WIN32)
 	message("[*] Initializing installation settings...")
 	install (TARGETS ${Info_App} DESTINATION C:/Alif3)
-	install (DIRECTORY ${AlifProject_SOURCE_DIR}/aliflib DESTINATION C:/Alif3)
+	install (DIRECTORY aliflib DESTINATION C:/Alif3)
 endif ()
 
 # --[ Copy Examples ] ------------------------------------------------------------
 
-file(COPY ${AlifProject_SOURCE_DIR}/examples DESTINATION ${CMAKE_BINARY_DIR}/)
+file(COPY examples DESTINATION ${CMAKE_BINARY_DIR}/)
