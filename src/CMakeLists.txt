@@ -107,7 +107,7 @@ else()
 	set_target_properties(${Info_App} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${WD_Windows})
 	set_target_properties(${Info_App} PROPERTIES CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WD_Windows})
 	set_target_properties(${Info_App} PROPERTIES EXECUTABLE_OUTPUT_PATH_DEBUG ${WD_Windows})
-	set_target_properties(${Info_App} PROPERTIES CMAKE_EXECUTABLE_OUTPUT_PATH ${Windows})
+	set_target_properties(${Info_App} PROPERTIES CMAKE_EXECUTABLE_OUTPUT_PATH ${WD_Windows})
 endif ()
 
 # --[ Compiler flags ] ----------------------------------------------------------
