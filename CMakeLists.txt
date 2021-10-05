@@ -65,3 +65,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Alif Compiler Source Code
 add_subdirectory(${AlifProject_SOURCE_DIR}/src Alif)
+
+# --[ CPack ] ----------------------------------------------------------------------
+
+set(CPACK_PACKAGE_DESCRIPTION ${DESCRIPTION})
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_VENDOR "Alif community")
+set(CPACK_PACKAGE_CONTACT "aliflang.org")
+set(CPACK_RPM_PACKAGE_AUTOREQ "no")
+set(CPACK_RPM_PACKAGE_REQUIRES "boost-devel >= 1.74.0, icu >= 66")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev ( >= 1.74.0 ), libicu-dev ( >= 66 )")
+Set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+include(CPack)
