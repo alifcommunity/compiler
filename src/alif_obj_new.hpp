@@ -1,126 +1,158 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens){
+
   // كائن
+  // Normal:  Obj v = foo()
+  // Short:   foo v
 
-  if (!o_tokens->TOKENS_PREDEFINED && IsInsideFunction)
-    // Igiore Local func var predefinition,
-    // focus only on Global var predefinition, and Class global var
-    // predefinition.
-    return; // continue;
+  if (!o_tokens->TOKENS_PREDEFINED)
+    return;
 
-  // كائن  الصنف_الثاني  ن  (ع, 2
-  // كائن ن = الصنف_الثاني (3, ح
+  // --- Short code ---------------------------------------------
 
-  // TODO: Set Obj Private or Public "خاص"
-  // int OBJ_POS = 1;
-  // if (Token[1] == "خاص")
-  // OBJ_POS = 2;
+  if (CLASS_IS_SET[Token[1]]){
 
-  // C++, can create obj global/class/func, but use it on func.
-  if (IsInsideNamespace && !IsInsideFunction)
-    ErrorCode("يجب إنشاء الكائن الجديد داخل دالة ", o_tokens);
+    // foo v
 
-  // if (Token[2] == "")
-  // ErrorCode("يجب وضع إسم الصنف بعد ' كائن '", o_tokens);
+    // --- Check for errors
+    if (Token[2] == "")
+      ErrorCode("يجب وضع إسم معرف الكائن بعد ' كائن '", o_tokens);
+    if (!IsValidName(Token[2], o_tokens))
+      ErrorCode("اسم غير مقبول : ' " + Token[2] + " ' ", o_tokens);
+    if (Token[3] != "")
+      ErrorCode("أمر غير معروف ' " + Token[3] + " ' ", o_tokens);
+
+    // --- reformat code
+    // from "foo v" to "obj v = foo()"
+    string cls = Token[1];
+    Token[1] = "كائن";
+    Token[3] = "=";
+    Token[4] = cls;
+    Token[5] = "(";
+    Token[6] = ")";
+    Token[7] = "";
+    o_tokens->TOTAL[o_tokens->Line] = 7;
+  }
+
+  // --- Check for errors ---------------------------------------
+
   if (Token[2] == "")
     ErrorCode("يجب وضع إسم معرف الكائن بعد ' كائن '", o_tokens);
-
-  // if (Token[3] == "")
-  // ErrorCode("يجب وضع إسم معرف الكائن بعد ' كائن " + Token[2] + " ' ",
-  // o_tokens);
+  if (!IsValidName(Token[2], o_tokens))
+    ErrorCode("اسم غير مقبول : ' " + Token[2] + " ' ", o_tokens);
   if (Token[3] != "=")
     ErrorCode("يجب وضع إشارة '=' بعد ' كائن " + Token[2] + " ' ", o_tokens);
-
-  // if (Token[4] != "" && Token[4] != "(")
-  // ErrorCode("أمر غير معروف ' " + Token[4] + " ', هل تقصد ' () ' ؟ ",
-  // o_tokens);
   if (Token[4] == "")
     ErrorCode("يجب وضع إسم الصنف بعد ' كائن " + Token[2] + " = '", o_tokens);
-
-  // if (Token[4] == "(" && Token[5] == "")
-  // ErrorCode("قوس مازال مفتوح، ربما تقصد ' () ' ", o_tokens);
   if (Token[5] == "(" && Token[6] == "")
     ErrorCode("قوس مازال مفتوح، ربما تقصد ' () ' ", o_tokens);
-
-  if (Token[5] == "(") {
+  if (Token[5] == "(")
+  {
     if (Token[o_tokens->TOTAL[o_tokens->Line]] != ")" &&
         Token[o_tokens->TOTAL[o_tokens->Line]] != "")
       ErrorCode("يجب انهاء السطر بالإشارة ')' '... " +
                     Token[o_tokens->TOTAL[o_tokens->Line]] + " ' ",
                 o_tokens);
   }
-
   if (!CLASS_IS_SET[Token[4]])
     ErrorCode("صنف غير معروف ' " + Token[4] + " ' ", o_tokens);
-
-  if (!IsValidName(Token[2], o_tokens))
-    ErrorCode("اسم غير مقبول : ' " + Token[2] + " ' ", o_tokens);
-
-  // if same name as class !
   if (Token[2] == Token[4])
     ErrorCode("تشابه في الاسم بين الكائن و الصنف ' " + Token[2] + " ' ",
               o_tokens);
 
-  // TODO: Is C++ Allow create Obj inside the same class ? class X { X o; }
+  // --- Set current parent ---------------------------------------
 
-  // C++, allow create Obj on global, global-class, local, but using it only on
-  // func.
+  std::string CurrentParent = "";
+
+  if (IsInsideClass)
+    CurrentParent = TheClass;
+  else if (IsInsideNamespace)
+    CurrentParent = TheNamespace;
+
+  // --- Initializing ---------------------------------------------
+
   std::string OBJ_ID;
-  if (IsInsideNamespace) {
-    if (IsInsideFunction) {
+
+  // --- Identify -------------------------------------------------
+
+  // --- Check ----------------------------------------------------
+
+  // --- ARGV -----------------------------------------------------
+
+  // --- Gen. Code ------------------------------------------------
+
+  // --- Add. Code ------------------------------------------------
+
+  // --- OLD STYLE ------------------------------------------------
+
+  // This code need to be cleaned..
+
+  if (IsInsideNamespace)
+  {
+    if (IsInsideFunction)
+    {
       // Namespace -> Function.
       // Local Obj.
 
       OBJ_ID = TheNamespace + TheFunction;
 
-      if (!o_tokens->TOKENS_PREDEFINED) {
+      if (!o_tokens->TOKENS_PREDEFINED)
+      {
 
         if (OBJ_IS_SET[std::make_pair(OBJ_ID, Token[2])])
           ErrorCode("الكائن ' " + Token[2] + " ' تم انشاؤه مسبقا في السطر : " +
                         OBJ_AT_LINE[std::make_pair(OBJ_ID, Token[2])],
                     o_tokens);
       }
-    } else {
+    }
+    else
+    {
       // Namespace.
       // Error Obj.
       ErrorCode("يجب إنشاء الكائن الجديد داخل دالة ", o_tokens);
     }
-  } else if (IsInsideClass) {
-    if (IsInsideFunction) {
+  }
+  else if (IsInsideClass)
+  {
+    if (IsInsideFunction)
+    {
       // Class -> Function.
       // Local Class Obj.
       OBJ_ID = TheClass + TheFunction;
 
-      if (!o_tokens->TOKENS_PREDEFINED) {
+      if (!o_tokens->TOKENS_PREDEFINED)
+      {
 
         if (OBJ_IS_SET[std::make_pair(OBJ_ID, Token[2])])
           ErrorCode("الكائن ' " + Token[2] + " ' تم انشاؤه مسبقا في السطر : " +
                         OBJ_AT_LINE[std::make_pair(OBJ_ID, Token[2])],
                     o_tokens);
       }
-    } else {
+    }
+    else
+    {
       // Class.
       // Global Class Obj.
 
@@ -129,7 +161,8 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       OBJ_ID = TheClass;
 
-      if (!o_tokens->TOKENS_PREDEFINED) {
+      if (!o_tokens->TOKENS_PREDEFINED)
+      {
 
         if (OBJ_IS_SET[std::make_pair(OBJ_ID, Token[2])])
           ErrorCode("الكائن ' " + Token[2] + " ' تم انشاؤه مسبقا في السطر : " +
@@ -137,7 +170,9 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
                     o_tokens);
       }
     }
-  } else {
+  }
+  else
+  {
     // Global Area.
     // Global Obj.
 
@@ -146,7 +181,8 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     OBJ_ID = "";
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
 
       if (OBJ_IS_SET[std::make_pair(OBJ_ID, Token[2])])
         ErrorCode("الكائن العام ' " + Token[2] +
@@ -174,7 +210,8 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   // bcs if no Arg then error:
   // ... which is of non-class type.
 
-  if (IsInsideNamespace) {
+  if (IsInsideNamespace)
+  {
     // Namespace -> Function.
 
     if (DEBUG)
@@ -191,8 +228,11 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     cpp_AddScript(TheFunction, " CLASS_" + Global_ID[Token[4]] + " " +
                                    Obj_ID[Token[2]] + " ");
     // *** *** *** *** *** ***
-  } else if (IsInsideClass) {
-    if (IsInsideFunction) {
+  }
+  else if (IsInsideClass)
+  {
+    if (IsInsideFunction)
+    {
       // Class -> Function.
 
       if (DEBUG)
@@ -210,10 +250,13 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       CPP_CLASS.append(" CLASS_" + Global_ID[Token[4]] + " " +
                        Obj_ID[Token[2]] + " ");
       // *** *** *** *** *** ***
-    } else {
+    }
+    else
+    {
       // Global Class.
 
-      if (!o_tokens->TOKENS_PREDEFINED) {
+      if (!o_tokens->TOKENS_PREDEFINED)
+      {
         SET_GLOBAL_OBJ_C_NAME(Token[2]);
         OBJ_IS_SET[std::make_pair(OBJ_ID, Token[2])] = true;
         OBJ_AT_LINE[std::make_pair(OBJ_ID, Token[2])] =
@@ -233,10 +276,13 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
                        GlobalObj_ID[Token[2]] + " ");
       // *** *** *** *** *** ***
     }
-  } else {
+  }
+  else
+  {
     // Global Area.
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       SET_GLOBAL_OBJ_C_NAME(Token[2]);
       OBJ_IS_SET[std::make_pair("", Token[2])] = true;
       OBJ_AT_LINE[std::make_pair("", Token[2])] = IntToString(o_tokens->Line);
@@ -256,8 +302,10 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       // Searching for ARGs of this global Obj.
 
       TempTokenCount = 0;
-      for (int p = 6; p <= o_tokens->TOTAL[o_tokens->Line]; p++) {
-        if (Token[p] != "") {
+      for (int p = 6; p <= o_tokens->TOTAL[o_tokens->Line]; p++)
+      {
+        if (Token[p] != "")
+        {
           TempToken[TempTokenCount] = Token[p];
           TempTokenCount++;
         }
@@ -270,10 +318,13 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           1, // 1 = constructor
           TheNamespace, TheFunction, TempToken, (TempTokenCount - 1), o_tokens);
 
-      if (ScriptSyntaxBuffer == "") {
+      if (ScriptSyntaxBuffer == "")
+      {
         // CPP_CLASS_GLOBAL_OBJ.append(" ; \n");
         OBJ_GLOBAL_DECLARATION[Token[4]].append(" ; \n");
-      } else {
+      }
+      else
+      {
         // CPP_CLASS_GLOBAL_OBJ.append(" ( " + ScriptSyntaxBuffer + " ); \n");
         OBJ_GLOBAL_DECLARATION[Token[4]].append(" ( " + ScriptSyntaxBuffer +
                                                 " ); \n");
@@ -290,8 +341,10 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   TempTokenCount = 0;
   // for (int p = 5; p <= o_tokens->TOTAL[o_tokens->Line]; p++)
-  for (int p = 6; p <= o_tokens->TOTAL[o_tokens->Line]; p++) {
-    if (Token[p] != "") {
+  for (int p = 6; p <= o_tokens->TOTAL[o_tokens->Line]; p++)
+  {
+    if (Token[p] != "")
+    {
       TempToken[TempTokenCount] = Token[p];
       TempTokenCount++;
     }
@@ -315,26 +368,36 @@ void parser_ObjNew(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     IS_EMPTY_ARG = false;
 
   // *** Generate Code ***
-  if (IsInsideClass) {
+  if (IsInsideClass)
+  {
     // Class.
     // Class -> Function.
-    if (IS_EMPTY_ARG) {
+    if (IS_EMPTY_ARG)
+    {
       CPP_CLASS.append(" ; \n");
-    } else {
+    }
+    else
+    {
       CPP_CLASS.append(" ( " + ScriptSyntaxBuffer + " ); \n");
     }
-  } else if (IsInsideNamespace) {
+  }
+  else if (IsInsideNamespace)
+  {
     // Namespace -> Function.
-    if (IS_EMPTY_ARG) {
+    if (IS_EMPTY_ARG)
+    {
       cpp_AddScript(TheFunction, " ; \n");
-    } else {
+    }
+    else
+    {
       cpp_AddScript(TheFunction, " ( " + ScriptSyntaxBuffer + " ); \n");
     }
-  } else {
+  }
+  else
+  {
     // Global Area.
     // Already processed in OBJ_GLOBAL_DECLARATION[]
   }
   // *** *** *** *** *** ***
 
-  return; // continue;
 }

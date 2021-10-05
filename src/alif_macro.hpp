@@ -1,34 +1,36 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void check_macro_alif(CLASS_TOKEN *o_tokens) {
+void check_macro_alif(CLASS_TOKEN *o_tokens)
+{
 
   if (!ALIF_FLAG_FILE[o_tokens->PATH_FULL_SOURCE])
     ErrorCode("يجب الإعلان عن ماكرو ألف اولا، المرجو اضافة ' #ألف ' في الأعلى",
               o_tokens);
 }
 
-void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
 
   if (Token[2] == "")
     ErrorCode("الماكرو غير محدد ' # '", o_tokens);
@@ -38,12 +40,14 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // --[ Macro - Alif ] -----------------------------------------------------
 
-  if (Token[2] == "ألف") {
+  if (Token[2] == "ألف")
+  {
 
     if (Token[3] != "")
       ErrorCode("أمر غير معروف : ' " + Token[3] + " ' ", o_tokens);
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
 
       if (ALIF_FLAG_FILE[o_tokens->PATH_FULL_SOURCE])
         ErrorCode("تم الاعلان عن ماكرو ألف مسبقا في السطر : " +
@@ -63,9 +67,11 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // --[ Macro - Confidtions ] ----------------------------------------------
 
-  if (Token[2] == "إذا") {
+  if (Token[2] == "إذا")
+  {
 
-    if (Token[3] == "لينكس") {
+    if (Token[3] == "لينكس")
+    {
 
       // #إذا لينكس ...
 
@@ -78,7 +84,9 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       str_arr_remove_elem(Token, 2, o_tokens->TOTAL[o_tokens->Line]); // إذا
       str_arr_remove_elem(Token, 2, o_tokens->TOTAL[o_tokens->Line]); // لينكس
 #endif
-    } else if (Token[3] == "ويندوز") {
+    }
+    else if (Token[3] == "ويندوز")
+    {
 
       // #إذا ويندوز ...
 
@@ -91,7 +99,9 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 #else
       return;
 #endif
-    } else if (Token[3] == "ماك") {
+    }
+    else if (Token[3] == "ماك")
+    {
 
       // #إذا ماك ...
 
@@ -104,7 +114,9 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 #else
       return;
 #endif
-    } else {
+    }
+    else
+    {
 
       ErrorCode("ماكرو شرطي غير معروف : ' " + Token[3] + " ' ", o_tokens);
     }
@@ -116,7 +128,8 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // --[ Macro - Library ] --------------------------------------------------
 
-  if (Token[2] == "مكتبة") {
+  if (Token[2] == "مكتبة")
+  {
 
     check_macro_alif(o_tokens);
 
@@ -142,7 +155,8 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // --[ Macro - Include ] --------------------------------------------------
 
-  else if (Token[2] == "أضف") {
+  else if (Token[2] == "أضف")
+  {
 
     check_macro_alif(o_tokens);
 
@@ -164,7 +178,8 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // --[ Macro - UI (WebUI) ] ------------------------------------------------
 
-  else if (Token[2] == "نص") {
+  else if (Token[2] == "نص")
+  {
 
     // This macro basically read a file
     // and save it into a const std string.
@@ -185,7 +200,8 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     if (Token[5] != "")
       ErrorCode("أمر غير معروف : ' " + Token[5] + " ' ", o_tokens);
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
 
       SET_GLOBAL_C_NAME(Token[3]);
       SetNewVar(true, "", "", Token[3], "نص", false, false, o_tokens->Line,
@@ -195,7 +211,8 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     std::string path = remove_quote(Token[4], o_tokens);
 
-    if (!is_file_exists(path)) {
+    if (!is_file_exists(path))
+    {
 
       // Try second path
       std::string second_path = argument.input.path; // [/home/folder/]
@@ -203,18 +220,23 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       if (is_file_exists(second_path))
         path = second_path;
-      else {
+      else
+      {
 
         // Search in all include path's
         bool found = false;
-        for (auto inc_path : argument.input.includes) {
+        for (auto inc_path : argument.input.includes)
+        {
 
-          if (is_file_exists(inc_path + path)) {
+          if (is_file_exists(inc_path + path))
+          {
 
             path = inc_path + path;
             found = true;
             break;
-          } else if (is_file_exists(inc_path + path + ".alif")) {
+          }
+          else if (is_file_exists(inc_path + path + ".alif"))
+          {
 
             path = inc_path + path + ".alif";
             found = true;
@@ -242,12 +264,14 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   // --[ Macro - Extra Compile / Link ] -------------------------------------
 
   else if (Token[2] == "أضف_ترجمة" || Token[2] == "أضف_ترجمة_بداية" ||
-           Token[2] == "أضف_تجميع" || Token[2] == "أضف_تجميع_بداية") {
+           Token[2] == "أضف_تجميع" || Token[2] == "أضف_تجميع_بداية")
+  {
 
     // #أضف_ترجمة " -O3 -z "
     // #أضف_تجميع " -lfoo "
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
 
       check_macro_alif(o_tokens);
 
@@ -274,7 +298,8 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // --[ Macro - Python ] ---------------------------------------------------
 
-  else if (Token[2] == "البايثون_مسار_عناوين") {
+  else if (Token[2] == "البايثون_مسار_عناوين")
+  {
 
     check_macro_alif(o_tokens);
 
@@ -287,7 +312,9 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       DEBUG_MESSAGE("[Setting Python Include '" +
                         remove_quote(Token[3], o_tokens) + "' ] \n\n",
                     o_tokens);
-  } else if (Token[2] == "البايثون_مسار_مكتبات") {
+  }
+  else if (Token[2] == "البايثون_مسار_مكتبات")
+  {
 
     check_macro_alif(o_tokens);
 
@@ -300,7 +327,9 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       DEBUG_MESSAGE("[Setting Python Lib '" + remove_quote(Token[3], o_tokens) +
                         "' ] \n\n",
                     o_tokens);
-  } else if (Token[2] == "البايثون_مكتبات") {
+  }
+  else if (Token[2] == "البايثون_مكتبات")
+  {
 
     check_macro_alif(o_tokens);
 
@@ -317,14 +346,18 @@ void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // --[ Macro - Unknow ] ---------------------------------------------------
 
-  else {
+  else
+  {
 
     if (Token[2] == "الف" || Token[2] == "ا" || Token[2] == "أ" ||
-        Token[2] == "الألف" || Token[2] == "الالف") {
+        Token[2] == "الألف" || Token[2] == "الالف")
+    {
 
       ErrorCode("ماكرو غير معروف : ' " + Token[2] + " '، هل تقصد ' ألف ' ؟ ",
                 o_tokens);
-    } else {
+    }
+    else
+    {
 
       if (Token[2] == "")
         ErrorCode("الماكرو غير محدد ' # '", o_tokens);

@@ -1,32 +1,33 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
 
   // نص
 
   if (!o_tokens->TOKENS_PREDEFINED && IsInsideFunction)
-    // Igiore Local func var predefinition,
+    // Ignore Local func var predefinition,
     // focus only on Global var predefinition, and Class global var
     // predefinition.
     return; // continue;
@@ -57,12 +58,16 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     ErrorCode("يجب اعطاء قيمة بعد ' = '", o_tokens);
 
   // Class
-  if (IsInsideClass) {
-    if (!IsInsideFunction) {
+  if (IsInsideClass)
+  {
+    if (!IsInsideFunction)
+    {
       // global var int class
 
-      if (Token[1] == "خاص") {
-        if (!o_tokens->TOKENS_PREDEFINED) {
+      if (Token[1] == "خاص")
+      {
+        if (!o_tokens->TOKENS_PREDEFINED)
+        {
           SetNewVarClass(true, true, TheClass, TheFunction, Token[INT_POS + 1],
                          "نص", false, false, o_tokens->Line, o_tokens);
           return; // continue;
@@ -77,7 +82,8 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         // Class : New Private STRING
         CPP_CLASS.append(" private: std::string " +
                          Global_ID[Token[INT_POS + 1]] + " ");
-        if (Token[INT_POS + 2] == "") {
+        if (Token[INT_POS + 2] == "")
+        {
           CPP_CLASS.append(" = \"\"; \n");
 
           if (DEBUG)
@@ -85,8 +91,11 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           return;                            // continue;
         }
         // *** *** *** *** *** ***
-      } else {
-        if (!o_tokens->TOKENS_PREDEFINED) {
+      }
+      else
+      {
+        if (!o_tokens->TOKENS_PREDEFINED)
+        {
           SetNewVarClass(true, false, TheClass, TheFunction, Token[INT_POS + 1],
                          "نص", false, false, o_tokens->Line, o_tokens);
           return; // continue;
@@ -100,7 +109,8 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         // Class : New Public STRING
         CPP_CLASS.append(" public: std::string " +
                          Global_ID[Token[INT_POS + 1]] + " ");
-        if (Token[INT_POS + 2] == "") {
+        if (Token[INT_POS + 2] == "")
+        {
           CPP_CLASS.append(" = \"\"; \n");
 
           if (DEBUG)
@@ -109,12 +119,17 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         }
         // *** *** *** *** *** ***
       }
-    } else {
+    }
+    else
+    {
       // local int class
 
-      if (Token[1] == "خاص") {
+      if (Token[1] == "خاص")
+      {
         ErrorCode("يجب استعمال خاصيه ' خاص ' خارج الدالة", o_tokens);
-      } else {
+      }
+      else
+      {
         // if (!o_tokens->TOKENS_PREDEFINED)
         //{
         SetNewVarClass(false, false, TheClass, TheFunction, Token[INT_POS + 1],
@@ -129,7 +144,8 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         // *** Generate Code ***
         // Class : New Local Class STRING
         CPP_CLASS.append(" std::string " + ID[Token[INT_POS + 1]] + " ");
-        if (Token[INT_POS + 2] == "") {
+        if (Token[INT_POS + 2] == "")
+        {
           CPP_CLASS.append(" = \"\"; \n");
 
           if (DEBUG)
@@ -141,11 +157,13 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     }
   }
   // Global String
-  else if (!IsInsideFunction) {
-    // Igiore Local var predefinition,
+  else if (!IsInsideFunction)
+  {
+    // Ignore Local var predefinition,
     // focus only on Global var predefinition
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       SetNewVar(true, "", "", Token[INT_POS + 1], "نص", false, false,
                 o_tokens->Line, o_tokens);
 
@@ -160,7 +178,8 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // Global Area
     // String a
     CPP_GLOBAL.append(" std::string " + Global_ID[Token[INT_POS + 1]] + " ");
-    if (Token[INT_POS + 2] == "") {
+    if (Token[INT_POS + 2] == "")
+    {
       CPP_GLOBAL.append(" ; \n");
 
       if (DEBUG)
@@ -168,10 +187,12 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       return;                            // continue;
     }
     // *** *** *** *** *** ***
-  } else {
+  }
+  else
+  {
     // Local String
 
-    // Igiore Local var predefinition,
+    // Ignore Local var predefinition,
     // focus only on Global var predefinition
 
     SetNewVar(false, TheNamespace, TheFunction, Token[INT_POS + 1], "نص", false,
@@ -184,21 +205,26 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // *** Generate Code ***
     // Local Area
     // STRING a
-    if (!IsInsideNamespace) {
+    if (!IsInsideNamespace)
+    {
       // Global Function
       CPP_GLOBAL_FUN.append(" std::string " + ID[Token[INT_POS + 1]] + " ");
-      if (Token[INT_POS + 2] == "") {
+      if (Token[INT_POS + 2] == "")
+      {
         CPP_GLOBAL_FUN.append(" ; \n");
 
         if (DEBUG)
           DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
         return;                            // continue;
       }
-    } else {
+    }
+    else
+    {
       // Local Function
       cpp_AddScript(TheFunction,
                     " std::string " + ID[Token[INT_POS + 1]] + " ");
-      if (Token[INT_POS + 2] == "") {
+      if (Token[INT_POS + 2] == "")
+      {
         cpp_AddScript(TheFunction, " = \"\"; \n");
 
         if (DEBUG)
@@ -209,30 +235,40 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // *** *** *** *** *** ***
   }
 
-  if (Token[INT_POS + 2] == "=") {
+  if (Token[INT_POS + 2] == "=")
+  {
     if (DEBUG)
       DEBUG_MESSAGE("= ", o_tokens); // DEBUG
 
-    if (!IsInsideFunction) {
-      if (IsInsideClass) {
+    if (!IsInsideFunction)
+    {
+      if (IsInsideClass)
+      {
         // Class Global-Area
         // *** Generate Code ***
         CPP_CLASS.append(" = ");
         // *** *** *** *** *** ***
-      } else {
+      }
+      else
+      {
         // *** Generate Code ***
         // Global Area
         // STRING a =
         CPP_GLOBAL.append(" = ");
         // *** *** *** *** *** ***
       }
-    } else {
-      if (IsInsideClass) {
+    }
+    else
+    {
+      if (IsInsideClass)
+      {
         // Local Function Class
         // *** Generate Code ***
         CPP_CLASS.append(" = ");
         // *** *** *** *** *** ***
-      } else {
+      }
+      else
+      {
         // *** Generate Code ***
         // Local Area
         // STRING a =
@@ -248,8 +284,10 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     TempTokenCount = 0;
 
-    for (int p = (INT_POS + 2); p <= o_tokens->TOTAL[o_tokens->Line]; p++) {
-      if (Token[p] != "") {
+    for (int p = (INT_POS + 2); p <= o_tokens->TOTAL[o_tokens->Line]; p++)
+    {
+      if (Token[p] != "")
+      {
         if (substr_utf8(Token[p], 0, 1) == "_" &&
             !IsInsideFunction) // to avoid : a = b + _a
         {
@@ -259,9 +297,10 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
                       "الانشاء فيه '" +
                           Token[p] + "' ",
                       o_tokens);
-        } else if (Token[INT_POS + 1] == Token[p] &&
-                   (Token[p - 1] !=
-                    ":")) // to avoid a = b + a, but ok for a = b + x:y:a
+        }
+        else if (Token[INT_POS + 1] == Token[p] &&
+                 (Token[p - 1] !=
+                  ":")) // to avoid a = b + a, but ok for a = b + x:y:a
         {
           if (G_VAR_IS_SET[(Token[INT_POS + 1])] &&
               IntToString(o_tokens->Line) !=
@@ -293,34 +332,39 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     // STRING Syntax
     ScriptSyntaxBuffer =
-        CheckForSyntax("نص",  // OBJECTIF_TYPE
-                       true,  // Accept Using Reference to Namespace:Controls
-                       true,  // Accept Using Reference to Namespace:Function
-                       true,  // Accept Using Reference to Global Functions
-                       true,  // Accept Using Reference to Local Functions
-                       true,  // Accept Using Reference to Global VAR
-                       true,  // Accept Using Reference to Local VAR
-                       false, // Accept Convertion from String To Int
-                       true,  // Accept Convertion from Int To String
+        CheckForSyntax("نص",                 // OBJECTIF_TYPE
+                       true,                 // Accept Using Reference to Namespace:Controls
+                       true,                 // Accept Using Reference to Namespace:Function
+                       true,                 // Accept Using Reference to Global Functions
+                       true,                 // Accept Using Reference to Local Functions
+                       true,                 // Accept Using Reference to Global VAR
+                       true,                 // Accept Using Reference to Local VAR
+                       false,                // Accept Convertion from String To Int
+                       true,                 // Accept Convertion from Int To String
                        TempToken,            // SYNTAX[] std::string
                        (TempTokenCount - 1), // SYNTAX_LONG int
                        WIN_OR_CLASS,         // TMP_WINDOW_NAME
                        TheFunction,          // TMP_FUNCTION_NAME
                        o_tokens);
 
-    if (IsInsideClass) {
+    if (IsInsideClass)
+    {
       // just for fixing this ...
       // *** Generate Code ***
       CPP_CLASS.append(ScriptSyntaxBuffer + " ; \n ");
       // *** *** *** *** *** ***
-    } else if (!IsInsideFunction) {
+    }
+    else if (!IsInsideFunction)
+    {
       // *** Generate Code ***
       // Global Area
       // STRING a = ... ;
       CPP_GLOBAL.append(ScriptSyntaxBuffer +
                         " ; \n "); // TODO: did we need 'CPP_CLASS' ??????
                                    // *** *** *** *** *** ***
-    } else {
+    }
+    else
+    {
       // *** Generate Code ***
       // Local Area
       // STRING a = ... ;
@@ -336,7 +380,8 @@ void parser_String(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     if (DEBUG)
       DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
     return;                            // continue;
-  } else if (Token[INT_POS + 2] != "")
+  }
+  else if (Token[INT_POS + 2] != "")
     ErrorCode("أمر غير معروف '" + Token[INT_POS + 2] + "', ربما تقصد '=' ",
               o_tokens);
 

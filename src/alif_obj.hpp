@@ -1,27 +1,28 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
   // كائن
 
   if (!o_tokens->TOKENS_PREDEFINED)
@@ -56,58 +57,77 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   bool IS_GLOBAL_OBJ = false;
   std::string WIN_OR_CLASS; // Needed by CheckForSyntax()
 
-  if (IsInsideClass) {
-    if (OBJ_IS_SET[std::make_pair(TheClass + TheFunction, Token[1])]) {
+  if (IsInsideClass)
+  {
+    if (OBJ_IS_SET[std::make_pair(TheClass + TheFunction, Token[1])])
+    {
       // Class -> Function.
       // Local Class Obj.
 
       OBJ_ID = TheClass + TheFunction;
       WIN_OR_CLASS = TheClass;
-    } else if (OBJ_IS_SET[std::make_pair(TheClass, Token[1])]) {
+    }
+    else if (OBJ_IS_SET[std::make_pair(TheClass, Token[1])])
+    {
       // Global Class.
 
       OBJ_ID = TheClass;
       WIN_OR_CLASS = TheClass;
       IS_GLOBAL_OBJ = true;
-    } else if (OBJ_IS_SET[std::make_pair("", Token[1])]) {
+    }
+    else if (OBJ_IS_SET[std::make_pair("", Token[1])])
+    {
       // Global Area Obj.
 
       OBJ_ID = "";
       WIN_OR_CLASS = "";
       IS_GLOBAL_OBJ = true;
-    } else
+    }
+    else
       ErrorCode("علة 1: انتماء الكائن غير معروف ' " + Token[1] + " ' ",
                 o_tokens);
-  } else if (IsInsideNamespace) {
-    if (OBJ_IS_SET[std::make_pair(TheNamespace + TheFunction, Token[1])]) {
+  }
+  else if (IsInsideNamespace)
+  {
+    if (OBJ_IS_SET[std::make_pair(TheNamespace + TheFunction, Token[1])])
+    {
       // Namespace -> Function.
       // Local Obj.
 
       OBJ_ID = TheNamespace + TheFunction;
       WIN_OR_CLASS = TheNamespace;
-    } else if (OBJ_IS_SET[std::make_pair("", Token[1])]) {
+    }
+    else if (OBJ_IS_SET[std::make_pair("", Token[1])])
+    {
       // Global Area Obj.
 
       OBJ_ID = "";
       WIN_OR_CLASS = "";
       IS_GLOBAL_OBJ = true;
-    } else
+    }
+    else
       ErrorCode("علة 2: انتماء الكائن غير معروف ' " + Token[1] + " ' ",
                 o_tokens);
-  } else {
-    if (OBJ_IS_SET[std::make_pair(TheFunction, Token[1])]) {
+  }
+  else
+  {
+    if (OBJ_IS_SET[std::make_pair(TheFunction, Token[1])])
+    {
       // Global Function.
       // Local Obj.
 
       OBJ_ID = TheFunction;
       WIN_OR_CLASS = "";
-    } else if (OBJ_IS_SET[std::make_pair("", Token[1])]) {
+    }
+    else if (OBJ_IS_SET[std::make_pair("", Token[1])])
+    {
       // Global Area Obj.
 
       OBJ_ID = "";
       WIN_OR_CLASS = "";
       IS_GLOBAL_OBJ = true;
-    } else
+    }
+    else
       ErrorCode("علة 3: انتماء الكائن غير معروف ' " + Token[1] + " ' ",
                 o_tokens);
   }
@@ -157,7 +177,8 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   std::string MEMBER_TYPE;
 
-  if (CLASS_G_VAR_IS_SET[std::make_pair(TK_CLASS, Token[3])]) {
+  if (CLASS_G_VAR_IS_SET[std::make_pair(TK_CLASS, Token[3])])
+  {
     // Var member
 
     if (CLASS_G_VAR_PRIVATE[std::make_pair(TK_CLASS, Token[3])])
@@ -183,13 +204,15 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     TempTokenCount = 0;
     for (int p = 4; p <= o_tokens->TOTAL[o_tokens->Line]; p++) // | = a + b |
     {
-      if (Token[p] != "") {
+      if (Token[p] != "")
+      {
         TempToken[TempTokenCount] = Token[p];
         TempTokenCount++;
       }
     }
 
-    if (IS_GLOBAL_OBJ) {
+    if (IS_GLOBAL_OBJ)
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[GLOBAL-OBJ ' " + Token[1] + " ' : ' " + Token[3] +
                           " '] = ",
@@ -197,20 +220,27 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       // *** Generate Code ***
       // Obj:Mem = ...
-      if (IsInsideClass) {
+      if (IsInsideClass)
+      {
         CPP_CLASS.append(" " + GlobalObj_ID[Token[1]] + "." +
                          Global_ID[Token[3]] + " = ");
-      } else if (!IsInsideNamespace) {
+      }
+      else if (!IsInsideNamespace)
+      {
         // global func
         CPP_GLOBAL_FUN.append(" " + GlobalObj_ID[Token[1]] + "." +
                               Global_ID[Token[3]] + " = ");
-      } else {
+      }
+      else
+      {
         // local func
         cpp_AddScript(TheFunction, " " + GlobalObj_ID[Token[1]] + "." +
                                        Global_ID[Token[3]] + " = ");
       }
       // *** *** *** *** *** ***
-    } else {
+    }
+    else
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[LOCAL-OBJ ' " + Token[1] + " ' : ' " + Token[3] +
                           " '] = ",
@@ -218,17 +248,22 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       // *** Generate Code ***
       // Obj:Mem = ...
-      if (IsInsideClass) {
+      if (IsInsideClass)
+      {
         CPP_CLASS.append(" " + Obj_ID[Token[1]] + "." + Global_ID[Token[3]] +
                          " = ");
-      } else if (!IsInsideNamespace) {
+      }
+      else if (!IsInsideNamespace)
+      {
         // global func
         // CPP_GLOBAL_FUN.append(" " + Obj_ID[Token[1]] + "." +
         // Global_ID[Token[3]] + " = ");
         ErrorCode("علة : كائن محلي داخل دالة عامة ' " + Token[1] + " : " +
                       Token[3] + " ' ",
                   o_tokens);
-      } else {
+      }
+      else
+      {
         // local func
         cpp_AddScript(TheFunction, " " + Obj_ID[Token[1]] + "." +
                                        Global_ID[Token[3]] + " = ");
@@ -237,15 +272,15 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     }
 
     ScriptSyntaxBuffer =
-        CheckForSyntax(MEMBER_TYPE, // OBJECTIF_TYPE
-                       true,  // Accept Using Reference to Namespace:Controls
-                       true,  // Accept Using Reference to Namespace:Function
-                       true,  // Accept Using Reference to Global Functions
-                       true,  // Accept Using Reference to Local Functions
-                       true,  // Accept Using Reference to Global VAR
-                       true,  // Accept Using Reference to Local VAR
-                       false, // Accept Convertion from String To Int
-                       true,  // Accept Convertion from Int To String
+        CheckForSyntax(MEMBER_TYPE,          // OBJECTIF_TYPE
+                       true,                 // Accept Using Reference to Namespace:Controls
+                       true,                 // Accept Using Reference to Namespace:Function
+                       true,                 // Accept Using Reference to Global Functions
+                       true,                 // Accept Using Reference to Local Functions
+                       true,                 // Accept Using Reference to Global VAR
+                       true,                 // Accept Using Reference to Local VAR
+                       false,                // Accept Convertion from String To Int
+                       true,                 // Accept Convertion from Int To String
                        TempToken,            // SYNTAX[] std::string
                        (TempTokenCount - 1), // SYNTAX_LONG int
                        WIN_OR_CLASS,         // TMP_WINDOW_NAME or CLASS_NAME
@@ -257,19 +292,26 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     // *** Generate Code ***
     // Obj:Mem = ... ;
-    if (IsInsideClass) {
+    if (IsInsideClass)
+    {
       CPP_CLASS.append(ScriptSyntaxBuffer + " ; \n");
-    } else if (!IsInsideNamespace) {
+    }
+    else if (!IsInsideNamespace)
+    {
       // global func
       CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ; \n");
-    } else {
+    }
+    else
+    {
       // local func
       cpp_AddScript(TheFunction, ScriptSyntaxBuffer + " ; \n");
     }
     // *** *** *** *** *** ***
 
     return; // continue;
-  } else if (CLASS_FUN_IS_SET[std::make_pair(TK_CLASS, Token[3])]) {
+  }
+  else if (CLASS_FUN_IS_SET[std::make_pair(TK_CLASS, Token[3])])
+  {
     // Function member
 
     if (CLASS_FUN_PRIVATE[std::make_pair(TK_CLASS, Token[3])])
@@ -300,13 +342,15 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     for (int p = 5; p <= o_tokens->TOTAL[o_tokens->Line];
          p++) // | a + b, c, 5) |
     {
-      if (Token[p] != "") {
+      if (Token[p] != "")
+      {
         TempToken[TempTokenCount] = Token[p];
         TempTokenCount++;
       }
     }
 
-    if (IS_GLOBAL_OBJ) {
+    if (IS_GLOBAL_OBJ)
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[GLOBAL-OBJ ' " + Token[1] + " ':'" + Token[3] +
                           " '(Func)( ",
@@ -314,20 +358,27 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       // *** Generate Code ***
       // Obj:MemFunc ( ...
-      if (IsInsideClass) {
+      if (IsInsideClass)
+      {
         CPP_CLASS.append(" " + GlobalObj_ID[Token[1]] + ".ClassFUNCTION_" +
                          ID[Token[3]] + "( ");
-      } else if (!IsInsideNamespace) {
+      }
+      else if (!IsInsideNamespace)
+      {
         // global func
         CPP_GLOBAL_FUN.append(" " + GlobalObj_ID[Token[1]] + ".ClassFUNCTION_" +
                               ID[Token[3]] + "( ");
-      } else {
+      }
+      else
+      {
         // local func
         cpp_AddScript(TheFunction, " " + GlobalObj_ID[Token[1]] +
                                        ".ClassFUNCTION_" + ID[Token[3]] + "( ");
       }
       // *** *** *** *** *** ***
-    } else {
+    }
+    else
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[LOCAL-OBJ2 ' " + Token[1] + " ':'" + Token[3] +
                           " '(Func)( ",
@@ -335,16 +386,21 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       // *** Generate Code ***
       // Obj:MemFunc ( ...
-      if (IsInsideClass) {
+      if (IsInsideClass)
+      {
         CPP_CLASS.append(" " + Obj_ID[Token[1]] + ".ClassFUNCTION_" +
                          ID[Token[3]] + "( ");
-      } else if (!IsInsideNamespace) {
+      }
+      else if (!IsInsideNamespace)
+      {
         // global func
         // CPP_GLOBAL_FUN.append();
         ErrorCode("علة : كائن محلي داخل دالة عامة ' " + Token[1] + " : " +
                       Token[3] + " ' ",
                   o_tokens);
-      } else {
+      }
+      else
+      {
         // local func
         cpp_AddScript(TheFunction, " " + Obj_ID[Token[1]] + ".ClassFUNCTION_" +
                                        ID[Token[3]] + "( ");
@@ -362,12 +418,17 @@ void parser_Obj(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     // *** Generate Code ***
     // Obj:MemFunc ( ... ) ;
-    if (IsInsideClass) {
+    if (IsInsideClass)
+    {
       CPP_CLASS.append(ScriptSyntaxBuffer + " ); \n");
-    } else if (!IsInsideNamespace) {
+    }
+    else if (!IsInsideNamespace)
+    {
       // global func
       CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ); \n");
-    } else {
+    }
+    else
+    {
       // local func
       cpp_AddScript(TheFunction, ScriptSyntaxBuffer + " ); \n");
     }

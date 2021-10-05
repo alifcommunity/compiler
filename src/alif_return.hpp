@@ -1,27 +1,28 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
   // إرجاع
   // func int ()
   // return 1 + 2
@@ -34,7 +35,8 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   if (!IsInsideFunction)
     ErrorCode("يجب استعمال ' إرجاع ' داخل دالة", o_tokens);
 
-  if (TheFunction_TYPE == "عادم") {
+  if (TheFunction_TYPE == "عادم")
+  {
     // ErrorCode("لا يمكن استعمال ' إرجاع ' في دالة من نوع عادم", o_tokens);
 
     if (Token[2] != "")
@@ -43,7 +45,8 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
                     "تغيير نوع الدالة",
                 o_tokens);
 
-    if (IsInsideClass) {
+    if (IsInsideClass)
+    {
       // void return in class func
 
       if (DEBUG)
@@ -54,7 +57,9 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       // *** *** *** *** *** ***
 
       return; // continue;
-    } else if (!IsInsideNamespace) {
+    }
+    else if (!IsInsideNamespace)
+    {
       // void return in global func
 
       if (DEBUG)
@@ -65,7 +70,9 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       // *** *** *** *** *** ***
 
       return; // continue;
-    } else {
+    }
+    else
+    {
       // void return in local func
 
       if (DEBUG)
@@ -77,7 +84,9 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       return; // continue;
     }
-  } else {
+  }
+  else
+  {
     // return int
     // return std::string
     // return bool
@@ -90,16 +99,22 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // std::string FUN_TYPE;
 
-  if (IsInsideClass) {
+  if (IsInsideClass)
+  {
     // return in class func
 
-    if (TheFunction_TYPE == "عدد") {
+    if (TheFunction_TYPE == "عدد")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-CLASS-INT] ", o_tokens); // DEBUG
-    } else if (TheFunction_TYPE == "نص") {
+    }
+    else if (TheFunction_TYPE == "نص")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-CLASS-STRING] ", o_tokens); // DEBUG
-    } else if (TheFunction_TYPE == "منطق") {
+    }
+    else if (TheFunction_TYPE == "منطق")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-CLASS-BOOL] ", o_tokens); // DEBUG
     }
@@ -113,16 +128,23 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       RETURN_FUN[std::make_pair(TheClass, TheFunction)] = "IF";
     else
       RETURN_FUN[std::make_pair(TheClass, TheFunction)] = "OK";
-  } else if (!IsInsideNamespace) {
+  }
+  else if (!IsInsideNamespace)
+  {
     // return in global func
 
-    if (TheFunction_TYPE == "عدد") {
+    if (TheFunction_TYPE == "عدد")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-GLOBAL-INT] ", o_tokens); // DEBUG
-    } else if (TheFunction_TYPE == "نص") {
+    }
+    else if (TheFunction_TYPE == "نص")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-GLOBAL-STRING] ", o_tokens); // DEBUG
-    } else if (TheFunction_TYPE == "منطق") {
+    }
+    else if (TheFunction_TYPE == "منطق")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-GLOABL-BOOL] ", o_tokens); // DEBUG
     }
@@ -136,16 +158,23 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       RETURN_FUN[std::make_pair("", TheFunction)] = "IF";
     else
       RETURN_FUN[std::make_pair("", TheFunction)] = "OK";
-  } else {
+  }
+  else
+  {
     // return in local func
 
-    if (TheFunction_TYPE == "عدد") {
+    if (TheFunction_TYPE == "عدد")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-INT] ", o_tokens); // DEBUG
-    } else if (TheFunction_TYPE == "نص") {
+    }
+    else if (TheFunction_TYPE == "نص")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-STRING] ", o_tokens); // DEBUG
-    } else if (TheFunction_TYPE == "منطق") {
+    }
+    else if (TheFunction_TYPE == "منطق")
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[RETURN-BOOL] ", o_tokens); // DEBUG
     }
@@ -162,22 +191,26 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       RETURN_FUN[std::make_pair(TheNamespace, TheFunction)] = "OK";
   }
 
-  if (Token[2] == "صحيح") {
+  if (Token[2] == "صحيح")
+  {
     // Return Syntax
     // return true.
 
     ScriptSyntaxBuffer = " true ";
     if (DEBUG)
       DEBUG_MESSAGE("[true] ", o_tokens); // DEBUG
-
-  } else if (Token[2] == "خطأ") {
+  }
+  else if (Token[2] == "خطأ")
+  {
     // Return Syntax
     // return false.
 
     ScriptSyntaxBuffer = " false ";
     if (DEBUG)
       DEBUG_MESSAGE("[false] ", o_tokens); // DEBUG
-  } else {
+  }
+  else
+  {
 
     // Return Syntax
     // return a + 1 + a * (_g - 3) ...
@@ -185,8 +218,10 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     TempToken[0] = "=";
     TempTokenCount = 1;
 
-    for (int p = 2; p <= o_tokens->TOTAL[o_tokens->Line]; p++) {
-      if (Token[p] != "") {
+    for (int p = 2; p <= o_tokens->TOTAL[o_tokens->Line]; p++)
+    {
+      if (Token[p] != "")
+      {
         TempToken[TempTokenCount] = Token[p];
         TempTokenCount++;
       }
@@ -199,15 +234,15 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       WIN_OR_CLASS = TheNamespace;
 
     ScriptSyntaxBuffer =
-        CheckForSyntax(TheFunction_TYPE, // OBJECTIF_TYPE
-                       true,  // Accept Using Reference to Namespace:Controls
-                       true,  // Accept Using Reference to Namespace:Function
-                       true,  // Accept Using Reference to Global Functions
-                       true,  // Accept Using Reference to Local Functions
-                       true,  // Accept Using Reference to Global VAR
-                       true,  // Accept Using Reference to Local VAR
-                       false, // Accept Convertion from String To Int
-                       true,  // Accept Convertion from Int To String
+        CheckForSyntax(TheFunction_TYPE,     // OBJECTIF_TYPE
+                       true,                 // Accept Using Reference to Namespace:Controls
+                       true,                 // Accept Using Reference to Namespace:Function
+                       true,                 // Accept Using Reference to Global Functions
+                       true,                 // Accept Using Reference to Local Functions
+                       true,                 // Accept Using Reference to Global VAR
+                       true,                 // Accept Using Reference to Local VAR
+                       false,                // Accept Convertion from String To Int
+                       true,                 // Accept Convertion from Int To String
                        TempToken,            // SYNTAX[] std::string
                        (TempTokenCount - 1), // SYNTAX_LONG int
                        WIN_OR_CLASS,         // TMP_WINDOW_NAME
@@ -222,13 +257,18 @@ void parser_Return(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   //   return
 
   // *** Generate Code ***
-  if (IsInsideClass) {
+  if (IsInsideClass)
+  {
     // Class Func return
     CPP_CLASS.append(ScriptSyntaxBuffer + " ); \n");
-  } else if (!IsInsideNamespace) {
+  }
+  else if (!IsInsideNamespace)
+  {
     // Global Func Return
     CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ); \n");
-  } else {
+  }
+  else
+  {
     // Local Func Return
     cpp_AddScript(TheFunction, ScriptSyntaxBuffer + " ); \n");
   }

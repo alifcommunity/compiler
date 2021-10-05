@@ -1,33 +1,34 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
   //منطق
 
   // bool A = true
 
   if (!o_tokens->TOKENS_PREDEFINED && IsInsideFunction)
-    // Igiore Local func bool-var predefinition,
+    // Ignore Local func bool-var predefinition,
     // focus only on Global bool-var predefinition, and Class global bool-var
     // predefinition.
     return; // continue;
@@ -58,12 +59,16 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     ErrorCode("يجب اعطاء قيمة بعد ' = '", o_tokens);
 
   // Class
-  if (IsInsideClass) {
-    if (!IsInsideFunction) {
+  if (IsInsideClass)
+  {
+    if (!IsInsideFunction)
+    {
       // global class bool-var Bool
 
-      if (Token[1] == "خاص") {
-        if (!o_tokens->TOKENS_PREDEFINED) {
+      if (Token[1] == "خاص")
+      {
+        if (!o_tokens->TOKENS_PREDEFINED)
+        {
           SetNewVarClass(true, true, TheClass, TheFunction, Token[BOOL_POS + 1],
                          "منطق", false, false, o_tokens->Line, o_tokens);
           return; // continue;
@@ -78,7 +83,8 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         // Class : New Private Bool
         CPP_CLASS.append(" private: bool " + Global_ID[Token[BOOL_POS + 1]] +
                          " ");
-        if (Token[BOOL_POS + 2] == "") {
+        if (Token[BOOL_POS + 2] == "")
+        {
           CPP_CLASS.append(" = false; \n");
 
           if (DEBUG)
@@ -86,8 +92,11 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           return;                            // continue;
         }
         // *** *** *** *** *** ***
-      } else {
-        if (!o_tokens->TOKENS_PREDEFINED) {
+      }
+      else
+      {
+        if (!o_tokens->TOKENS_PREDEFINED)
+        {
           SetNewVarClass(true, false, TheClass, TheFunction,
                          Token[BOOL_POS + 1], "منطق", false, false,
                          o_tokens->Line, o_tokens);
@@ -102,7 +111,8 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         // Class : New Public Bool
         CPP_CLASS.append(" public: bool " + Global_ID[Token[BOOL_POS + 1]] +
                          " ");
-        if (Token[BOOL_POS + 2] == "") {
+        if (Token[BOOL_POS + 2] == "")
+        {
           CPP_CLASS.append(" = false; \n");
 
           if (DEBUG)
@@ -111,12 +121,17 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         }
         // *** *** *** *** *** ***
       }
-    } else {
+    }
+    else
+    {
       // local Bool class
 
-      if (Token[1] == "خاص") {
+      if (Token[1] == "خاص")
+      {
         ErrorCode("يجب استعمال خاصيه ' خاص ' خارج الدالة", o_tokens);
-      } else {
+      }
+      else
+      {
         // if (!o_tokens->TOKENS_PREDEFINED)
         //{
         SetNewVarClass(false, false, TheClass, TheFunction, Token[BOOL_POS + 1],
@@ -131,7 +146,8 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         // *** Generate Code ***
         // Class : New Local Class Bool
         CPP_CLASS.append(" bool " + ID[Token[BOOL_POS + 1]] + " ");
-        if (Token[BOOL_POS + 2] == "") {
+        if (Token[BOOL_POS + 2] == "")
+        {
           CPP_CLASS.append(" = false; \n");
 
           if (DEBUG)
@@ -141,13 +157,16 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         // *** *** *** *** *** ***
       }
     }
-  } else if (!IsInsideFunction) {
+  }
+  else if (!IsInsideFunction)
+  {
     // Global Area Bool
 
-    // Igiore Local bool-var predefinition,
+    // Ignore Local bool-var predefinition,
     // focus only on Global bool-var predefinition
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       SetNewVar(true, "", "", Token[BOOL_POS + 1], "منطق", false, false,
                 o_tokens->Line, o_tokens);
 
@@ -162,7 +181,8 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // Global Area
     // Bool a
     CPP_GLOBAL.append(" bool " + Global_ID[Token[BOOL_POS + 1]] + " ");
-    if (Token[BOOL_POS + 2] == "") {
+    if (Token[BOOL_POS + 2] == "")
+    {
       CPP_GLOBAL.append(" = false; \n");
 
       if (DEBUG)
@@ -170,7 +190,9 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       return;                            // continue;
     }
     // *** *** *** *** *** ***
-  } else {
+  }
+  else
+  {
     // Local Bool
 
     SetNewVar(false, TheNamespace, TheFunction, Token[BOOL_POS + 1], "منطق",
@@ -183,20 +205,25 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // *** Generate Code ***
     // Local Area
     // Bool a
-    if (!IsInsideNamespace) {
+    if (!IsInsideNamespace)
+    {
       // Global Function
       CPP_GLOBAL_FUN.append(" bool " + ID[Token[BOOL_POS + 1]] + " ");
-      if (Token[BOOL_POS + 2] == "") {
+      if (Token[BOOL_POS + 2] == "")
+      {
         CPP_GLOBAL_FUN.append(" = false; \n");
 
         if (DEBUG)
           DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
         return;                            // continue;
       }
-    } else {
+    }
+    else
+    {
       // Local Function
       cpp_AddScript(TheFunction, " bool " + ID[Token[BOOL_POS + 1]] + " ");
-      if (Token[BOOL_POS + 2] == "") {
+      if (Token[BOOL_POS + 2] == "")
+      {
         cpp_AddScript(TheFunction, " = false; \n");
 
         if (DEBUG)
@@ -207,30 +234,40 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // *** *** *** *** *** ***
   }
 
-  if (Token[BOOL_POS + 2] == "=") {
+  if (Token[BOOL_POS + 2] == "=")
+  {
     if (DEBUG)
       DEBUG_MESSAGE("= ", o_tokens); // DEBUG
 
-    if (!IsInsideFunction) {
-      if (IsInsideClass) {
+    if (!IsInsideFunction)
+    {
+      if (IsInsideClass)
+      {
         // Class Global-Area
         // *** Generate Code ***
         CPP_CLASS.append(" = ");
         // *** *** *** *** *** ***
-      } else {
+      }
+      else
+      {
         // *** Generate Code ***
         // Global Area
         // Bool a =
         CPP_GLOBAL.append(" = ");
         // *** *** *** *** *** ***
       }
-    } else {
-      if (IsInsideClass) {
+    }
+    else
+    {
+      if (IsInsideClass)
+      {
         // Local Function Class
         // *** Generate Code ***
         CPP_CLASS.append(" = ");
         // *** *** *** *** *** ***
-      } else {
+      }
+      else
+      {
         // *** Generate Code ***
         // Local Area
         // Bool a =
@@ -246,8 +283,10 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     TempTokenCount = 0;
 
-    for (int p = (BOOL_POS + 2); p <= o_tokens->TOTAL[o_tokens->Line]; p++) {
-      if (Token[p] != "") {
+    for (int p = (BOOL_POS + 2); p <= o_tokens->TOTAL[o_tokens->Line]; p++)
+    {
+      if (Token[p] != "")
+      {
         if (substr_utf8(Token[p], 0, 1) == "_" &&
             !IsInsideFunction) // to avoid : a = b + _a
         {
@@ -257,9 +296,10 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
                       "تم الانشاء فيه '" +
                           Token[p] + "' ",
                       o_tokens);
-        } else if (Token[BOOL_POS + 1] == Token[p] &&
-                   (Token[p - 1] !=
-                    ":")) // to avoid a = b + a, but ok for a = b + x:y:a
+        }
+        else if (Token[BOOL_POS + 1] == Token[p] &&
+                 (Token[p - 1] !=
+                  ":")) // to avoid a = b + a, but ok for a = b + x:y:a
         {
           if (G_VAR_IS_SET[(Token[BOOL_POS + 1])] &&
               IntToString(o_tokens->Line) !=
@@ -292,15 +332,15 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     // Bool Syntax
     ScriptSyntaxBuffer =
-        CheckForSyntax("منطق", // OBJECTIF_TYPE
-                       true,   // Accept Using Reference to Namespace:Controls
-                       true,   // Accept Using Reference to Namespace:Function
-                       true,   // Accept Using Reference to Global Functions
-                       true,   // Accept Using Reference to Local Functions
-                       true,   // Accept Using Reference to Global VAR
-                       true,   // Accept Using Reference to Local VAR
-                       false,  // Accept Convertion from String To Bool
-                       true,   // Accept Convertion from Bool To String
+        CheckForSyntax("منطق",               // OBJECTIF_TYPE
+                       true,                 // Accept Using Reference to Namespace:Controls
+                       true,                 // Accept Using Reference to Namespace:Function
+                       true,                 // Accept Using Reference to Global Functions
+                       true,                 // Accept Using Reference to Local Functions
+                       true,                 // Accept Using Reference to Global VAR
+                       true,                 // Accept Using Reference to Local VAR
+                       false,                // Accept Convertion from String To Bool
+                       true,                 // Accept Convertion from Bool To String
                        TempToken,            // SYNTAX[] std::string
                        (TempTokenCount - 1), // SYNTAX_LONG
                        WIN_OR_CLASS,         // TMP_WINDOW_NAME
@@ -310,16 +350,21 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     if (DEBUG)
       DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
 
-    if (IsInsideClass) {
+    if (IsInsideClass)
+    {
       // just for fixing this ...
       // *** Generate Code ***
       CPP_CLASS.append(ScriptSyntaxBuffer + " ; \n ");
       // *** *** *** *** *** ***
-    } else if (!IsInsideFunction) {
+    }
+    else if (!IsInsideFunction)
+    {
       // Global Area
       // Bool a = ... ;
       CPP_GLOBAL.append(ScriptSyntaxBuffer + " ; \n ");
-    } else {
+    }
+    else
+    {
       // Local Area
       // Bool a = ... ;
       if (!IsInsideNamespace)
@@ -334,7 +379,8 @@ void parser_bool(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     if (DEBUG)
       DEBUG_MESSAGE("\n\n", o_tokens); // DEBUG
     return;                            // continue;
-  } else if (Token[BOOL_POS + 2] != "")
+  }
+  else if (Token[BOOL_POS + 2] != "")
     ErrorCode("أمر غير معروف '" + Token[BOOL_POS + 2] + "', ربما تقصد '=' ",
               o_tokens);
 

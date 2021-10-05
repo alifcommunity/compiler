@@ -1,28 +1,29 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
 std::string GetFormatedHTML(std::string HTML, std::string WindowName,
-                            CLASS_TOKEN *o_tokens) {
+                            CLASS_TOKEN *o_tokens)
+{
 
   std::string FormatedHTML;
 
@@ -77,7 +78,8 @@ o_tokens); } else { FormatedHTML.append(Line);
 
   std::istringstream ScriptStream(HTML);
   std::string Line;
-  while (std::getline(ScriptStream, Line)) {
+  while (std::getline(ScriptStream, Line))
+  {
 
     // <img src="..." ...>
     // <img src="data:image/png;base64,..." ...>
@@ -94,7 +96,8 @@ o_tokens); } else { FormatedHTML.append(Line);
     LineLower = boost::algorithm::to_lower_copy(Line);
 
     p_1 = LineLower.find(" src=\"");
-    if (p_1 != std::string::npos) {
+    if (p_1 != std::string::npos)
+    {
 
       p_1 = p_1 + 6;
 
@@ -113,14 +116,16 @@ o_tokens); } else { FormatedHTML.append(Line);
       // o_tokens); // DEBUG
 
       std::size_t p_2 = Line.find('\"', p_1);
-      if (p_2 != std::string::npos) {
+      if (p_2 != std::string::npos)
+      {
 
         LineBuffer =
             boost::algorithm::trim_copy(substr_utf8(Line, p_1, (p_2 - p_1)));
         // LineBuffer = substr_utf8(Line, p_1, (p_2 - p_1));
 
         // Fix: src="file://..."
-        if (substr_utf8(LineBuffer, 0, 7) == "file://") {
+        if (substr_utf8(LineBuffer, 0, 7) == "file://")
+        {
 
           boost::algorithm::replace_first(LineBuffer, "file://", "");
           if (DEBUG)
@@ -138,7 +143,8 @@ o_tokens); } else { FormatedHTML.append(Line);
         // std::size_t p_hs = LineBuffer.find("https://");
         // if (p_h != std::string::npos || p_hs != std::string::npos){
         if (substr_utf8(LineBuffer, 0, 7) == "http://" ||
-            substr_utf8(LineBuffer, 0, 8) == "https://") {
+            substr_utf8(LineBuffer, 0, 8) == "https://")
+        {
 
           // Allow external link..
           FormatedHTML.append(Line);
@@ -166,25 +172,44 @@ o_tokens); } else { FormatedHTML.append(Line);
         // -> image/webp
 
         if (FileType == "jpg" || FileType == "jpeg" || FileType == "jfif" ||
-            FileType == "pjpeg" || FileType == "pjp") {
+            FileType == "pjpeg" || FileType == "pjp")
+        {
           FileType = "image/jpeg";
-        } else if (FileType == "png") {
+        }
+        else if (FileType == "png")
+        {
           FileType = "image/png";
-        } else if (FileType == "gif") {
+        }
+        else if (FileType == "gif")
+        {
           FileType = "image/gif";
-        } else if (FileType == "apng") {
+        }
+        else if (FileType == "apng")
+        {
           FileType = "image/apng";
-        } else if (FileType == "bmp") {
+        }
+        else if (FileType == "bmp")
+        {
           FileType = "image/bmp";
-        } else if (FileType == "ico" || FileType == "cur") {
+        }
+        else if (FileType == "ico" || FileType == "cur")
+        {
           FileType = "image/x-icon";
-        } else if (FileType == "tif" || FileType == "tiff") {
+        }
+        else if (FileType == "tif" || FileType == "tiff")
+        {
           FileType = "image/tiff";
-        } else if (FileType == "svg") {
+        }
+        else if (FileType == "svg")
+        {
           FileType = "image/svg+xml";
-        } else if (FileType == "webp") {
+        }
+        else if (FileType == "webp")
+        {
           FileType = "image/webp";
-        } else {
+        }
+        else
+        {
 
           // if(DEBUG)DEBUG_MESSAGE("Unknow 0 |" + FileType + "| next \n\n",
           // o_tokens); // DEBUG
@@ -242,7 +267,8 @@ o_tokens); } else { FormatedHTML.append(Line);
 }
 
 void HTML_to_c(std::string sHTMLPath, std::string sCPath, std::string VarName,
-               std::string WindowName, CLASS_TOKEN *o_tokens) {
+               std::string WindowName, CLASS_TOKEN *o_tokens)
+{
   // This function can be completly replace in c++20 by <embed>
   // In: test.html
   // Out: test.c -> const test_content = "..test.html..";
@@ -304,7 +330,8 @@ void HTML_to_c(std::string sHTMLPath, std::string sCPath, std::string VarName,
       "_webui_html ); ";
 }
 
-void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
 
   // #واجهة رئيسية "UI_WEB_1"
   // #window_web MyWindow "MyFile.html"
@@ -333,7 +360,8 @@ void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   // ------------------------
 
-  if (Token[3] == "رئيسية") {
+  if (Token[3] == "رئيسية")
+  {
 
     // temporary set because this window
     // didnt created yet, but we need
@@ -342,7 +370,8 @@ void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     // --- WindowWeb Main --------------------
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
 
       if (CONTROL_WIN_IS_SET["رئيسية"])
         ErrorCode("المجال ' رئيسية ' تم انشاؤها مسبقا في السطر رقم : " +
@@ -463,7 +492,9 @@ void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     // temporary end
     TheNamespace = "";
-  } else {
+  }
+  else
+  {
     // --- WindowWeb MyWindowName --------------------
 
     // temporary set because this window
@@ -474,7 +505,8 @@ void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     if (!IsValidName(Token[3], o_tokens))
       ErrorCode("اسم غير مقبول : ' " + Token[3] + " ' ", o_tokens);
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
 
       if (CONTROL_WIN_IS_SET[Token[3]])
         ErrorCode("المجال ' " + Token[3] + " ' تم انشاؤها مسبقا في السطر : " +
@@ -600,7 +632,8 @@ void parser_NewWindowWeb(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   TheNamespace = "";
 }
 
-void parser_NewWindow(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_NewWindow(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
 
   if (IsInsideNamespace)
     ErrorCode("لا يمكن انشاء مجال داخل مجال، المجال الحالية : " + TheNamespace,
@@ -618,7 +651,8 @@ void parser_NewWindow(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   if (Token[3] != "" && Token[3] != "(")
     ErrorCode("أمر غير معروف : ' " + Token[3] + " ' ", o_tokens);
 
-  if (Token[3] == "(") {
+  if (Token[3] == "(")
+  {
     if (Token[4] == "")
       ErrorCode("يجب اغلاق ')' ", o_tokens);
 
@@ -631,7 +665,8 @@ void parser_NewWindow(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
   if (Token[2] == "رئيسية") // مجال رئيسية
   {
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       if (MAIN_WIN_IS_SET)
         ErrorCode("النافذه الرئيسية تم انشاؤها مسبقا في السطر : " +
                       MAIN_WIN_AT_LINE,
@@ -654,13 +689,16 @@ void parser_NewWindow(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     Win_CurrentTotalFucntion = 0;
     APP_TYPE = "PC_GUI";
 
-    if (CONTROL_WIN_IS_SET["رئيسية"]) {
+    if (CONTROL_WIN_IS_SET["رئيسية"])
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[NAMESPACE] [MAIN] {CTR ALREADY SET} \n\n",
                       o_tokens); // DEBUG
 
       return; // continue;
-    } else {
+    }
+    else
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[NAMESPACE] [MAIN] {SET BASE CTR} \n\n",
                       o_tokens); // DEBUG
@@ -673,12 +711,14 @@ void parser_NewWindow(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       return; // continue;
     }
-  } else // مجال MyWindowName
+  }
+  else // مجال MyWindowName
   {
     if (!IsValidName(Token[2], o_tokens))
       ErrorCode("اسم غير مقبول : ' " + Token[2] + " ' ", o_tokens);
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       if (namespace_is_set[Token[2]])
         ErrorCode("المجال ' " + Token[2] + " ' تم انشاؤها مسبقا في السطر : " +
                       namespace_at_line[Token[2]],
@@ -702,12 +742,15 @@ void parser_NewWindow(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     Win_CurrentTotalFucntion = 0;
     APP_TYPE = "PC_GUI";
 
-    if (CONTROL_WIN_IS_SET[Token[2]]) {
+    if (CONTROL_WIN_IS_SET[Token[2]])
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[NAMESPACE] [" + Token[2] + "] {CTR ALREADY SET} \n\n",
                       o_tokens); // DEBUG
       return;                    // continue;
-    } else {
+    }
+    else
+    {
       if (DEBUG)
         DEBUG_MESSAGE("[NAMESPACE] [" + Token[2] + "] {SET BASE CTR} \n\n",
                       o_tokens); // DEBUG

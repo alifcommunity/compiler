@@ -1,27 +1,28 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
 
   //دالة
 
@@ -44,7 +45,8 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     if (Token[FUN_POS + 2] != "" && Token[FUN_POS + 2] != "(")
       ErrorCode("أمر غير معروف : ' " + Token[FUN_POS + 2] + " ' ", o_tokens);
 
-    if (Token[FUN_POS + 2] == "(") {
+    if (Token[FUN_POS + 2] == "(")
+    {
       if (Token[FUN_POS + 3] == "")
         ErrorCode("يجب اغلاق القوس ')' ", o_tokens);
 
@@ -55,7 +57,8 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         ErrorCode("أمر غير معروف : ' " + Token[FUN_POS + 4] + " ' ", o_tokens);
     }
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       if (MAIN_FUN_IS_SET[TheNamespace])
         ErrorCode("الدالة الرئيسية تم انشاؤها مسبقا في السطر : " +
                       MAIN_FUN_AT_LINE[TheNamespace],
@@ -89,8 +92,9 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       DEBUG_MESSAGE("[FUNCTION] [MAIN] \n\n", o_tokens); // DEBUG
 
     return; // continue;
-  } else if (Token[FUN_POS + 1] == "عدد" || Token[FUN_POS + 1] == "نص" ||
-             Token[FUN_POS + 1] == "منطق") // دالة TYPE MyFunctionName (...)
+  }
+  else if (Token[FUN_POS + 1] == "عدد" || Token[FUN_POS + 1] == "نص" ||
+           Token[FUN_POS + 1] == "منطق") // دالة TYPE MyFunctionName (...)
   {
     // --------------------------
     // Type Function
@@ -104,9 +108,12 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     if (Token[FUN_POS + 3] == "") // دالة TYPE MyFunctionName
     {
-      if (Token[FUN_POS + 1] == "عدد") {
-        if (!IsInsideNamespace) {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+      if (Token[FUN_POS + 1] == "عدد")
+      {
+        if (!IsInsideNamespace)
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Global function
             ADD_FUN(true, "", Token[FUN_POS + 2], "عدد", o_tokens->Line,
                     o_tokens);
@@ -129,8 +136,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           CPP_GLOBAL_FUN.append(" double FUNCTION_" +
                                 Global_ID[Token[FUN_POS + 2]] + "(){ \n");
           // *** *** *** *** *** ***
-        } else {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Local function
             ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "عدد",
                     o_tokens->Line, o_tokens);
@@ -166,9 +176,13 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
 
         return; // continue;
-      } else if (Token[FUN_POS + 1] == "نص") {
-        if (!IsInsideNamespace) {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+      }
+      else if (Token[FUN_POS + 1] == "نص")
+      {
+        if (!IsInsideNamespace)
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Global function
             ADD_FUN(true, "", Token[FUN_POS + 2], "نص", o_tokens->Line,
                     o_tokens);
@@ -191,8 +205,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           CPP_GLOBAL_FUN.append(" std::string FUNCTION_" +
                                 Global_ID[Token[FUN_POS + 2]] + "(){ \n");
           // *** *** *** *** *** ***
-        } else {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Local function
             ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "نص",
                     o_tokens->Line, o_tokens);
@@ -229,9 +246,13 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
 
         return; // continue;
-      } else if (Token[FUN_POS + 1] == "منطق") {
-        if (!IsInsideNamespace) {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+      }
+      else if (Token[FUN_POS + 1] == "منطق")
+      {
+        if (!IsInsideNamespace)
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Global function
             ADD_FUN(true, "", Token[FUN_POS + 2], "منطق", o_tokens->Line,
                     o_tokens);
@@ -254,8 +275,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           CPP_GLOBAL_FUN.append(" bool FUNCTION_" +
                                 Global_ID[Token[FUN_POS + 2]] + "(){ \n");
           // *** *** *** *** *** ***
-        } else {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Local function
             ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "منطق",
                     o_tokens->Line, o_tokens);
@@ -292,7 +316,8 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
         return; // continue;
       }
-    } else if (Token[FUN_POS + 3] == "(") // دالة TYPE MyFunctionName ( ???
+    }
+    else if (Token[FUN_POS + 3] == "(") // دالة TYPE MyFunctionName ( ???
     {
       if (Token[FUN_POS + 4] == "")
         ErrorCode("سطر غير كامل المرجو اضافة ')' ", o_tokens);
@@ -303,9 +328,12 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           ErrorCode("أمر غير معروف : ' " + Token[FUN_POS + 5] + " ' ",
                     o_tokens);
 
-        if (Token[FUN_POS + 1] == "عدد") {
-          if (!IsInsideNamespace) {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+        if (Token[FUN_POS + 1] == "عدد")
+        {
+          if (!IsInsideNamespace)
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Global function
               ADD_FUN(true, "", Token[FUN_POS + 2], "عدد", o_tokens->Line,
                       o_tokens);
@@ -328,8 +356,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             CPP_GLOBAL_FUN.append(" double FUNCTION_" +
                                   Global_ID[Token[FUN_POS + 2]] + "(){ \n");
             // *** *** *** *** *** ***
-          } else {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+          }
+          else
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Local function
               ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "عدد",
                       o_tokens->Line, o_tokens);
@@ -367,9 +398,13 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
 
           return; // continue;
-        } else if (Token[FUN_POS + 1] == "نص") {
-          if (!IsInsideNamespace) {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else if (Token[FUN_POS + 1] == "نص")
+        {
+          if (!IsInsideNamespace)
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Global function
               ADD_FUN(true, "", Token[FUN_POS + 2], "نص", o_tokens->Line,
                       o_tokens);
@@ -392,8 +427,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             CPP_GLOBAL_FUN.append(" std::string FUNCTION_" +
                                   Global_ID[Token[FUN_POS + 2]] + "(){ \n");
             // *** *** *** *** *** ***
-          } else {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+          }
+          else
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Local function
               ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "نص",
                       o_tokens->Line, o_tokens);
@@ -431,9 +469,13 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
 
           return; // continue;
-        } else if (Token[FUN_POS + 1] == "منطق") {
-          if (!IsInsideNamespace) {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else if (Token[FUN_POS + 1] == "منطق")
+        {
+          if (!IsInsideNamespace)
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Global function
               ADD_FUN(true, "", Token[FUN_POS + 2], "منطق", o_tokens->Line,
                       o_tokens);
@@ -456,8 +498,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             CPP_GLOBAL_FUN.append(" bool FUNCTION_" +
                                   Global_ID[Token[FUN_POS + 2]] + "(){ \n");
             // *** *** *** *** *** ***
-          } else {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+          }
+          else
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Local function
               ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "منطق",
                       o_tokens->Line, o_tokens);
@@ -495,22 +540,28 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
           return; // continue;
         }
-      } else // دالة TYPE MyFunctionName (...)
+      }
+      else // دالة TYPE MyFunctionName (...)
       {
         if (Token[o_tokens->TOTAL[o_tokens->Line] - 1] != ")")
           ErrorCode("يجب انهاء السطر بالإشارة ')' ", o_tokens);
 
         TempTokenCount = 0;
-        for (int p = 5; p <= o_tokens->TOTAL[o_tokens->Line]; p++) {
-          if (Token[p] != "") {
+        for (int p = 5; p <= o_tokens->TOTAL[o_tokens->Line]; p++)
+        {
+          if (Token[p] != "")
+          {
             TempToken[TempTokenCount] = Token[p];
             TempTokenCount++;
           }
         }
 
-        if (Token[FUN_POS + 1] == "عدد") {
-          if (!IsInsideNamespace) {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+        if (Token[FUN_POS + 1] == "عدد")
+        {
+          if (!IsInsideNamespace)
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Global function
               ADD_FUN(true, "", Token[FUN_POS + 2], "عدد", o_tokens->Line,
                       o_tokens);
@@ -545,8 +596,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(
                 true, TempToken, (TempTokenCount - 1), TheNamespace,
                 Token[FUN_POS + 2], o_tokens);
-          } else {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+          }
+          else
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Local function
               ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "عدد",
                       o_tokens->Line, o_tokens);
@@ -589,11 +643,14 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             DEBUG_MESSAGE(") \n\n", o_tokens); // DEBUG
 
           // *** Generate Code ***
-          if (!IsInsideNamespace) {
+          if (!IsInsideNamespace)
+          {
             // Global INT Func(...)
             CPP_GLOBAL.append(NEW_FUNCTION_ARG + " ); \n");
             CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ){ \n");
-          } else {
+          }
+          else
+          {
             // Local INT Func(...)
             CBUFER =
                 CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
@@ -613,9 +670,13 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
 
           return; // continue;
-        } else if (Token[FUN_POS + 1] == "نص") {
-          if (!IsInsideNamespace) {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else if (Token[FUN_POS + 1] == "نص")
+        {
+          if (!IsInsideNamespace)
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Global function
               ADD_FUN(true, "", Token[FUN_POS + 2], "نص", o_tokens->Line,
                       o_tokens);
@@ -652,8 +713,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(
                 true, TempToken, (TempTokenCount - 1), TheNamespace,
                 Token[FUN_POS + 2], o_tokens);
-          } else {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+          }
+          else
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Local function
               ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "نص",
                       o_tokens->Line, o_tokens);
@@ -699,11 +763,14 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             DEBUG_MESSAGE(") \n\n", o_tokens); // DEBUG
 
           // *** Generate Code ***
-          if (!IsInsideNamespace) {
+          if (!IsInsideNamespace)
+          {
             // Global String Func(...)
             CPP_GLOBAL.append(NEW_FUNCTION_ARG + " ); \n");
             CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ){ \n");
-          } else {
+          }
+          else
+          {
             // Local String Func(...)
             CBUFER =
                 CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
@@ -723,9 +790,13 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
 
           return; // continue;
-        } else if (Token[FUN_POS + 1] == "منطق") {
-          if (!IsInsideNamespace) {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else if (Token[FUN_POS + 1] == "منطق")
+        {
+          if (!IsInsideNamespace)
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Global function
               ADD_FUN(true, "", Token[FUN_POS + 2], "منطق", o_tokens->Line,
                       o_tokens);
@@ -760,8 +831,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             ScriptSyntaxBuffer = CHECK_NEW_FUN_SYNTAX(
                 true, TempToken, (TempTokenCount - 1), TheNamespace,
                 Token[FUN_POS + 2], o_tokens);
-          } else {
-            if (!o_tokens->TOKENS_PREDEFINED) {
+          }
+          else
+          {
+            if (!o_tokens->TOKENS_PREDEFINED)
+            {
               // Local function
               ADD_FUN(false, TheNamespace, Token[FUN_POS + 2], "منطق",
                       o_tokens->Line, o_tokens);
@@ -804,11 +878,14 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
             DEBUG_MESSAGE(") \n\n", o_tokens); // DEBUG
 
           // *** Generate Code ***
-          if (!IsInsideNamespace) {
+          if (!IsInsideNamespace)
+          {
             // Global INT Func(...)
             CPP_GLOBAL.append(NEW_FUNCTION_ARG + " ); \n");
             CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ){ \n");
-          } else {
+          }
+          else
+          {
             // Local INT Func(...)
             CBUFER =
                 CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
@@ -831,7 +908,8 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         }
       }
     }
-  } else // void : دالة MyFunctionName (???) // void
+  }
+  else // void : دالة MyFunctionName (???) // void
   {
     if (Token[FUN_POS + 2] != "" && Token[FUN_POS + 2] != "(")
       ErrorCode("أمر غير معروف : ' " + Token[FUN_POS + 2] + " ' ", o_tokens);
@@ -841,8 +919,10 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     if (Token[FUN_POS + 2] == "") // دالة MyFunctionName
     {
-      if (!IsInsideNamespace) {
-        if (!o_tokens->TOKENS_PREDEFINED) {
+      if (!IsInsideNamespace)
+      {
+        if (!o_tokens->TOKENS_PREDEFINED)
+        {
           // Global function
           ADD_FUN(true, "", Token[FUN_POS + 1], "عادم", o_tokens->Line,
                   o_tokens);
@@ -866,8 +946,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         CPP_GLOBAL_FUN.append(" void FUNCTION_" +
                               Global_ID[Token[FUN_POS + 1]] + "(){ \n");
         // *** *** *** *** *** ***
-      } else {
-        if (!o_tokens->TOKENS_PREDEFINED) {
+      }
+      else
+      {
+        if (!o_tokens->TOKENS_PREDEFINED)
+        {
           // Local function
           ADD_FUN(false, TheNamespace, Token[FUN_POS + 1], "عادم",
                   o_tokens->Line, o_tokens);
@@ -904,8 +987,9 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       Win_CurrentTotalFucntion++;
       Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
 
-      return;                             // continue;
-    } else if (Token[FUN_POS + 2] == "(") // دالة MyFunctionName ( ???
+      return; // continue;
+    }
+    else if (Token[FUN_POS + 2] == "(") // دالة MyFunctionName ( ???
     {
       if (Token[FUN_POS + 3] == ")") // دالة MyFunctionName ()
       {
@@ -913,8 +997,10 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           ErrorCode("أمر غير معروف : ' " + Token[FUN_POS + 4] + " ' ",
                     o_tokens);
 
-        if (!IsInsideNamespace) {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+        if (!IsInsideNamespace)
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Global function
             ADD_FUN(true, "", Token[FUN_POS + 1], "عادم", o_tokens->Line,
                     o_tokens);
@@ -939,8 +1025,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           CPP_GLOBAL_FUN.append(" void FUNCTION_" +
                                 Global_ID[Token[FUN_POS + 1]] + "(){ \n");
           // *** *** *** *** *** ***
-        } else {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Local function
             ADD_FUN(false, TheNamespace, Token[FUN_POS + 1], "عادم",
                     o_tokens->Line, o_tokens);
@@ -978,21 +1067,26 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         Win_TotalFucntion[TheNamespace] = Win_CurrentTotalFucntion;
 
         return; // continue;
-      } else    // دالة MyFunctionName (...)
+      }
+      else // دالة MyFunctionName (...)
       {
         if (Token[o_tokens->TOTAL[o_tokens->Line] - 1] != ")")
           ErrorCode("يجب انهاء السطر بالإشارة ')' ", o_tokens);
 
         TempTokenCount = 0;
-        for (int p = 4; p <= o_tokens->TOTAL[o_tokens->Line]; p++) {
-          if (Token[p] != "") {
+        for (int p = 4; p <= o_tokens->TOTAL[o_tokens->Line]; p++)
+        {
+          if (Token[p] != "")
+          {
             TempToken[TempTokenCount] = Token[p];
             TempTokenCount++;
           }
         }
 
-        if (!IsInsideNamespace) {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+        if (!IsInsideNamespace)
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Global function
             ADD_FUN(true, "", Token[FUN_POS + 1], "عادم", o_tokens->Line,
                     o_tokens);
@@ -1028,8 +1122,11 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           ScriptSyntaxBuffer =
               CHECK_NEW_FUN_SYNTAX(true, TempToken, (TempTokenCount - 1),
                                    TheNamespace, Token[FUN_POS + 1], o_tokens);
-        } else {
-          if (!o_tokens->TOKENS_PREDEFINED) {
+        }
+        else
+        {
+          if (!o_tokens->TOKENS_PREDEFINED)
+          {
             // Local function
             ADD_FUN(false, TheNamespace, Token[FUN_POS + 1], "عادم",
                     o_tokens->Line, o_tokens);
@@ -1072,11 +1169,14 @@ void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           DEBUG_MESSAGE(") \n\n", o_tokens); // DEBUG
 
         // *** Generate Code ***
-        if (!IsInsideNamespace) {
+        if (!IsInsideNamespace)
+        {
           // Global VOID Func(...)
           CPP_GLOBAL.append(NEW_FUNCTION_ARG + " ); \n");
           CPP_GLOBAL_FUN.append(ScriptSyntaxBuffer + " ){ \n");
-        } else {
+        }
+        else
+        {
           // Local VOID Func(...)
           CBUFER = CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")];
           CPP_WINDOW[std::make_pair(TheNamespace, "FUN_DECLARATION")] =

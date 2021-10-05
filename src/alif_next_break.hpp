@@ -1,27 +1,28 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_NextBreak(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_NextBreak(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
   // التالي - كسر
 
   if (!o_tokens->TOKENS_PREDEFINED)
@@ -39,28 +40,37 @@ void parser_NextBreak(std::string Token[2048], CLASS_TOKEN *o_tokens) {
                   " '، على العموم لايجب وضع أي شيئ بعد ' " + Token[1] + " ' ' ",
               o_tokens);
 
-  if (Token[1] == "التالي") {
+  if (Token[1] == "التالي")
+  {
     if (DEBUG)
       DEBUG_MESSAGE("[Continue] \n\n", o_tokens); // DEBUG
 
     // *** Generate Code ***
-    if (!IsInsideNamespace) {
+    if (!IsInsideNamespace)
+    {
       // Global Fun IF
       CPP_GLOBAL_FUN.append("\n continue; \n ");
-    } else {
+    }
+    else
+    {
       // Local Fun IF
       cpp_AddScript(TheFunction, "\n continue; \n ");
     }
     // *** *** *** *** *** ***
-  } else {
+  }
+  else
+  {
     if (DEBUG)
       DEBUG_MESSAGE("[Break] \n\n", o_tokens); // DEBUG
 
     // *** Generate Code ***
-    if (!IsInsideNamespace) {
+    if (!IsInsideNamespace)
+    {
       // Global Fun IF
       CPP_GLOBAL_FUN.append("\n break; \n ");
-    } else {
+    }
+    else
+    {
       // Local Fun IF
       cpp_AddScript(TheFunction, "\n break; \n ");
     }

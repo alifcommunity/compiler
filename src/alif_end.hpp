@@ -1,27 +1,28 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
   // نهاية
 
   if (Token[2] == "")
@@ -30,7 +31,8 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   if (Token[3] != "")
     ErrorCode("أمر غير معروف : ' " + Token[3] + " ' ", o_tokens);
 
-  if (Token[2] == "دالة") {
+  if (Token[2] == "دالة")
+  {
     if (!IsInsideFunction)
       ErrorCode("يجب استعمال نهايه داخل داله", o_tokens);
 
@@ -44,8 +46,10 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
                     " كلما مازالت مفتوحه",
                 o_tokens);
 
-    if (IsInsideClass) {
-      if (!o_tokens->TOKENS_PREDEFINED) {
+    if (IsInsideClass)
+    {
+      if (!o_tokens->TOKENS_PREDEFINED)
+      {
         IsInsideFunction = false; // Need by Tokens Predefined
         TheFunction = "";         // Need by Tokens Predefined
         return;                   // continue;
@@ -66,8 +70,11 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       // End Class Func()
       CPP_CLASS.append(" \n } \n");
       // *** *** *** *** *** ***
-    } else if (!IsInsideNamespace) {
-      if (!o_tokens->TOKENS_PREDEFINED) {
+    }
+    else if (!IsInsideNamespace)
+    {
+      if (!o_tokens->TOKENS_PREDEFINED)
+      {
         IsInsideFunction = false; // Need by Tokens Predefined
         TheFunction = "";         // Need by Tokens Predefined
         return;                   // continue;
@@ -92,8 +99,11 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       // if(TheFunction != "رئيسية")
       // 	CPP_GLOBAL_FUN.append(" \n } \n");
       // *** *** *** *** *** ***
-    } else {
-      if (!o_tokens->TOKENS_PREDEFINED) {
+    }
+    else
+    {
+      if (!o_tokens->TOKENS_PREDEFINED)
+      {
         IsInsideFunction = false; // Need by Tokens Predefined
         TheFunction = "";         // Need by Tokens Predefined
         return;                   // continue;
@@ -119,7 +129,9 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     IsInsideFunction = false;
     TheFunction = "";
     return; // continue;
-  } else if (Token[2] == "إذا") {
+  }
+  else if (Token[2] == "إذا")
+  {
     if (!o_tokens->TOKENS_PREDEFINED)
       return; // continue;
 
@@ -130,12 +142,14 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       DEBUG_MESSAGE("[END IF " + IntToString(ALIF_IF_STATUS) + "] \n\n",
                     o_tokens); // DEBUG
 
-    if (IsInsideClass) {
+    if (IsInsideClass)
+    {
       // just for fixing this ...
       // *** Generate Code ***
       CPP_CLASS.append("\n } \n ");
       // *** *** *** *** *** ***
-    } else if (!IsInsideNamespace)
+    }
+    else if (!IsInsideNamespace)
       // global func
       CPP_GLOBAL_FUN.append("\n } \n ");
     else
@@ -145,7 +159,9 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     ALIF_IF_STATUS--;
     return; // continue;
-  } else if (Token[2] == "كلما") {
+  }
+  else if (Token[2] == "كلما")
+  {
     if (!o_tokens->TOKENS_PREDEFINED)
       return; // continue;
 
@@ -156,12 +172,14 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
       DEBUG_MESSAGE("[END LOOP " + IntToString(ALIF_LOOP_STATUS) + "] \n\n",
                     o_tokens); // DEBUG
 
-    if (IsInsideClass) {
+    if (IsInsideClass)
+    {
       // just for fixing this ...
       // *** Generate Code ***
       CPP_CLASS.append("\n } \n ");
       // *** *** *** *** *** ***
-    } else if (!IsInsideNamespace)
+    }
+    else if (!IsInsideNamespace)
       // global func
       CPP_GLOBAL_FUN.append("\n } \n ");
     else
@@ -171,14 +189,17 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
     ALIF_LOOP_STATUS--;
     return; // continue;
-  } else if (Token[2] == "مجال") {
+  }
+  else if (Token[2] == "مجال")
+  {
     if (!IsInsideNamespace)
       ErrorCode("يجب ان تكون داخل مجال", o_tokens);
 
     if (IsInsideFunction)
       ErrorCode("يجب اغلاق الدالة : " + TheFunction, o_tokens);
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       IsInsideNamespace = false; // Need by Tokens Predefined
       TheNamespace = "";         // Need by Tokens Predefined
       return;                    // continue;
@@ -193,14 +214,17 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     IsInsideNamespace = false;
     TheNamespace = "";
     return; // continue;
-  } else if (Token[2] == "صنف") {
+  }
+  else if (Token[2] == "صنف")
+  {
     if (!IsInsideClass)
       ErrorCode("يجب أن تكون داخل صنف", o_tokens);
 
     if (IsInsideFunction)
       ErrorCode("يجب اغلاق الدالة : " + TheFunction, o_tokens);
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       IsInsideClass = false; // Need by Tokens Predefined
       TheClass = "";         // Need by Tokens Predefined
       return;                // continue;
@@ -225,13 +249,17 @@ void parser_End(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     OBJ_GLOBAL_DECLARATION[TheClass] = "";
     TheClass = "";
     return; // continue;
-  } else {
+  }
+  else
+  {
     if (Token[2] == "ادا" || Token[2] == "إدا" || Token[2] == "أدا" ||
-        Token[2] == "اذا" || Token[2] == "أذا") {
+        Token[2] == "اذا" || Token[2] == "أذا")
+    {
       ErrorCode("أمر غير معروف : ' " + Token[2] +
                     " '، هل تقصد ' نهاية إذا ' ؟ ",
                 o_tokens);
-    } else
+    }
+    else
       ErrorCode("أمر غير معروف : ' " + Token[2] + " ' ", o_tokens);
 
     // TODO: More doyo mean ?!

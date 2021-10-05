@@ -1,33 +1,35 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
   //أداة
 
   if (IsInsideNamespace || IsInsideFunction || IsInsideClass)
     ErrorCode("يجب انشاء الادوات في المنطقة العامة", o_tokens);
 
-  if (Token[2] == "مجال") {
+  if (Token[2] == "مجال")
+  {
     if (Token[3] != "(")
       ErrorCode("إشارة مفقودة '(' قبل ' " + Token[3] + " ' ", o_tokens);
     if (Token[5] != ",")
@@ -49,7 +51,8 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // if already any other type of global var exist
     CheckForSameGlobalID(Token[6], o_tokens);
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       if (CONTROL_WIN_IS_SET[Token[4]])
         ErrorCode("النافذة ' " + Token[4] +
                       " ' تم انشاؤها مسبقا في السطر رقم : " +
@@ -80,7 +83,8 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     CPP_WINDOW[std::make_pair(Token[4], "ارتفاع")] = Token[12];
     CPP_WINDOW[std::make_pair(Token[4], "نص")] =
         remove_quote(Token[14], o_tokens);
-    if (Token[4] != "رئيسية") {
+    if (Token[4] != "رئيسية")
+    {
       Namespace_Total++;
       Namespace_Total_Names[Namespace_Total] = Token[4];
       CPP_ID_DECLARATION.append(" int ID_WINDOW_" + ID[Token[4]] +
@@ -94,7 +98,9 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // *** *** *** *** *** ***
 
     return; // continue;
-  } else if (Token[2] == "زر" || Token[2] == "نص" || Token[2] == "ملصق") {
+  }
+  else if (Token[2] == "زر" || Token[2] == "نص" || Token[2] == "ملصق")
+  {
     if (Token[3] != "(")
       ErrorCode("إشارة مفقودة '(' قبل ' " + Token[3] + " ' ", o_tokens);
     if (Token[5] != ",")
@@ -121,7 +127,8 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     // if already any other type of global var exist
     CheckForSameGlobalID(Token[6], o_tokens);
 
-    if (!o_tokens->TOKENS_PREDEFINED) {
+    if (!o_tokens->TOKENS_PREDEFINED)
+    {
       if (CONTROL_IS_SET[std::make_pair(Token[4], Token[6])])
         ErrorCode("الأداة ' " + Token[6] +
                       " ' تم انشاؤها مسبقا في السطر رقم : " +
@@ -148,7 +155,8 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
     CBUFER_OBJ = "OBJ_CTR_" + ID[Token[4]] + "_" + Control_ID[Token[6]];
     CPP_ID_DECLARATION.append(" int " + CBUFER_ID +
                               " = ALIFCORE_ID_GENERATOR(); \n");
-    if (Token[2] == "زر") {
+    if (Token[2] == "زر")
+    {
       CPP_OBJ_DECLARATION.append(" wxButton* " + CBUFER_OBJ + "; \n");
       CBUFER = CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")];
       CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")] =
@@ -156,7 +164,9 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           ", (\"" + remove_quote(Token[16], o_tokens) + "\"), wxPoint(" +
           Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " +
           Token[14] + ")); \n";
-    } else if (Token[2] == "نص") {
+    }
+    else if (Token[2] == "نص")
+    {
       // TODO: AppendText -> أضف
       //       SetLabel -> نص
       // what about wxTE_MULTILINE ?
@@ -168,7 +178,9 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           ", (\"" + remove_quote(Token[16], o_tokens) + "\"), wxPoint(" +
           Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " +
           Token[14] + "), wxTE_MULTILINE | wxTE_RIGHT); \n";
-    } else if (Token[2] == "ملصق") {
+    }
+    else if (Token[2] == "ملصق")
+    {
       CPP_OBJ_DECLARATION.append(" wxStaticText* " + CBUFER_OBJ + "; \n");
       CBUFER = CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")];
       CPP_WINDOW[std::make_pair(Token[4], "CTR_CONSTRUCTOR")] =
@@ -177,13 +189,17 @@ void parser_Control(std::string Token[2048], CLASS_TOKEN *o_tokens) {
           Token[8] + "," + Token[10] + "), wxSize(" + Token[12] + ", " +
           Token[14] +
           "), wxST_NO_AUTORESIZE | wxALIGN_RIGHT | wxST_ELLIPSIZE_END); \n";
-    } else {
+    }
+    else
+    {
       ErrorCode("علة: نوع الأداة غير معروف ' " + Token[2] + " ' ", o_tokens);
     }
     // *** *** *** *** *** ***
 
     return; // continue;
-  } else {
+  }
+  else
+  {
     if (Token[2] == "مجال")
       ErrorCode("نوع الأداة غير معروف ' " + Token[2] +
                     " '، هل تقصد ' مجال ' ؟ ",

@@ -1,27 +1,28 @@
 /*
-        The Alif Programming Language
-        Version 3.x Series
-        (C)2021 Hassan DRAGA
-        www.aliflang.org
+  The Alif Programming Language
+  Version 3.x Series
+  (C)2021 Hassan DRAGA
+  www.aliflang.org
 
-        This file is part of Alif compiler.
+  This file is part of Alif compiler.
 
-        Alif compiler is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-        Software Foundation; either version 3, or (at your option) any later
-        version.
+  Alif compiler is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 3, or (at your option) any later
+  version.
 
-        Alif compiler is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-        FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-        for more details.
+  Alif compiler is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with Alif compiler; see the file COPYING3. If not see
-        <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with Alif compiler; see the file COPYING3. If not see
+  <http://www.gnu.org/licenses/>.
 */
 
-void parser_TwoPointOperator(std::string Token[2048], CLASS_TOKEN *o_tokens) {
+void parser_TwoPointOperator(std::string Token[2048], CLASS_TOKEN *o_tokens)
+{
 
   // ---------------------------------------------------------------------------------
   // : (Operator between members)
@@ -30,8 +31,8 @@ void parser_TwoPointOperator(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   // namespace:local_func(a, b)	| namespace:my_func(a, b)
   // namespace:local_var			| namespace:my_var
 
-  // namespace_name	:		local_func		( 	... ) 1
-  // 2		3				4 	5		6
+  // namespace_name	:		local_func		( 	... )
+  // 1              2		3				      4 	5		6
 
   if (!o_tokens->TOKENS_PREDEFINED)
     return; // continue;
@@ -39,28 +40,8 @@ void parser_TwoPointOperator(std::string Token[2048], CLASS_TOKEN *o_tokens) {
   if (!IsInsideFunction)
     ErrorCode("يجب استعمال المجال داخل دالة", o_tokens);
 
-  // int ARG;
-  // std::string WIN, CONTROL, OPTION, OPTION_TYPE;
-  // WIN = "";
-  // CONTROL = "";
-  // OPTION = "";
-  // ARG = 0;
-
-  std::string CTR_WIN;
-  std::string CTR_CONTROL;
-  std::string CTR_OPTION;
-  std::string CTR_OPTION_TYPE;
-  std::string CTR_OPTION_CPP_END;
-  // int CTR_ARG;
-  // int CTR_OPERATOR_POSITION;
-
-  // TODO: main:center() not work if main set only by code !
-
-  // TODO: devision, must allow '/' and '\'
-
-  if ( // CONTROL_WIN_IS_SET[Token[1]] ||
-       //(Token[1] == "رئيسية" && MAIN_WIN_IS_SET)
-      namespace_is_set[Token[1]]) {
+  if (namespace_is_set[Token[1]])
+  {
     // namespace:local_func(a, b)		| win:my_func(a, b)
 
     if (Token[2] != ":")
@@ -85,12 +66,14 @@ void parser_TwoPointOperator(std::string Token[2048], CLASS_TOKEN *o_tokens) {
                     " " + Token[3] + " ' ",
                 o_tokens);
 
-    if (Token[4] == "(") {
+    if (Token[4] == "(")
+    {
       // -----------------------
       // namespace:win-local_func()
       // -----------------------
 
-      if (L_FUN_IS_SET[std::make_pair(Token[1], Token[3])]) {
+      if (L_FUN_IS_SET[std::make_pair(Token[1], Token[3])])
+      {
         if (Token[o_tokens->TOTAL[o_tokens->Line] - 1] != ")")
           ErrorCode("يجب انهاء السطر بالإشارة ')' ", o_tokens);
 
@@ -113,7 +96,8 @@ void parser_TwoPointOperator(std::string Token[2048], CLASS_TOKEN *o_tokens) {
         for (int p = 5; p <= o_tokens->TOTAL[o_tokens->Line];
              p++) // | a, b + 2, c) |
         {
-          if (Token[p] != "") {
+          if (Token[p] != "")
+          {
             TempToken[TempTokenCount] = Token[p];
             TempTokenCount++;
           }
@@ -158,13 +142,17 @@ void parser_TwoPointOperator(std::string Token[2048], CLASS_TOKEN *o_tokens) {
 
       // Exception!
       return; // continue;
-    } else {
+    }
+    else
+    {
       // Exception !
       ErrorCode("يجب اضافه ':' أو '()' أو '=' بعد ' " + Token[1] + " " +
                     Token[2] + " " + Token[3] + " ' ",
                 o_tokens);
     }
-  } else {
+  }
+  else
+  {
     // Exception !
     ErrorCode("أمر غير معروف ' " + Token[1] + " ', يجب أن تكون فقط مجال",
               o_tokens);
