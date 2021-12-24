@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13.0)
 
 # --[ Alif version ] ---------------------------------------------------------------
 
-project(AlifProject VERSION 3.0.33 DESCRIPTION "Alif Programming Language - Compiler.")
+project(AlifProject VERSION 3.0.40 DESCRIPTION "Alif Programming Language - Compiler.")
 message("-- [ Alif version ${CMAKE_PROJECT_VERSION} ]")
 
 # --[ Uninstall ] ------------------------------------------------------------------
