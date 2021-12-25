@@ -21,16 +21,14 @@
   <http://www.gnu.org/licenses/>.
 */
 
-void check_macro_alif(CLASS_TOKEN *o_tokens)
-{
+void check_macro_alif(CLASS_TOKEN *o_tokens){
 
   if (!ALIF_FLAG_FILE[o_tokens->PATH_FULL_SOURCE])
     ErrorCode("يجب الإعلان عن ماكرو ألف اولا، المرجو اضافة ' #ألف ' في الأعلى",
               o_tokens);
 }
 
-void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens)
-{
+void parser_macro_ui(std::string Token[2048], CLASS_TOKEN *o_tokens){
 
   if (Token[2] == "")
     ErrorCode("الماكرو غير محدد ' # '", o_tokens);
