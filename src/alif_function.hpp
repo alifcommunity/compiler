@@ -21,8 +21,7 @@
   <http://www.gnu.org/licenses/>.
 */
 
-
-void __parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens)
+void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens)
 {
 
   //دالة
@@ -1201,70 +1200,3 @@ void __parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens)
     }
   }
 }
-
-void parser_Function(std::string Token[2048], CLASS_TOKEN *o_tokens){
-  
-  // دالة
-
-  int FuncPosition = 1;
-
-  // --- Check for errors ---------------------------------------
-
-  if (IsInsideFunction)
-    ErrorCode("لا يمكن انشاء دالة داخل دالة، الدالة الحالية : " + TheFunction, o_tokens);
-  
-  if (Token[FuncPosition + 1] == "")
-    ErrorCode("يجب اعطاء اسم لهته الدالة الجديدة", o_tokens);
-  
-  if (Token[FuncPosition + 2] != "" && Token[FuncPosition + 2] != "(")
-      ErrorCode("أمر غير معروف : ' " + Token[FuncPosition + 2] + " ' ", o_tokens);
-
-  if (Token[FuncPosition + 1] == "رئيسية"){
-
-    // دالة رئيسية ()
-
-    if (IsInsideNamespace)
-      ErrorCode("لا يمكن انشاء دالة رئيسية داخل مجال، بل يجب انشائها في المجال "
-                "العام أو داخل صنف",
-                o_tokens);
-
-    if (Token[FuncPosition + 2] == "(")
-    {
-      if (Token[FuncPosition + 3] == "")
-        ErrorCode("يجب اغلاق القوس ')' ", o_tokens);
-
-      if (Token[FuncPosition + 3] != ")")
-        ErrorCode("الدالة الرئيسية لا تقبل الخصائص", o_tokens);
-
-      if (Token[FuncPosition + 4] != "")
-        ErrorCode("أمر غير معروف : ' " + Token[FuncPosition + 4] + " ' ", o_tokens);
-    }
-
-    // Set
-    MAIN_FUN_IS_SET[TheNamespace] = true; // Old v2
-    MAIN_FUN_AT_LINE[TheNamespace] = IntToString(o_tokens->Line); // Old v2
-    IsInsideFunction = true; // Need by Tokens Predefined
-    TheFunction = "رئيسية";  // Need by Tokens Predefined
-    script.main.is_set = true;
-    script.main.set_at_line = IntToString(o_tokens->Line);
-    return;
-  }
-
-  // --- Set current parent ---------------------------------------
-
-  // --- Initializing ---------------------------------------------
-
-  // --- Identify -------------------------------------------------
-
-  // --- Check ----------------------------------------------------
-
-  // --- ARGV -----------------------------------------------------
-
-  // --- Gen. Code ------------------------------------------------
-
-  // --- Add. Code ------------------------------------------------
-  
-
-}
-
-
