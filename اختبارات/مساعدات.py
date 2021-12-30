@@ -12,7 +12,7 @@ def run(cmd, return_prcss=False, inputs=None):
         stdouts = []
         stderrs = []
         for i in inputs:
-            out, err = process.communicate(i.encode())
+            out, err = process.communicate(str(i).encode())
             stdouts.append(out.decode())
             stderrs.append(err.decode())
         return stdouts, stderrs, process.returncode
