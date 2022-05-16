@@ -1,10 +1,10 @@
 /*
  This is the core used in every app
- compiled by Alif 3.x Series, which
+ compiled by Alif 4.x Series, which
  conain all functions and tools needed
  by the app in the runtimes.
  File: [Alif folder]/alifcore/alifcore.cc
- Version: Alif Core 1.0.2
+ Version: Alif Core 1.3
 */
 
 #ifndef UNICODE
@@ -208,4 +208,11 @@ std::string alifcore_wchar_to_str(wchar_t wstr[])
 
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   return converter.to_bytes(wstr);
+}
+
+// -- Alif v4 -------------------------------------------------------------
+
+// See file 'manual_test/alif_var.cpp'
+class alif_var {
+  // ..
 }

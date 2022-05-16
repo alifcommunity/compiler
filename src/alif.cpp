@@ -1,7 +1,7 @@
 /*
   The Alif Programming Language
-  Version 3.x Series
-  (C)2021 Hassan DRAGA
+  Version 4.x Series
+  (C)2022 Hassan DRAGA
   www.aliflang.org
 
   This file is part of Alif compiler.
@@ -21,7 +21,7 @@
   <http://www.gnu.org/licenses/>.
 */
 
-#define ALIF_VERSION "3.0.34 (Beta)"
+#define ALIF_VERSION "4.0.0 (Beta)"
 
 // Stack ********************************************************
 
