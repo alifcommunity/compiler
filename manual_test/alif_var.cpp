@@ -7,31 +7,31 @@
 
 class alif_var {
     private:
-        double integer;
+        double number;
         std::string str;
         void Set(int data) {
-            this->integer = data;
+            this->number = data;
             std::ostringstream ss;
             ss << data;
             this->str = ss.str();
         }
         void Set(const char* data) {
-            this->integer = atof(data);
+            this->number = atof(data);
             this->str = data;
         }
         void Set(double data) { 
-            this->integer = data;
+            this->number = data;
             std::ostringstream ss;
             ss << data;
             this->str = ss.str();
         }
         void Set(std::string data) {
-            this->integer = atof(data.c_str());
+            this->number = atof(data.c_str());
             this->str = data;
         }
     public:
         alif_var() {
-            this->integer = 0;
+            this->number = 0;
             this->str = "";
         }
         alif_var(int data) {
@@ -47,13 +47,13 @@ class alif_var {
             Set(data);
         }
     
-        // Integer - Set
+        // number - Set
         alif_var& operator= (double data) { Set(data); return *this; }
         alif_var& operator>> (double data) { Set(data); return *this; }
-        // Integer - Get
-        operator double() { return this->integer; }
-        double operator++ () { return ++this->integer; }
-        double operator-- () { return --this->integer; }
+        // number - Get
+        operator double() { return this->number; }
+        double operator++ () { return ++this->number; }
+        double operator-- () { return --this->number; }
 
         // Char - Set
         alif_var& operator= (const char* data) { Set(data); return *this; }
@@ -87,7 +87,7 @@ alif_var test_var(alif_var v){
 
 int main() {
 
-    // Integer
+    // number
     {
         alif_var a = 1;
         alif_var b = 2;
