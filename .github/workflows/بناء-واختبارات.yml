@@ -30,7 +30,7 @@ on:
 
 env:
   BUILD_TYPE: Release
-  BOOST_VER: 1.76.0
+  BOOST_VER: 1.79.0
   BOOST_LIBS: filesystem program_options system locale date_time regex nowide thread
 
 jobs:
