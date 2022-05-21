@@ -7270,11 +7270,80 @@ void CLEAN() {
 }
 
 void compile_linux64() {
+  <<<<<<< Alif_4
     std::string LINUX_CMD;
 
     std::string LOG_PATH;
     std::string LOG_LINE8;
     std::string LOG_LINE8_Buffer;
+  =======
+  std::string LINUX_CMD;
+
+  std::string LOG_PATH;
+  std::string LOG_LINE8;
+  std::string LOG_LINE8_Buffer;
+
+  // ------------------------------------------------------
+  // Compile - WX3 Master - GTK2 - x86_64 - Optimized
+  // ------------------------------------------------------
+
+  // Compiling...
+  // g++ -c -o "Bin/Linux_64/alifstudio.o" -Wno-undef -Wno-unused-parameter
+  // -D__WXGTK__ -Wno-ctor-dtor-privacy -Woverloaded-virtual
+  // -D_FILE_OFFSET_BITS=64 -DwxDEBUG_LEVEL=0 -I"/usr/local/include/aliflibwx"
+  // -I"Src" -pthread -m64 -DG_DISABLE_CAST_CHECKS $cmd -m64 -std=c++11
+  // "Src/alifstudio.cpp"
+
+  // -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -pthread -DNDEBUG
+  // -fvisibility=hidden -lfto -fno-fat-lto-objects -DBOOST_ALL_NO_LIB
+  // -DBOOST_FILESYSTEM_DYN_LINK
+
+  // LINUX_CMD = "g++ -Wall -std=gnu++17 -m64 -finput-charset=utf-8 -O3 -pthread
+  // -DNDEBUG -fvisibility=hidden -c -o \"" + PATH_FULL_OBJ + "\" "
+  // " -I\"/usr/local/include\" "		// Standard "
+  // -I\"/usr/local/lib/aliflib\" "	// Alif lib 			" \"" + PATH_FULL_CPP
+  // + "\"
+  // " 			" 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM +
+  // "_compile.log\" ";
+
+  LINUX_CMD = "g++ -c -o \"" + PATH_FULL_OBJ + "\" \"" + PATH_FULL_CPP +
+              "\" -I\"/usr/local/lib/aliflib\" " + "-march=armv8-a" +
+              " 2> \"" + PATH_TEMP + "/alifcompiler_" + RANDOM +
+              "_compile.log\" ";
+
+  if (DEBUG)
+    LogMessage("Compile command (Linux) : " + LINUX_CMD + " \n");
+  // std::cout << "\n\n--------------\nCompile: |" << LINUX_CMD <<
+  // "|\n--------------\n";
+
+  // LINUX_CMD = "g++ -c -o \"" + PATH_FULL_OBJ + "\" -Wno-undef
+  // -Wno-unused-parameter "
+  // 				"-D__WXGTK__ -Wno-ctor-dtor-privacy
+  // -Woverloaded-virtual -D_FILE_OFFSET_BITS=64 "
+  // 				"-DwxDEBUG_LEVEL=0 -I\"/usr/local/include/aliflibwx\"
+  // -pthread -m64 -DG_DISABLE_CAST_CHECKS -O2 -m64 -std=c++11 " +
+  // Compile_ExtraCompile +
+  // " \"" + 				PATH_FULL_CPP + "\" 2> \"" + PATH_TEMP +
+  // "/alifcompiler_" + RANDOM
+  // + "_compile.log\" ";
+
+  system(LINUX_CMD.c_str());
+
+  // ----------------------
+  // Read Log File
+  // ----------------------
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  LOG_PATH = PATH_TEMP + "/alifcompiler_" + RANDOM + "_compile.log";
+
+  boost::nowide::ifstream FILE_STREAM_COMPILER(LOG_PATH);
+
+  if (!FILE_STREAM_COMPILER.is_open()) {
+    ALIF_ERROR("ERROR: Could not open compile log file : " + LOG_PATH);
+    exit(EXIT_FAILURE);
+  }
+  >>>>>>> main
 
     // ------------------------------------------------------
     // Compile - WX3 Master - GTK2 - x86_64 - Optimized
@@ -7303,7 +7372,97 @@ void compile_linux64() {
     // std::cout << "\n\n--------------\nCompile: |" << LINUX_CMD <<
     // "|\n--------------\n";
 
+  <<<<<<< Alif_4
     system(LINUX_CMD.c_str());
+  =======
+    ALIF_ERROR(
+        "Please report this error to the Alif Community: "
+        "https://github.com/alifcommunity/compiler/issues \n\nAlif Compiler " +
+        VERSION + " - Linux\n\nFile : " + PATH_FULL_ALIF +
+        "\nError: " + LOG_LINE8_Buffer + "\nCompile command: " + LINUX_CMD);
+    exit(EXIT_FAILURE);
+  }
+
+  // ------------------------------------------------------
+  // Resource
+  // ------------------------------------------------------
+
+  // ...
+
+  // ------------------------------------------------------
+  // Link
+  // ------------------------------------------------------
+
+  std::string GUI_CMD = "";
+
+  // if (APP_TYPE == "PC_GUI")
+  // 	GUI_CMD = " ............. ";
+
+  // g++ -o "Bin/Linux_64/alifstudio" "Bin/Linux_64/alifstudio.o"
+  // -L"/usr/local/lib/aliflibwx" -pthread -m64 -static-libgcc -static-libstdc++
+  // -lwx_gtk2u_alif_webview-3.1 -lwx_gtk2u_alif_propgrid-3.1
+  // -lwx_gtk2u_alif_aui-3.1 -lwebkitgtk-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0
+  // -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lpangoft2-1.0
+  // -lpango-1.0 -lfontconfig -lfreetype -lsoup-2.4 -lgio-2.0 -lgobject-2.0
+  // -ljavascriptcoregtk-1.0 -lglib-2.0 -lwx_gtk2u_alif_stc-3.1
+  // -lwx_gtk2u_alif_core-3.1 -lwx_baseu_alif-3.1 -lwxscintilla_alif-3.1
+  // -lwxtiff_alif-3.1 -lwxjpeg_alif-3.1 -lwxpng_alif-3.1  -lgtk-x11-2.0
+  // -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0
+  // -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lfontconfig -lfreetype
+  // -lgthread-2.0 -pthread -lglib-2.0 -lX11 -lXxf86vm -lSM -lgtk-x11-2.0
+  // -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0
+  // -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype
+  // -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype
+  // -lwxzlib_alif-3.1 -lwxregexu_alif-3.1 -lwxexpat_alif-3.1 -ldl -lm  -ldl -lm
+  // $cmd
+
+  // -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu" -lpython3.5
+
+  // LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\"  "
+  // 				"-L\"/usr/local/lib/aliflibwx\"
+  // -lwx_gtk2u_alif_webview-3.1 -lwx_gtk2u_alif_propgrid-3.1
+  // -lwx_gtk2u_alif_aui-3.1 -lwebkitgtk-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0
+  // -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lpangoft2-1.0
+  // -lpango-1.0 -lfontconfig -lfreetype -lsoup-2.4 -lgio-2.0 -lgobject-2.0
+  // -ljavascriptcoregtk-1.0 -lglib-2.0 -lwx_gtk2u_alif_stc-3.1
+  // -lwx_gtk2u_alif_core-3.1 -lwx_baseu_alif-3.1 -lwxscintilla_alif-3.1
+  // -lwxtiff_alif-3.1 -lwxjpeg_alif-3.1 -lwxpng_alif-3.1 -lgtk-x11-2.0
+  // -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0
+  // -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lfontconfig -lfreetype
+  // -lgthread-2.0 -pthread -lglib-2.0 -lX11 -lXxf86vm -lSM -lgtk-x11-2.0
+  // -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0
+  // -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype
+  // -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype
+  // -lwxzlib_alif-3.1 -lwxregexu_alif-3.1 -lwxexpat_alif-3.1 "
+  // 				"-pthread -m64 -static-libgcc -static-libstdc++ -ldl -lm
+  // -ldl -lm -O2 -L\"/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu\" " +
+  // Compile_ExtraLink;
+
+  // LINUX_CMD =	"g++ -Os -m64 -finput-charset=utf-8 -pthread -o \"" +
+  // PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\" "
+  // 			"-L\"/usr/local/lib/aliflib\" -lwebui
+  // -lboost_filesystem";
+
+  //LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ +
+  //            "\" -L\"/usr/local/lib/aliflib\" " + Compile_ExtraLink +
+  //            " "; // TODO: Add 2 > log
+
+    LINUX_CMD = "g++ -o \"" + PATH_FULL_BIN + "\" \"" + PATH_FULL_OBJ + "\" -L\"usr/local/lib/aliflib\" " + "-march=armv8-a  -std=gun++17 -Os -finput-charset=utf-8 -pthread -lboost_system -lboost_thread ";
+	
+  if (DEBUG)
+    LogMessage("Link command (Linux) : " + LINUX_CMD + " \n");
+
+  // std::cout << "\n\n--------------\nLink: |" << LINUX_CMD <<
+  // "|\n--------------\n";
+  // g++
+  // -Os -m64 -finput-charset=utf-8 -pthread -lboost_filesystem -lboost_thread
+  // -Os -m64 -finput-charset=utf-8 -pthread -lboost_filesystem -lboost_thread
+  // -L"/usr/local/lib/aliflib" -o "test" "/tmp/alifcompiler_1007.o"
+
+  if (system(LINUX_CMD.c_str()) != 0) {
+    // cout << endl << "Bug: Can't Link generated code. " << endl;
+    // exit(EXIT_FAILURE);
+  >>>>>>> main
 
     // ----------------------
     // Read Log File
