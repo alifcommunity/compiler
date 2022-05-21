@@ -1,10 +1,10 @@
 /*
  This is the core used in every app
- compiled by Alif 3.x Series, which
+ compiled by Alif 4.x Series, which
  conain all functions and tools needed
  by the app in the runtimes.
  File: [Alif folder]/alifcore/alifcore.cc
- Version: Alif Core 1.0.2
+ Version: Alif Core 1.3
 */
 
 #ifndef UNICODE
@@ -19,8 +19,8 @@
 
 #ifdef _WIN32
 #include <tchar.h>
-#include <winsock2.h>
 #include <windows.h>
+#include <winsock2.h>
 #elif __APPLE__
 // ...
 #else
@@ -75,7 +75,8 @@ int Generated_ID = 10000;
 int ALIFCORE_ID_GENERATOR() { return Generated_ID++; }
 
 // int to string
-std::string alifcore_IntToString(double INT_VAL) {
+std::string alifcore_IntToString(double INT_VAL)
+{
 
   std::stringstream STRING_STREAM_BUFFER;
   STRING_STREAM_BUFFER << std::setprecision(16) << INT_VAL;
@@ -83,13 +84,15 @@ std::string alifcore_IntToString(double INT_VAL) {
   return STRING_BUFFER;
 }
 
-double alifcore_StringToInt(std::string s) {
+double alifcore_StringToInt(std::string s)
+{
 
   std::string::size_type sz;
   return std::stod(s, &sz);
 }
 
-bool alifcore_StringToBool(std::string Value) {
+bool alifcore_StringToBool(std::string Value)
+{
 
   if (Value == "true" || Value == "TRUE" || Value == "1" || Value == "نعم" ||
       Value == "صحيح" || Value == "True")
@@ -99,7 +102,8 @@ bool alifcore_StringToBool(std::string Value) {
     return false;
 }
 
-std::string alifcore_BoolToString(bool Value) {
+std::string alifcore_BoolToString(bool Value)
+{
 
   if (Value)
     return "true";
@@ -109,7 +113,8 @@ std::string alifcore_BoolToString(bool Value) {
 
 // -- Alif v3 -------------------------------------------------------------
 
-struct _alifcore_inf {
+struct _alifcore_inf
+{
 
 #ifdef _WIN32
   std::string exe_ext = ".exe";
@@ -124,7 +129,8 @@ struct _alifcore_inf {
 
 } alifcore_inf;
 
-unsigned char *alifcore_malloc(size_t size) {
+unsigned char *alifcore_malloc(size_t size)
+{
 
   // return NULL;
   if (size > 0)
@@ -133,7 +139,8 @@ unsigned char *alifcore_malloc(size_t size) {
     return NULL;
 }
 
-void *alifcore_memset(void *s, int c, size_t n) {
+void *alifcore_memset(void *s, int c, size_t n)
+{
 
   // return s;
   if (s != NULL)
@@ -142,40 +149,43 @@ void *alifcore_memset(void *s, int c, size_t n) {
     return NULL;
 }
 
-void alifcore_free(void *ptr) {
+void alifcore_free(void *ptr)
+{
 
   if (ptr != NULL)
     free(ptr);
 }
 
-std::string &alifcore_ltrim(std::string &s) {
+std::string &alifcore_ltrim(std::string &s)
+{
 
-  auto it = std::find_if(s.begin(), s.end(), [](char c) {
-    return !std::isspace<char>(c, std::locale::classic());
-  });
+  auto it = std::find_if(s.begin(), s.end(), [](char c)
+                         { return !std::isspace<char>(c, std::locale::classic()); });
 
   s.erase(s.begin(), it);
 
   return s;
 }
 
-std::string &alifcore_rtrim(std::string &s) {
+std::string &alifcore_rtrim(std::string &s)
+{
 
-  auto it = std::find_if(s.rbegin(), s.rend(), [](char c) {
-    return !std::isspace<char>(c, std::locale::classic());
-  });
+  auto it = std::find_if(s.rbegin(), s.rend(), [](char c)
+                         { return !std::isspace<char>(c, std::locale::classic()); });
 
   s.erase(it.base(), s.end());
 
   return s;
 }
 
-std::string &alifcore_trim(std::string &s) {
+std::string &alifcore_trim(std::string &s)
+{
 
   return alifcore_ltrim(alifcore_rtrim(s));
 }
 
-void alifcore_initialization() {
+void alifcore_initialization()
+{
 
 #ifdef _WIN32
   // Create and install global locale
@@ -186,14 +196,23 @@ void alifcore_initialization() {
   boost::filesystem::path::imbue(std::locale());
 }
 
-std::string alifcore_wchar_to_str(wchar_t wstr) {
+std::string alifcore_wchar_to_str(wchar_t wstr)
+{
 
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   return converter.to_bytes(wstr);
 }
 
-std::string alifcore_wchar_to_str(wchar_t wstr[]) {
+std::string alifcore_wchar_to_str(wchar_t wstr[])
+{
 
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   return converter.to_bytes(wstr);
+}
+
+// -- Alif v4 -------------------------------------------------------------
+
+// See file 'manual_test/alif_var.cpp'
+class alif_var {
+  // ..
 }
