@@ -1,5 +1,6 @@
 #   The Alif Programming Language
 #   Version 4.x Series
+#   (C)2022 Hassan DRAGA
 #   (C)2022 TheAwiteb <https://github.com/TheAwiteb>
 #   www.aliflang.org
 
